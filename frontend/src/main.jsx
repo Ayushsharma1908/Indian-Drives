@@ -171,6 +171,8 @@ import {
   UpdateLicenceDetailsPage,
   RenewDrivingLicencePage,
   DuplicateDrivingLicencePage,
+  LicenceServicePaymentCheckoutPage,
+  LicenceServicePaymentSuccessPage,
   MyJourneyTimelinePage
 } from "./pages/licence-services";
 
@@ -252,6 +254,8 @@ function ProtectedApp() {
         <Route path="/renew-licence" element={<RenewDrivingLicencePage />} />
         <Route path="/renewal-submitted" element={<RenewDrivingLicencePage />} />
         <Route path="/duplicate-licence" element={<DuplicateDrivingLicencePage />} />
+        <Route path="/licence-services/payment" element={<LicenceServicePaymentCheckoutPage />} />
+        <Route path="/licence-services/payment-success" element={<LicenceServicePaymentSuccessPage />} />
         <Route path="/journey" element={<MyJourneyTimelinePage />} />
         <Route path="/review-application-form" element={<LLApplicationReviewPage />} />
 

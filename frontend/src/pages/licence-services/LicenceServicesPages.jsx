@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   RefreshCw, Copy, Edit3, ShieldCheck, CheckCircle2, FileText, ArrowRight,
@@ -629,7 +629,7 @@ export function RenewDrivingLicencePage() {
           </div>
 
           <button
-            onClick={() => alert("Processing licence renewal payment of ₹250...")}
+            onClick={() => navigate('/licence-services/payment?service=renew&fee=250&title=Licence%20Renewal')}
             style={{
               width: '100%',
               background: '#002542',
@@ -662,10 +662,44 @@ export function RenewDrivingLicencePage() {
 }
 
 // ----------------------------------------------------------------------
-// 5. UPDATE LICENCE DETAILS PAGE (1:1 IMAGE 5 MATCH)
+// 5. UPDATE LICENCE DETAILS PAGE (1:1 IMAGE 5 MATCH - FULLY INTERACTIVE)
 // ----------------------------------------------------------------------
 export function UpdateLicenceDetailsPage() {
   const navigate = useNavigate();
+
+  // State for selected update categories
+  const [selectedFields, setSelectedFields] = useState(['name', 'contact']);
+
+  // State for form inputs
+  const [fullName, setFullName] = useState('Arjun Sharma');
+  const [streetAddress, setStreetAddress] = useState('#42, 5th Main, HSR Layout Sector 1');
+  const [pincode, setPincode] = useState('560102');
+  const [phone, setPhone] = useState('+91 91234 56789');
+  const [email, setEmail] = useState('arjun.sharma@newemail.com');
+  const [uploadedFile, setUploadedFile] = useState('Aadhar_Card_Updated.pdf');
+
+  // Toggle category selection
+  const toggleField = (fieldKey) => {
+    if (selectedFields.includes(fieldKey)) {
+      if (selectedFields.length > 1) {
+        setSelectedFields(selectedFields.filter(f => f !== fieldKey));
+      }
+    } else {
+      setSelectedFields([...selectedFields, fieldKey]);
+    }
+  };
+
+  // Dynamic fee calculation: Base ₹150 + ₹50 per selected field
+  const processingFee = 150 + selectedFields.length * 50;
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (selectedFields.length === 0) {
+      alert("Please select at least one field to update.");
+      return;
+    }
+    navigate(`/licence-services/payment?service=update&fee=${processingFee}&title=Licence%20Details%20Update`);
+  };
 
   return (
     <div className="page page-update-dl" style={{ width: 'min(1120px, calc(100% - 48px))', margin: '40px auto', fontFamily: 'Inter, system-ui, sans-serif' }}>
@@ -684,7 +718,7 @@ export function UpdateLicenceDetailsPage() {
       </div>
 
       {/* Main 2-Column Layout */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: '32px', alignItems: 'start' }}>
+      <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: '32px', alignItems: 'start' }}>
         
         {/* Left Column Stack */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
@@ -707,47 +741,67 @@ export function UpdateLicenceDetailsPage() {
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
-              {/* Option 1: Name (Selected) */}
-              <div style={{
-                background: '#fffbeb',
-                border: '2px solid #b45309',
-                borderRadius: '16px',
-                padding: '20px',
-                textAlign: 'center',
-                cursor: 'pointer',
-                position: 'relative'
-              }}>
-                <div style={{ position: 'absolute', top: '10px', right: '10px', width: '18px', height: '18px', borderRadius: '50%', background: '#b45309', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', fontWeight: 800 }}>✓</div>
-                <User size={22} color="#b45309" style={{ margin: '0 auto 8px auto' }} />
-                <div style={{ fontSize: '14px', fontWeight: 800, color: '#173b57' }}>Name</div>
+              {/* Option 1: Name */}
+              <div
+                onClick={() => toggleField('name')}
+                style={{
+                  background: selectedFields.includes('name') ? '#fffbeb' : '#ffffff',
+                  border: selectedFields.includes('name') ? '2px solid #b45309' : '1px solid #cbd5e1',
+                  borderRadius: '16px',
+                  padding: '20px',
+                  textAlign: 'center',
+                  cursor: 'pointer',
+                  position: 'relative',
+                  transition: 'all 0.15s ease'
+                }}
+              >
+                {selectedFields.includes('name') && (
+                  <div style={{ position: 'absolute', top: '10px', right: '10px', width: '18px', height: '18px', borderRadius: '50%', background: '#b45309', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', fontWeight: 800 }}>✓</div>
+                )}
+                <User size={22} color={selectedFields.includes('name') ? '#b45309' : '#64748b'} style={{ margin: '0 auto 8px auto' }} />
+                <div style={{ fontSize: '14px', fontWeight: selectedFields.includes('name') ? 800 : 700, color: '#173b57' }}>Name</div>
               </div>
 
               {/* Option 2: Address */}
-              <div style={{
-                background: '#ffffff',
-                border: '1px solid #cbd5e1',
-                borderRadius: '16px',
-                padding: '20px',
-                textAlign: 'center',
-                cursor: 'pointer'
-              }}>
-                <MapPin size={22} color="#64748b" style={{ margin: '0 auto 8px auto' }} />
-                <div style={{ fontSize: '14px', fontWeight: 700, color: '#173b57' }}>Address</div>
+              <div
+                onClick={() => toggleField('address')}
+                style={{
+                  background: selectedFields.includes('address') ? '#fffbeb' : '#ffffff',
+                  border: selectedFields.includes('address') ? '2px solid #b45309' : '1px solid #cbd5e1',
+                  borderRadius: '16px',
+                  padding: '20px',
+                  textAlign: 'center',
+                  cursor: 'pointer',
+                  position: 'relative',
+                  transition: 'all 0.15s ease'
+                }}
+              >
+                {selectedFields.includes('address') && (
+                  <div style={{ position: 'absolute', top: '10px', right: '10px', width: '18px', height: '18px', borderRadius: '50%', background: '#b45309', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', fontWeight: 800 }}>✓</div>
+                )}
+                <MapPin size={22} color={selectedFields.includes('address') ? '#b45309' : '#64748b'} style={{ margin: '0 auto 8px auto' }} />
+                <div style={{ fontSize: '14px', fontWeight: selectedFields.includes('address') ? 800 : 700, color: '#173b57' }}>Address</div>
               </div>
 
-              {/* Option 3: Contact Details (Selected) */}
-              <div style={{
-                background: '#fffbeb',
-                border: '2px solid #b45309',
-                borderRadius: '16px',
-                padding: '20px',
-                textAlign: 'center',
-                cursor: 'pointer',
-                position: 'relative'
-              }}>
-                <div style={{ position: 'absolute', top: '10px', right: '10px', width: '18px', height: '18px', borderRadius: '50%', background: '#b45309', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', fontWeight: 800 }}>✓</div>
-                <CreditCard size={22} color="#b45309" style={{ margin: '0 auto 8px auto' }} />
-                <div style={{ fontSize: '14px', fontWeight: 800, color: '#173b57' }}>Contact Details</div>
+              {/* Option 3: Contact Details */}
+              <div
+                onClick={() => toggleField('contact')}
+                style={{
+                  background: selectedFields.includes('contact') ? '#fffbeb' : '#ffffff',
+                  border: selectedFields.includes('contact') ? '2px solid #b45309' : '1px solid #cbd5e1',
+                  borderRadius: '16px',
+                  padding: '20px',
+                  textAlign: 'center',
+                  cursor: 'pointer',
+                  position: 'relative',
+                  transition: 'all 0.15s ease'
+                }}
+              >
+                {selectedFields.includes('contact') && (
+                  <div style={{ position: 'absolute', top: '10px', right: '10px', width: '18px', height: '18px', borderRadius: '50%', background: '#b45309', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', fontWeight: 800 }}>✓</div>
+                )}
+                <CreditCard size={22} color={selectedFields.includes('contact') ? '#b45309' : '#64748b'} style={{ margin: '0 auto 8px auto' }} />
+                <div style={{ fontSize: '14px', fontWeight: selectedFields.includes('contact') ? 800 : 700, color: '#173b57' }}>Contact Details</div>
               </div>
             </div>
           </div>
@@ -772,67 +826,110 @@ export function UpdateLicenceDetailsPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
               
               {/* Name Field Row */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', alignItems: 'center', paddingBottom: '24px', borderBottom: '1px solid #f1f5f9' }}>
-                <div style={{ background: '#f0f9ff', padding: '16px 20px', borderRadius: '14px', border: '1px solid #e0f2fe' }}>
-                  <div style={{ fontSize: '10px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase' }}>CURRENT RECORD</div>
-                  <div style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', marginTop: '4px' }}>FULL NAME</div>
-                  <div style={{ fontSize: '14px', fontWeight: 600, color: '#94a3b8', marginTop: '2px' }}>Arjun Kumar Sharma</div>
-                </div>
+              {selectedFields.includes('name') && (
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', alignItems: 'center', paddingBottom: '24px', borderBottom: selectedFields.length > 1 ? '1px solid #f1f5f9' : 'none' }}>
+                  <div style={{ background: '#f0f9ff', padding: '16px 20px', borderRadius: '14px', border: '1px solid #e0f2fe' }}>
+                    <div style={{ fontSize: '10px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase' }}>CURRENT RECORD</div>
+                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', marginTop: '4px' }}>FULL NAME</div>
+                    <div style={{ fontSize: '14px', fontWeight: 600, color: '#94a3b8', marginTop: '2px' }}>Arjun Kumar Sharma</div>
+                  </div>
 
-                <div>
-                  <label style={{ fontSize: '11px', fontWeight: 800, color: '#173b57', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>
-                    NEW FULL NAME
-                  </label>
-                  <input
-                    type="text"
-                    defaultValue="Arjun Sharma"
-                    style={{
-                      width: '100%',
-                      padding: '12px 16px',
-                      fontSize: '14px',
-                      borderRadius: '10px',
-                      border: '1px solid #cbd5e1',
-                      color: '#173b57',
-                      boxSizing: 'border-box'
-                    }}
-                  />
-                </div>
-              </div>
-
-              {/* Contact Details Row */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', alignItems: 'center' }}>
-                <div style={{ background: '#f0f9ff', padding: '16px 20px', borderRadius: '14px', border: '1px solid #e0f2fe' }}>
-                  <div style={{ fontSize: '10px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase' }}>CURRENT RECORD</div>
-                  <div style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', marginTop: '4px' }}>PHONE NUMBER</div>
-                  <div style={{ fontSize: '13px', fontWeight: 600, color: '#94a3b8' }}>+91 98765 43210</div>
-                  <div style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', marginTop: '8px' }}>EMAIL ADDRESS</div>
-                  <div style={{ fontSize: '13px', fontWeight: 600, color: '#94a3b8' }}>arjun.s@oldemail.com</div>
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                   <div>
                     <label style={{ fontSize: '11px', fontWeight: 800, color: '#173b57', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>
-                      NEW PHONE NUMBER
+                      NEW FULL NAME
                     </label>
                     <input
                       type="text"
-                      defaultValue="+91 91234 56789"
-                      style={{ width: '100%', padding: '10px 14px', fontSize: '14px', borderRadius: '10px', border: '1px solid #cbd5e1', color: '#173b57', boxSizing: 'border-box' }}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={{ fontSize: '11px', fontWeight: 800, color: '#173b57', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>
-                      NEW EMAIL ADDRESS
-                    </label>
-                    <input
-                      type="email"
-                      defaultValue="arjun.sharma@newemail.com"
-                      style={{ width: '100%', padding: '10px 14px', fontSize: '14px', borderRadius: '10px', border: '1px solid #cbd5e1', color: '#173b57', boxSizing: 'border-box' }}
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '12px 16px',
+                        fontSize: '14px',
+                        borderRadius: '10px',
+                        border: '1px solid #cbd5e1',
+                        color: '#173b57',
+                        boxSizing: 'border-box'
+                      }}
                     />
                   </div>
                 </div>
-              </div>
+              )}
+
+              {/* Address Field Row */}
+              {selectedFields.includes('address') && (
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', alignItems: 'center', paddingBottom: '24px', borderBottom: selectedFields.includes('contact') ? '1px solid #f1f5f9' : 'none' }}>
+                  <div style={{ background: '#f0f9ff', padding: '16px 20px', borderRadius: '14px', border: '1px solid #e0f2fe' }}>
+                    <div style={{ fontSize: '10px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase' }}>CURRENT RECORD</div>
+                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', marginTop: '4px' }}>ADDRESS</div>
+                    <div style={{ fontSize: '13px', fontWeight: 600, color: '#94a3b8', marginTop: '2px' }}>#99, 10th Main, HSR Layout, Bengaluru - 560102</div>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <div>
+                      <label style={{ fontSize: '11px', fontWeight: 800, color: '#173b57', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>
+                        NEW STREET ADDRESS
+                      </label>
+                      <input
+                        type="text"
+                        value={streetAddress}
+                        onChange={(e) => setStreetAddress(e.target.value)}
+                        style={{ width: '100%', padding: '10px 14px', fontSize: '14px', borderRadius: '10px', border: '1px solid #cbd5e1', color: '#173b57', boxSizing: 'border-box' }}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ fontSize: '11px', fontWeight: 800, color: '#173b57', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>
+                        PINCODE
+                      </label>
+                      <input
+                        type="text"
+                        value={pincode}
+                        onChange={(e) => setPincode(e.target.value)}
+                        style={{ width: '100%', padding: '10px 14px', fontSize: '14px', borderRadius: '10px', border: '1px solid #cbd5e1', color: '#173b57', boxSizing: 'border-box' }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Contact Details Row */}
+              {selectedFields.includes('contact') && (
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', alignItems: 'center' }}>
+                  <div style={{ background: '#f0f9ff', padding: '16px 20px', borderRadius: '14px', border: '1px solid #e0f2fe' }}>
+                    <div style={{ fontSize: '10px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase' }}>CURRENT RECORD</div>
+                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', marginTop: '4px' }}>PHONE NUMBER</div>
+                    <div style={{ fontSize: '13px', fontWeight: 600, color: '#94a3b8' }}>+91 98765 43210</div>
+                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', marginTop: '8px' }}>EMAIL ADDRESS</div>
+                    <div style={{ fontSize: '13px', fontWeight: 600, color: '#94a3b8' }}>arjun.s@oldemail.com</div>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                    <div>
+                      <label style={{ fontSize: '11px', fontWeight: 800, color: '#173b57', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>
+                        NEW PHONE NUMBER
+                      </label>
+                      <input
+                        type="text"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        style={{ width: '100%', padding: '10px 14px', fontSize: '14px', borderRadius: '10px', border: '1px solid #cbd5e1', color: '#173b57', boxSizing: 'border-box' }}
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ fontSize: '11px', fontWeight: 800, color: '#173b57', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>
+                        NEW EMAIL ADDRESS
+                      </label>
+                      <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        style={{ width: '100%', padding: '10px 14px', fontSize: '14px', borderRadius: '10px', border: '1px solid #cbd5e1', color: '#173b57', boxSizing: 'border-box' }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
 
             </div>
           </div>
@@ -866,14 +963,25 @@ export function UpdateLicenceDetailsPage() {
                 borderRadius: '16px',
                 padding: '24px',
                 textAlign: 'center',
-                background: '#fafbfc'
+                background: '#fafbfc',
+                position: 'relative'
               }}>
                 <FileText size={28} color="#94a3b8" style={{ margin: '0 auto 10px auto' }} />
-                <div style={{ fontSize: '14px', fontWeight: 800, color: '#173b57' }}>Proof of Name Change</div>
+                <div style={{ fontSize: '14px', fontWeight: 800, color: '#173b57' }}>Proof Document</div>
                 <div style={{ fontSize: '11px', color: '#94a3b8', margin: '4px 0 14px 0' }}>PDF, JPG up to 5MB</div>
-                <button style={{ background: '#ffffff', border: '1px solid #cbd5e1', padding: '6px 16px', borderRadius: '8px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', color: '#173b57' }}>
+                
+                <label style={{ background: '#ffffff', border: '1px solid #cbd5e1', padding: '6px 16px', borderRadius: '8px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', color: '#173b57', display: 'inline-block' }}>
                   Browse Files
-                </button>
+                  <input
+                    type="file"
+                    style={{ display: 'none' }}
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files[0]) {
+                        setUploadedFile(e.target.files[0].name);
+                      }
+                    }}
+                  />
+                </label>
               </div>
 
               {/* Uploaded Document Card */}
@@ -888,8 +996,8 @@ export function UpdateLicenceDetailsPage() {
                   <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#b45309', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                     <FileText size={16} />
                   </div>
-                  <div>
-                    <div style={{ fontSize: '13px', fontWeight: 800, color: '#173b57' }}>Aadhar_Card_Updated.pdf</div>
+                  <div style={{ overflow: 'hidden' }}>
+                    <div style={{ fontSize: '13px', fontWeight: 800, color: '#173b57', textOverflow: 'ellipsis', overflow: 'hidden', strokeWidth: 'nowrap' }}>{uploadedFile}</div>
                     <div style={{ fontSize: '11px', color: '#64748b', marginTop: '2px' }}>1.2 MB • Uploaded ✓</div>
                   </div>
                 </div>
@@ -944,7 +1052,7 @@ export function UpdateLicenceDetailsPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginBottom: '20px', fontSize: '14px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', color: '#64748b' }}>
                 <span>Updates Selected</span>
-                <strong style={{ color: '#173b57' }}>2 Fields</strong>
+                <strong style={{ color: '#173b57' }}>{selectedFields.length} Field{selectedFields.length > 1 ? 's' : ''}</strong>
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'space-between', color: '#64748b' }}>
@@ -954,7 +1062,7 @@ export function UpdateLicenceDetailsPage() {
 
               <div style={{ display: 'flex', justifyContent: 'space-between', color: '#64748b' }}>
                 <span>Processing Fee</span>
-                <strong style={{ color: '#173b57' }}>₹200.00</strong>
+                <strong style={{ color: '#173b57' }}>₹{processingFee}.00</strong>
               </div>
             </div>
 
@@ -964,7 +1072,7 @@ export function UpdateLicenceDetailsPage() {
             </div>
 
             <button
-              onClick={() => alert("Update request submitted for RTO verification.")}
+              type="submit"
               style={{
                 width: '100%',
                 background: '#002542',
@@ -992,7 +1100,7 @@ export function UpdateLicenceDetailsPage() {
 
         </div>
 
-      </div>
+      </form>
 
     </div>
   );
@@ -1034,7 +1142,7 @@ export function DuplicateDrivingLicencePage() {
         </div>
 
         <button
-          onClick={() => alert("Duplicate smartcard application submitted cleanly. Fee: ₹500.")}
+          onClick={() => navigate('/licence-services/payment?service=duplicate&fee=500&title=Duplicate%20Smartcard')}
           style={{
             width: '100%',
             background: '#002542',
@@ -1050,6 +1158,343 @@ export function DuplicateDrivingLicencePage() {
         >
           Request Duplicate Smartcard (Fee: ₹500) →
         </button>
+
+      </div>
+    </div>
+  );
+}
+
+// ----------------------------------------------------------------------
+// 7. LICENCE SERVICES FEE PAYMENT CHECKOUT PAGE (3RD PATH PAYMENT)
+// ----------------------------------------------------------------------
+export function LicenceServicePaymentCheckoutPage() {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  const serviceKey = searchParams.get('service') || 'renew';
+  const feeAmount = parseInt(searchParams.get('fee') || '250', 10);
+  const titleName = searchParams.get('title') || 'Driving Licence Service';
+
+  const [paymentMethod, setPaymentMethod] = useState('upi');
+  const [upiId, setUpiId] = useState('arjun@okaxis');
+
+  const baseFee = feeAmount > 50 ? feeAmount - 50 : feeAmount;
+  const processingFee = 50;
+
+  const handlePay = (e) => {
+    e.preventDefault();
+    const refId = Math.floor(10000 + Math.random() * 90000);
+    navigate(`/licence-services/payment-success?service=${serviceKey}&fee=${feeAmount}&title=${encodeURIComponent(titleName)}&ref=REQ-LS-${refId}`);
+  };
+
+  return (
+    <div className="page page-ls-payment" style={{ width: 'min(1080px, calc(100% - 48px))', margin: '36px auto', fontFamily: 'Inter, system-ui, sans-serif' }}>
+      
+      {/* Header Section */}
+      <div style={{ marginBottom: '32px' }}>
+        <span style={{ background: '#e0f2fe', color: '#0369a1', fontSize: '11px', fontWeight: 800, padding: '4px 12px', borderRadius: '16px', textTransform: 'uppercase' }}>
+          🔒 SECURE PAYMENT CHECKOUT
+        </span>
+        <h1 style={{ fontSize: '36px', fontWeight: 800, color: '#173b57', margin: '8px 0 6px 0', letterSpacing: '-0.8px' }}>
+          {titleName} Payment
+        </h1>
+        <p style={{ color: '#64748b', fontSize: '15px', margin: 0 }}>
+          Complete the official Ministry fee payment to submit your licence service request.
+        </p>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: '32px', alignItems: 'start' }}>
+        
+        {/* Left Column: Payment Options */}
+        <div style={{ background: '#ffffff', borderRadius: '24px', padding: '36px', border: '1px solid #e2e8f0', boxShadow: '0 4px 20px rgba(0, 37, 66, 0.03)' }}>
+          <h3 style={{ fontSize: '20px', fontWeight: 800, color: '#173b57', margin: '0 0 24px 0' }}>
+            Select Payment Method
+          </h3>
+
+          {/* Payment Method Tabs */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '14px', marginBottom: '28px' }}>
+            {[
+              { id: 'upi', label: 'UPI / GPay', icon: '⚡' },
+              { id: 'card', label: 'Debit / Credit Card', icon: '💳' },
+              { id: 'netbanking', label: 'Net Banking', icon: '🏦' }
+            ].map((m) => (
+              <div
+                key={m.id}
+                onClick={() => setPaymentMethod(m.id)}
+                style={{
+                  background: paymentMethod === m.id ? '#f0f9ff' : '#ffffff',
+                  border: paymentMethod === m.id ? '2px solid #002542' : '1px solid #cbd5e1',
+                  borderRadius: '16px',
+                  padding: '16px 12px',
+                  textAlign: 'center',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease'
+                }}
+              >
+                <div style={{ fontSize: '20px', marginBottom: '6px' }}>{m.icon}</div>
+                <div style={{ fontSize: '13px', fontWeight: 800, color: '#173b57' }}>{m.label}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Form fields based on selected method */}
+          <form onSubmit={handlePay}>
+            {paymentMethod === 'upi' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '28px' }}>
+                <div>
+                  <label style={{ fontSize: '11px', fontWeight: 800, color: '#173b57', textTransform: 'uppercase', display: 'block', marginBottom: '8px' }}>
+                    Enter Virtual Payment Address (VPA / UPI ID)
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. username@upi"
+                    value={upiId}
+                    onChange={(e) => setUpiId(e.target.value)}
+                    style={{ width: '100%', padding: '14px 16px', fontSize: '15px', borderRadius: '12px', border: '1px solid #cbd5e1', color: '#173b57', outline: 'none', boxSizing: 'border-box' }}
+                  />
+                </div>
+                <div style={{ fontSize: '13px', color: '#64748b' }}>
+                  Supported Apps: Google Pay, PhonePe, Paytm, BHIM, Amazon Pay.
+                </div>
+              </div>
+            )}
+
+            {paymentMethod === 'card' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '28px' }}>
+                <div>
+                  <label style={{ fontSize: '11px', fontWeight: 800, color: '#173b57', textTransform: 'uppercase', display: 'block', marginBottom: '8px' }}>Card Number</label>
+                  <input type="text" placeholder="4532 •••• •••• 8910" defaultValue="4532 9918 2039 8910" style={{ width: '100%', padding: '14px 16px', fontSize: '15px', borderRadius: '12px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }} />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                  <div>
+                    <label style={{ fontSize: '11px', fontWeight: 800, color: '#173b57', textTransform: 'uppercase', display: 'block', marginBottom: '8px' }}>Expiry</label>
+                    <input type="text" placeholder="MM/YY" defaultValue="09/29" style={{ width: '100%', padding: '14px 16px', fontSize: '15px', borderRadius: '12px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }} />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '11px', fontWeight: 800, color: '#173b57', textTransform: 'uppercase', display: 'block', marginBottom: '8px' }}>CVV</label>
+                    <input type="password" placeholder="•••" defaultValue="882" style={{ width: '100%', padding: '14px 16px', fontSize: '15px', borderRadius: '12px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }} />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {paymentMethod === 'netbanking' && (
+              <div style={{ marginBottom: '28px' }}>
+                <label style={{ fontSize: '11px', fontWeight: 800, color: '#173b57', textTransform: 'uppercase', display: 'block', marginBottom: '8px' }}>Select Bank</label>
+                <select style={{ width: '100%', padding: '14px 16px', fontSize: '15px', borderRadius: '12px', border: '1px solid #cbd5e1', color: '#173b57', boxSizing: 'border-box' }}>
+                  <option>State Bank of India (SBI)</option>
+                  <option>HDFC Bank</option>
+                  <option>ICICI Bank</option>
+                  <option>Axis Bank</option>
+                </select>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              style={{
+                width: '100%',
+                background: '#002542',
+                color: '#ffffff',
+                border: 'none',
+                padding: '16px',
+                borderRadius: '12px',
+                fontWeight: 800,
+                fontSize: '16px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                boxShadow: '0 4px 14px rgba(0, 37, 66, 0.2)'
+              }}
+            >
+              Pay ₹{feeAmount}.00 & Complete <ArrowRight size={18} />
+            </button>
+          </form>
+        </div>
+
+        {/* Right Column: Fee Breakdown */}
+        <div style={{ background: '#f0f9ff', borderRadius: '24px', padding: '32px', border: '1px solid #e0f2fe' }}>
+          <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+            <div style={{ width: '48px', height: '48px', borderRadius: '16px', background: '#002542', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px auto' }}>
+              <FileText size={24} />
+            </div>
+            <div style={{ fontSize: '11px', fontWeight: 800, color: '#0369a1', letterSpacing: '1px', textTransform: 'uppercase' }}>
+              FEE BREAKDOWN
+            </div>
+          </div>
+
+          <div style={{ background: '#ffffff', borderRadius: '16px', padding: '24px', border: '1px solid #e2e8f0', marginBottom: '24px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', color: '#64748b', marginBottom: '12px' }}>
+              <span>{titleName} Fee</span>
+              <strong style={{ color: '#173b57' }}>₹{baseFee}.00</strong>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', color: '#64748b', marginBottom: '16px' }}>
+              <span>RTO Processing Fee</span>
+              <strong style={{ color: '#173b57' }}>₹{processingFee}.00</strong>
+            </div>
+
+            <div style={{ borderTop: '1px dashed #e2e8f0', paddingTop: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontSize: '14px', fontWeight: 800, color: '#173b57' }}>Total Payable</span>
+              <strong style={{ fontSize: '24px', fontWeight: 800, color: '#002542' }}>₹{feeAmount}.00</strong>
+            </div>
+          </div>
+
+          <div style={{ textAlign: 'center', fontSize: '11px', fontWeight: 800, color: '#94a3b8', letterSpacing: '0.8px', textTransform: 'uppercase', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
+            <Lock size={12} /> SECURE ENCRYPTED GATEWAY
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  );
+}
+
+// ----------------------------------------------------------------------
+// 8. LICENCE SERVICES PAYMENT SUCCESSFUL RECEIPT PAGE
+// ----------------------------------------------------------------------
+export function LicenceServicePaymentSuccessPage() {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  const serviceKey = searchParams.get('service') || 'renew';
+  const feeAmount = searchParams.get('fee') || '250';
+  const titleName = searchParams.get('title') || 'Licence Service Application';
+  const refNo = searchParams.get('ref') || 'REQ-LS-99182';
+
+  useEffect(() => {
+    localStorage.setItem('last_processed_flow', 'licence_service');
+    localStorage.setItem('last_processed_title', titleName);
+    localStorage.setItem('last_processed_fee', feeAmount);
+  }, [titleName, feeAmount]);
+
+  return (
+    <div className="page page-ls-payment-success" style={{ width: 'min(760px, calc(100% - 48px))', margin: '40px auto', fontFamily: 'Inter, system-ui, sans-serif' }}>
+      <div style={{ background: '#ffffff', borderRadius: '24px', padding: '44px', border: '1px solid #e2e8f0', boxShadow: '0 6px 24px rgba(0, 37, 66, 0.05)', textAlign: 'center' }}>
+        
+        {/* Success Icon */}
+        <div style={{
+          width: '76px',
+          height: '76px',
+          borderRadius: '50%',
+          background: '#dcfce7',
+          color: '#16a34a',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          margin: '0 auto 20px auto',
+          boxShadow: '0 0 0 8px #f0fdf4'
+        }}>
+          <CheckCircle2 size={46} strokeWidth={2.5} />
+        </div>
+
+        <h1 style={{ fontSize: '34px', fontWeight: 800, color: '#173b57', margin: '0 0 8px 0', letterSpacing: '-0.5px' }}>
+          Payment Successful!
+        </h1>
+
+        <p style={{ color: '#64748b', fontSize: '15px', margin: '0 auto 32px auto', maxWidth: '520px', lineHeight: 1.5 }}>
+          Your <strong>{titleName}</strong> fee payment has been processed securely. A confirmation email and SMS have been sent with your official receipt.
+        </p>
+
+        {/* Detailed Receipt Card */}
+        <div style={{ background: '#f8fafc', borderRadius: '20px', border: '1px solid #e2e8f0', padding: '28px', marginBottom: '32px', textAlign: 'left' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e2e8f0', paddingBottom: '16px', marginBottom: '20px' }}>
+            <span style={{ fontSize: '12px', fontWeight: 800, color: '#002542', textTransform: 'uppercase', letterSpacing: '0.8px' }}>
+              OFFICIAL TRANSACTION RECEIPT
+            </span>
+            <span style={{ fontSize: '12px', fontWeight: 700, color: '#64748b' }}>
+              RECEIPT ID: DS-PAY-981-LS
+            </span>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px 32px' }}>
+            <div>
+              <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Service Name</div>
+              <div style={{ fontSize: '15px', fontWeight: 700, color: '#173b57', marginTop: '4px' }}>{titleName}</div>
+            </div>
+
+            <div>
+              <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Application Ref No</div>
+              <div style={{ fontSize: '15px', fontWeight: 700, color: '#173b57', marginTop: '4px' }}>{refNo}</div>
+            </div>
+
+            <div>
+              <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Payment Method</div>
+              <div style={{ fontSize: '15px', fontWeight: 700, color: '#173b57', marginTop: '4px' }}>UPI (GPay •• 9812)</div>
+            </div>
+
+            <div>
+              <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Amount Paid</div>
+              <div style={{ fontSize: '20px', fontWeight: 800, color: '#002542', marginTop: '2px' }}>₹{feeAmount}.00</div>
+            </div>
+
+            <div>
+              <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Payment Status</div>
+              <div style={{ fontSize: '14px', fontWeight: 800, color: '#16a34a', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#16a34a' }} /> SUCCESS ✓
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
+          <button
+            onClick={() => navigate('/dashboard')}
+            style={{
+              background: '#002542',
+              color: '#ffffff',
+              border: 'none',
+              padding: '16px 28px',
+              borderRadius: '12px',
+              fontWeight: 800,
+              fontSize: '15px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              boxShadow: '0 4px 14px rgba(0, 37, 66, 0.2)'
+            }}
+          >
+            Back to Dashboard <ArrowRight size={18} />
+          </button>
+
+          <button
+            onClick={() => navigate('/manage-licence')}
+            style={{
+              background: '#ffffff',
+              color: '#173b57',
+              border: '1px solid #cbd5e1',
+              padding: '16px 24px',
+              borderRadius: '12px',
+              fontWeight: 700,
+              fontSize: '15px',
+              cursor: 'pointer'
+            }}
+          >
+            View Licence Wallet
+          </button>
+
+          <button
+            onClick={() => alert("Downloading official RTO Payment Receipt PDF...")}
+            style={{
+              background: '#ffffff',
+              color: '#173b57',
+              border: '1px solid #cbd5e1',
+              padding: '16px 20px',
+              borderRadius: '12px',
+              fontWeight: 700,
+              fontSize: '15px',
+              cursor: 'pointer'
+            }}
+          >
+            📥 Download Receipt
+          </button>
+        </div>
 
       </div>
     </div>

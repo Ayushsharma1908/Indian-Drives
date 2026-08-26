@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Car, ShieldCheck, CheckCircle2, CalendarDays, MapPin, CreditCard, Clock,
@@ -1798,6 +1798,11 @@ export function DLTestSlotBookingPage() {
 export function DLAppointmentFixedPage() {
   const navigate = useNavigate();
 
+  useEffect(() => {
+    localStorage.setItem('last_processed_flow', 'dl_appointment');
+    localStorage.setItem('last_processed_title', 'DL Practical Test Slot Fixed');
+  }, []);
+
   return (
     <div className="page page-dl-appointment-fixed" style={{ width: 'min(760px, calc(100% - 48px))', margin: '48px auto', fontFamily: 'Inter, system-ui, sans-serif', textAlign: 'center' }}>
       <div style={{ background: '#ffffff', borderRadius: '24px', padding: '44px', border: '1px solid #e2e8f0', boxShadow: '0 6px 24px rgba(0, 37, 66, 0.05)' }}>
@@ -2006,9 +2011,20 @@ export function DLDashboardPage() {
 
 // ----------------------------------------------------------------------
 // 8B. DRIVING TEST RESULT PAGE (1:1 REFERENCE IMAGE MATCH)
-// ----------------------------------------------------------------------
 export function DrivingTestResultPage() {
   const navigate = useNavigate();
+  const [activeStep, setActiveStep] = useState(1);
+
+  // Auto-process timeline to Step 3 (Dispatch & Tracking) in 1 second
+  useEffect(() => {
+    localStorage.setItem('last_processed_flow', 'dl_passed');
+    localStorage.setItem('last_processed_title', 'Driving Licence Exam Passed');
+
+    const timer = setTimeout(() => {
+      setActiveStep(3);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <div className="page page-dl-test-result" style={{ width: 'min(1120px, calc(100% - 48px))', margin: '36px auto', fontFamily: 'Inter, system-ui, sans-serif' }}>
@@ -2247,48 +2263,109 @@ export function DrivingTestResultPage() {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', position: 'relative', marginBottom: '28px' }}>
             {/* Vertical Line */}
-            <div style={{ position: 'absolute', top: '16px', bottom: '16px', left: '15px', width: '2px', background: '#e2e8f0', zIndex: 0 }} />
+            <div style={{ position: 'absolute', top: '16px', bottom: '16px', left: '15px', width: '2px', background: activeStep >= 3 ? '#bbf7d0' : '#e2e8f0', zIndex: 0, transition: 'all 0.5s ease' }} />
 
             {/* Step 1: Licence Approval */}
             <div style={{ display: 'flex', gap: '16px', zIndex: 1 }}>
-              <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#002542', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontWeight: 800, fontSize: '12px' }}>
-                1
+              <div style={{
+                width: '32px',
+                height: '32px',
+                borderRadius: '50%',
+                background: activeStep >= 3 ? '#16a34a' : '#002542',
+                color: '#ffffff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+                fontWeight: 800,
+                fontSize: '12px',
+                transition: 'all 0.5s ease'
+              }}>
+                {activeStep >= 3 ? <Check size={16} strokeWidth={3} /> : '1'}
               </div>
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <div style={{ fontSize: '15px', fontWeight: 800, color: '#173b57' }}>Licence Approval</div>
-                  <span style={{ background: '#e0f2fe', color: '#0369a1', fontSize: '10px', fontWeight: 800, padding: '2px 8px', borderRadius: '10px' }}>
-                    In Progress
+                  <span style={{
+                    background: activeStep >= 3 ? '#dcfce7' : '#e0f2fe',
+                    color: activeStep >= 3 ? '#15803d' : '#0369a1',
+                    fontSize: '10px',
+                    fontWeight: 800,
+                    padding: '2px 8px',
+                    borderRadius: '10px',
+                    transition: 'all 0.5s ease'
+                  }}>
+                    {activeStep >= 3 ? '✓ Approved' : 'In Progress'}
                   </span>
                 </div>
                 <div style={{ fontSize: '13px', color: '#64748b', marginTop: '4px', lineHeight: 1.4 }}>
-                  RTO officer is reviewing your test results for final approval.
+                  RTO officer reviewed and approved test results.
                 </div>
               </div>
             </div>
 
             {/* Step 2: Smart Card Printing */}
-            <div style={{ display: 'flex', gap: '16px', zIndex: 1, opacity: 0.6 }}>
-              <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#f1f5f9', color: '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontWeight: 700, fontSize: '12px' }}>
-                2
+            <div style={{ display: 'flex', gap: '16px', zIndex: 1, opacity: activeStep >= 3 ? 1 : 0.6, transition: 'all 0.5s ease' }}>
+              <div style={{
+                width: '32px',
+                height: '32px',
+                borderRadius: '50%',
+                background: activeStep >= 3 ? '#16a34a' : '#f1f5f9',
+                color: activeStep >= 3 ? '#ffffff' : '#64748b',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+                fontWeight: 800,
+                fontSize: '12px',
+                transition: 'all 0.5s ease'
+              }}>
+                {activeStep >= 3 ? <Check size={16} strokeWidth={3} /> : '2'}
               </div>
               <div>
-                <div style={{ fontSize: '15px', fontWeight: 700, color: '#173b57' }}>Smart Card Printing</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div style={{ fontSize: '15px', fontWeight: 700, color: '#173b57' }}>Smart Card Printing</div>
+                  {activeStep >= 3 && (
+                    <span style={{ background: '#dcfce7', color: '#15803d', fontSize: '10px', fontWeight: 800, padding: '2px 8px', borderRadius: '10px' }}>
+                      ✓ Printed
+                    </span>
+                  )}
+                </div>
                 <div style={{ fontSize: '13px', color: '#64748b', marginTop: '4px', lineHeight: 1.4 }}>
-                  Once approved, your physical smart card will be printed.
+                  Physical smartcard printed & chip encoded.
                 </div>
               </div>
             </div>
 
             {/* Step 3: Dispatch & Tracking */}
-            <div style={{ display: 'flex', gap: '16px', zIndex: 1, opacity: 0.6 }}>
-              <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#f1f5f9', color: '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontWeight: 700, fontSize: '12px' }}>
+            <div style={{ display: 'flex', gap: '16px', zIndex: 1, opacity: activeStep >= 3 ? 1 : 0.6, transition: 'all 0.5s ease' }}>
+              <div style={{
+                width: '32px',
+                height: '32px',
+                borderRadius: '50%',
+                background: activeStep >= 3 ? '#002542' : '#f1f5f9',
+                color: activeStep >= 3 ? '#ffffff' : '#64748b',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+                fontWeight: 800,
+                fontSize: '12px',
+                transition: 'all 0.5s ease'
+              }}>
                 3
               </div>
               <div>
-                <div style={{ fontSize: '15px', fontWeight: 700, color: '#173b57' }}>Dispatch & Tracking</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div style={{ fontSize: '15px', fontWeight: 800, color: '#173b57' }}>Dispatch & Tracking</div>
+                  {activeStep >= 3 && (
+                    <span style={{ background: '#e0f2fe', color: '#0369a1', fontSize: '10px', fontWeight: 800, padding: '2px 8px', borderRadius: '10px' }}>
+                      In Progress
+                    </span>
+                  )}
+                </div>
                 <div style={{ fontSize: '13px', color: '#64748b', marginTop: '4px', lineHeight: 1.4 }}>
-                  Card is handed over to India Post. A tracking ID will be generated.
+                  Handed over to India Post. Tracking ID assigned.
                 </div>
               </div>
             </div>
@@ -2308,13 +2385,29 @@ export function DrivingTestResultPage() {
 
           </div>
 
-          {/* Bottom Info Note Box */}
-          <div style={{ background: '#f8fafc', borderRadius: '14px', padding: '14px 16px', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span style={{ fontSize: '16px' }}>ℹ️</span>
-            <div style={{ fontSize: '12px', color: '#64748b', lineHeight: 1.4 }}>
-              You can download a provisional digital copy via DigiLocker once Step 1 is completed.
-            </div>
-          </div>
+          {/* Action Button: View Order -> opens Dispatch & Live Tracking Page */}
+          <button
+            onClick={() => navigate('/dl/dispatch')}
+            style={{
+              width: '100%',
+              background: '#002542',
+              color: '#ffffff',
+              border: 'none',
+              padding: '16px',
+              borderRadius: '14px',
+              fontWeight: 800,
+              fontSize: '15px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              boxShadow: '0 4px 16px rgba(0, 37, 66, 0.25)',
+              transition: 'all 0.2s ease'
+            }}
+          >
+            View Order <ArrowRight size={18} />
+          </button>
 
         </div>
 
