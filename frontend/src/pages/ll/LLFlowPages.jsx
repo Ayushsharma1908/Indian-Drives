@@ -894,18 +894,31 @@ export function LLFeePaymentPage() {
 
         </div>
 
+        {/* LL Test Scenario Readiness Banner */}
+        <div style={{ background: '#f0f9ff', borderRadius: '16px', border: '1px solid #bae6fd', padding: '20px 24px', maxWidth: '640px', margin: '0 auto 28px auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px', textAlign: 'left' }}>
+            <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: '#002542', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <Laptop size={22} />
+            </div>
+            <div>
+              <div style={{ fontSize: '14px', fontWeight: 800, color: '#173b57' }}>Next Stage: Online LL Test Scenario</div>
+              <div style={{ fontSize: '12px', color: '#64748b', marginTop: '2px' }}>Your fee is verified. Proceed to take your 15-minute road safety computer test.</div>
+            </div>
+          </div>
+        </div>
+
         {/* Bottom Action Buttons */}
         <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
           <button
-            onClick={() => navigate('/journey')}
-            style={{ background: '#002542', color: '#ffffff', border: 'none', padding: '14px 28px', borderRadius: '10px', fontWeight: 800, fontSize: '15px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
+            onClick={() => navigate('/ll/assessment-cockpit')}
+            style={{ background: '#002542', color: '#ffffff', border: 'none', padding: '16px 32px', borderRadius: '12px', fontWeight: 800, fontSize: '15px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 14px rgba(0, 37, 66, 0.2)' }}
           >
-            Continue to Journey <ArrowRight size={18} />
+            Start LL Test Scenario <ArrowRight size={18} />
           </button>
 
           <button
             onClick={() => alert("Downloading official government fee receipt (PDF)...")}
-            style={{ background: '#ffffff', color: '#173b57', border: '1px solid #e2e8f0', padding: '14px 24px', borderRadius: '10px', fontWeight: 700, fontSize: '15px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
+            style={{ background: '#ffffff', color: '#173b57', border: '1px solid #cbd5e1', padding: '16px 24px', borderRadius: '12px', fontWeight: 700, fontSize: '15px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
           >
             📥 Download Receipt
           </button>

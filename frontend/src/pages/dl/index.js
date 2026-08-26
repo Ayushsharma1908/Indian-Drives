@@ -5,7 +5,9 @@ export {
   DLConfirmAddressPage,
   DLVerifiedDocumentsPage,
   DLPaymentCheckoutPage,
+  DLTestCenterSelectionPage,
   DLTestSlotBookingPage,
+  DLAppointmentFixedPage,
   DLDashboardPage,
   DrivingTestResultPage,
   LicenceDispatchPage
