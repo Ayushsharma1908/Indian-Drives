@@ -44,7 +44,7 @@ export function AssistantPromptBanner({ promptText, queryText, badgeText = "AI G
       </div>
 
       <div style={{ fontSize: '12px', fontWeight: 700, color: '#002542', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-        Ask Indian Drives <ArrowRight size={13} />
+        Ask DriveSeva <ArrowRight size={13} />
       </div>
     </div>
   );

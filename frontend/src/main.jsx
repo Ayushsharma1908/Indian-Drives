@@ -305,12 +305,15 @@ function Shell({ children }) {
             My Journey
           </NavLink>
           <NavLink to="/ask" className={({ isActive }) => isActive ? "active nav-ask-highlight" : "nav-ask-highlight"} style={({ isActive }) => ({ color: isActive ? '#e88a2d' : '#476179', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px' })}>
-            <span style={{ color: '#e88a2d', fontSize: '14px' }}>✦</span> Ask Indian Drives
+            <span style={{ color: '#e88a2d', fontSize: '14px' }}>✦</span> Ask DriveSeva
           </NavLink>
         </nav>
 
         <div className="top-actions">
           <LanguageSelector currentLanguage={language} onSelectLanguage={setLanguage} />
+          <Link className="icon-button" to="/help-center" aria-label="Help & Support" title="Help & Support">
+            <CircleHelp size={18} />
+          </Link>
           <Link className="icon-button" to="/notifications" aria-label="Notifications" style={{ position: 'relative' }}>
             <Bell size={18} />
             {hasUnread && (

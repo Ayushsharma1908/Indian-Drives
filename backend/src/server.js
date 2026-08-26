@@ -420,16 +420,25 @@ function issuedLicence() {
   };
 }
 
-const server = app.listen(port, () => {
-  console.log(`\n🚀 Indian Drives API server is running on http://localhost:${port}`);
-});
+function startServer(targetPort) {
+  const server = app.listen(targetPort, () => {
+    console.log(`\n🚀 Indian Drives API server is running on http://localhost:${targetPort}`);
+  });
 
-server.on("error", (err) => {
-  if (err.code === "EADDRINUSE") {
-    console.error(`\n⚠️  Port ${port} is currently in use.`);
-    console.error(`👉 To free it, run: lsof -ti :${port} | xargs kill -9\n`);
-    process.exit(1);
-  } else {
-    console.error("Server error:", err);
-  }
-});
+  server.on("error", (err) => {
+    if (err.code === "EADDRINUSE") {
+      const nextPort = Number(targetPort) + 1;
+      if (nextPort <= 5010) {
+        console.warn(`\n⚠️ Port ${targetPort} is in use, attempting port ${nextPort}...`);
+        startServer(nextPort);
+      } else {
+        console.error(`\n❌ Could not find an open port between 5001 and ${nextPort}.`);
+        process.exit(1);
+      }
+    } else {
+      console.error("Server error:", err);
+    }
+  });
+}
+
+startServer(port);

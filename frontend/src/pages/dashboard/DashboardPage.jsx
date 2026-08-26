@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Calendar, ArrowRight, Car, FileText, Shield, Bell } from 'lucide-react';
+import { Calendar, ArrowRight, Car, FileText, Shield, Bell, CheckCircle2, Award } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { api } from '../../services/api';
 
 export function DashboardPage() {

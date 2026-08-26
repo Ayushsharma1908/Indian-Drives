@@ -276,7 +276,7 @@ export function AskIndianDrivesPage() {
               REAL CONVERSATIONAL AI ASSISTANT
             </div>
             <h1 style={{ fontSize: '32px', fontWeight: 800, color: '#173b57', margin: '0 0 4px 0', letterSpacing: '-0.5px' }}>
-              Ask Indian Drives
+              Ask DriveSeva
             </h1>
             <p style={{ fontSize: '15px', color: '#476179', margin: 0 }}>
               Your conversational guide through the driving licence process — talk naturally, understand, and take action.
