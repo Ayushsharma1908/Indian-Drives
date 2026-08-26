@@ -1,14 +1,23 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Calendar, ArrowRight, Car, FileText, Shield, Bell } from 'lucide-react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Calendar, ArrowRight, Car, FileText, Shield, Bell, CheckCircle2 } from 'lucide-react';
 import { api } from '../../services/api';
 
 export function DashboardPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [upcomingVisit, setUpcomingVisit] = useState(null);
   const [importantNotice, setImportantNotice] = useState(null);
+  const [isLLCompleted, setIsLLCompleted] = useState(false);
 
   useEffect(() => {
+    // Check LL completion flag
+    const paramCompleted = searchParams.get('ll_completed');
+    const localCompleted = localStorage.getItem('ll_completed');
+    if (paramCompleted === 'true' || localCompleted === 'true') {
+      setIsLLCompleted(true);
+    }
+
     // Check for active booked appointments
     api.appointments()
       .then((res) => {
@@ -40,13 +49,13 @@ export function DashboardPage() {
         }
       })
       .catch(() => {});
-  }, []);
+  }, [searchParams]);
 
   return (
     <div className="page-dashboard-container" style={{ background: '#f7f9fb', minHeight: 'calc(100vh - 72px)', padding: '32px 0 60px 0', fontFamily: 'Inter, system-ui, sans-serif' }}>
       <div style={{ maxWidth: '1184px', margin: '0 auto', padding: '0 24px', display: 'flex', flexDirection: 'column', gap: '48px' }}>
         
-        {/* 1. DYNAMIC UPCOMING VISIT / NOTIFICATION BANNER (Shows only when there is an active visit or urgent notification) */}
+        {/* 1. DYNAMIC UPCOMING VISIT / NOTIFICATION BANNER */}
         {upcomingVisit ? (
           <div style={{ display: 'flex', justifyContent: 'center' }}>
             <div style={{
@@ -115,6 +124,83 @@ export function DashboardPage() {
                 onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
               >
                 View appointment <ArrowRight size={15} />
+              </button>
+            </div>
+          </div>
+        ) : isLLCompleted ? (
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <div style={{
+              background: '#ffffff',
+              border: '2px solid #e88a2d',
+              borderRadius: '18px',
+              padding: '18px 26px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '24px',
+              width: '100%',
+              maxWidth: '860px',
+              boxShadow: '0 4px 20px rgba(232, 138, 45, 0.12)'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                <div style={{
+                  position: 'relative',
+                  width: '46px',
+                  height: '46px',
+                  borderRadius: '14px',
+                  background: '#fff7ed',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#e88a2d',
+                  flexShrink: 0
+                }}>
+                  <Car size={22} />
+                  <span style={{
+                    position: 'absolute',
+                    top: '8px',
+                    right: '8px',
+                    width: '9px',
+                    height: '9px',
+                    borderRadius: '50%',
+                    background: '#e88a2d',
+                    boxShadow: '0 0 0 2px #ffffff'
+                  }} />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <div style={{ fontSize: '11px', fontWeight: 800, color: '#e88a2d', letterSpacing: '0.8px', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#e88a2d' }} />
+                    UPCOMING FOR YOU · DL APPLICATION WAITING
+                  </div>
+                  <div style={{ fontSize: '15px', fontWeight: 800, color: '#173b57' }}>
+                    Learner Licence Approved — Driving Licence (DL) is waiting!
+                  </div>
+                  <div style={{ fontSize: '13px', color: '#64748b', fontWeight: 500 }}>
+                    Your LL is active. Click to open your DL Dashboard and book your driving test slot.
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={() => navigate('/dl/intro')}
+                style={{
+                  background: '#002542',
+                  border: 'none',
+                  color: '#ffffff',
+                  fontSize: '14px',
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '12px 20px',
+                  borderRadius: '10px',
+                  boxShadow: '0 4px 12px rgba(0, 37, 66, 0.2)',
+                  flexShrink: 0,
+                  transition: 'all 0.15s ease'
+                }}
+              >
+                Go to DL Flow <ArrowRight size={16} />
               </button>
             </div>
           </div>

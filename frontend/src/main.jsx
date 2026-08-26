@@ -142,6 +142,7 @@ import {
   LLApplicantDetailsPage,
   LLAddressDetailsPage,
   LLApplicationReviewPage,
+  LLFeePaymentPage,
   LLAssessmentCockpitPage,
   LLAssessmentLiveExamPage,
   LLAssessmentResultPage,
@@ -205,13 +206,15 @@ function ProtectedApp() {
 
         {/* Learner Licence Flow */}
         <Route path="/ll/intro" element={<LLApplicationIntroPage />} />
-        <Route path="/ll/vehicle" element={<LLVehicleSelectionPage />} />
-        <Route path="/ll/documents" element={<LLDocumentRequirementsPage />} />
         <Route path="/ll/applicant" element={<LLApplicantDetailsPage />} />
         <Route path="/ll/address" element={<LLAddressDetailsPage />} />
+        <Route path="/ll/vehicle" element={<LLVehicleSelectionPage />} />
+        <Route path="/ll/documents" element={<LLDocumentRequirementsPage />} />
         <Route path="/ll/review" element={<LLApplicationReviewPage />} />
+        <Route path="/ll/payment" element={<LLFeePaymentPage />} />
         <Route path="/ll/dashboard" element={<MyJourneyTimelinePage initialStage="ll" />} />
         <Route path="/ll/verified" element={<LLVerifiedPage />} />
+        <Route path="/ll/issued" element={<LLVerifiedPage />} />
         <Route path="/ll/assessment-cockpit" element={<LLAssessmentCockpitPage />} />
         <Route path="/ll/assessment-exam" element={<LLAssessmentLiveExamPage />} />
         <Route path="/ll/assessment-result" element={<LLAssessmentResultPage />} />
