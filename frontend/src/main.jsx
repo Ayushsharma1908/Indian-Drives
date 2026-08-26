@@ -269,6 +269,16 @@ function Shell({ children }) {
   const { language, setLanguage } = useContext(LanguageContext);
   const { user, logout } = useContext(AuthContext);
 
+  const [hasUnread, setHasUnread] = useState(() => {
+    return localStorage.getItem('indian-drives-unread-notifications') !== 'false';
+  });
+
+  useEffect(() => {
+    const handleRead = () => setHasUnread(false);
+    window.addEventListener('notifications-read', handleRead);
+    return () => window.removeEventListener('notifications-read', handleRead);
+  }, []);
+
   return (
     <div className="app-shell">
       <header className="topbar">
@@ -293,8 +303,22 @@ function Shell({ children }) {
 
         <div className="top-actions">
           <LanguageSelector currentLanguage={language} onSelectLanguage={setLanguage} />
-          <Link className="icon-button" to="/notifications" aria-label="Notifications">
+          <Link className="icon-button" to="/notifications" aria-label="Notifications" style={{ position: 'relative' }}>
             <Bell size={18} />
+            {hasUnread && (
+              <span
+                style={{
+                  position: 'absolute',
+                  top: '6px',
+                  right: '6px',
+                  width: '8px',
+                  height: '8px',
+                  borderRadius: '50%',
+                  background: '#ef4444',
+                  boxShadow: '0 0 0 2px #ffffff'
+                }}
+              />
+            )}
           </Link>
           <Link className="profile-pill" to="/profile" aria-label="Profile" style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#f1f5f9', color: '#173b57', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '14px' }}>
             A

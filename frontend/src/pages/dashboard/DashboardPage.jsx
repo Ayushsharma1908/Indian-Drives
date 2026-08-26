@@ -49,7 +49,7 @@ export function DashboardPage() {
           }
         }
       })
-      .catch(() => {});
+      .catch(() => { });
 
     // Check for urgent unread notifications
     api.notifications()
@@ -68,13 +68,13 @@ export function DashboardPage() {
           }
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   return (
     <div className="page-dashboard-container" style={{ background: '#f7f9fb', minHeight: 'calc(100vh - 72px)', padding: '32px 0 60px 0', fontFamily: 'Inter, system-ui, sans-serif' }}>
       <div style={{ maxWidth: '1184px', margin: '0 auto', padding: '0 24px', display: 'flex', flexDirection: 'column', gap: '48px' }}>
-        
+
         {/* 1. DYNAMIC NOTIFICATION BANNER (SHOWS ONLY THE CURRENTLY PROCESSED FLOW AFTER 2-SECOND DELAY) */}
         <AnimatePresence mode="wait">
           {showProcessedNotification && activeFlow === 'dl_passed' && (
@@ -461,86 +461,13 @@ export function DashboardPage() {
           )}
         </AnimatePresence>
 
-        {importantNotice && (
-          <div style={{ display: 'flex', justifyContent: 'center' }}>
-            <div style={{
-              background: '#ffffff',
-              border: '1px solid #e2e8f0',
-              borderRadius: '16px',
-              padding: '16px 24px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: '24px',
-              width: '100%',
-              maxWidth: '840px',
-              boxShadow: '0 2px 10px rgba(0, 37, 66, 0.03)'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                <div style={{
-                  position: 'relative',
-                  width: '42px',
-                  height: '42px',
-                  borderRadius: '12px',
-                  background: '#fef3e9',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#e88a2d'
-                }}>
-                  <Bell size={20} />
-                  <span style={{
-                    position: 'absolute',
-                    top: '10px',
-                    right: '10px',
-                    width: '7px',
-                    height: '7px',
-                    borderRadius: '50%',
-                    background: '#e88a2d'
-                  }} />
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                  <span style={{ fontSize: '11px', fontWeight: 800, color: '#e88a2d', letterSpacing: '0.8px', textTransform: 'uppercase' }}>
-                    IMPORTANT UPDATE
-                  </span>
-                  <span style={{ fontSize: '15px', fontWeight: 600, color: '#173b57' }}>
-                    {importantNotice.title} <span style={{ color: '#94a3b8', margin: '0 6px' }}>·</span> {importantNotice.body}
-                  </span>
-                </div>
-              </div>
-
-              <button
-                onClick={() => navigate('/notifications')}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  color: '#173b57',
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  padding: '6px 12px',
-                  borderRadius: '8px',
-                  transition: 'all 0.15s ease'
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.background = '#f1f5f9')}
-                onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
-              >
-                View notification <ArrowRight size={15} />
-              </button>
-            </div>
-          </div>
-        )}
-
         {/* 2. HERO SECTION ("Namaste, Yanshi 👋") */}
         <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(360px, 480px)', gap: '40px', alignItems: 'center', padding: '20px 0' }}>
-          
+
           {/* Left Text */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <h1 style={{ fontSize: '54px', fontWeight: 700, color: '#173b57', margin: 0, lineHeight: 1.1, letterSpacing: '-1.5px' }}>
-              Namaste, Yanshi 👋
+              Namaste, Yanshi 🙏
             </h1>
             <div style={{ fontSize: '22px', color: '#173b57', fontWeight: 600, lineHeight: 1.4 }}>
               Welcome to Indian Drives.
@@ -627,7 +554,7 @@ export function DashboardPage() {
 
           {/* 3 Interactive Destination Cards with Smooth Hover Animations */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '32px' }}>
-            
+
             {/* Card 01: Starting Fresh */}
             <div
               className="journey-destination-card"
