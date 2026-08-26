@@ -420,4 +420,16 @@ function issuedLicence() {
   };
 }
 
-app.listen(port, () => console.log(`Indian Drives API listening on ${port}`));
+const server = app.listen(port, () => {
+  console.log(`\n🚀 Indian Drives API server is running on http://localhost:${port}`);
+});
+
+server.on("error", (err) => {
+  if (err.code === "EADDRINUSE") {
+    console.error(`\n⚠️  Port ${port} is currently in use.`);
+    console.error(`👉 To free it, run: lsof -ti :${port} | xargs kill -9\n`);
+    process.exit(1);
+  } else {
+    console.error("Server error:", err);
+  }
+});
