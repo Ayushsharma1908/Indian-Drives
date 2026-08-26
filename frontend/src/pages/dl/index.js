@@ -1,7 +1,9 @@
 export {
   DLIntroPage,
-  DLConfirmVehiclePage,
-  DLConfirmDetailsPage,
+  DLLearnerFoundPage,
+  DLStartIntroPage,
+  DLConfirmAddressPage,
+  DLVerifiedDocumentsPage,
   DLPaymentCheckoutPage,
   DLTestSlotBookingPage,
   DLDashboardPage,

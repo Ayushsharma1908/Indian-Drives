@@ -151,8 +151,10 @@ import {
 
 import {
   DLIntroPage,
-  DLConfirmVehiclePage,
-  DLConfirmDetailsPage,
+  DLLearnerFoundPage,
+  DLStartIntroPage,
+  DLConfirmAddressPage,
+  DLVerifiedDocumentsPage,
   DLPaymentCheckoutPage,
   DLTestSlotBookingPage,
   DLDashboardPage,
@@ -220,19 +222,18 @@ function ProtectedApp() {
         <Route path="/ll/assessment-result" element={<LLAssessmentResultPage />} />
 
         {/* Driving Licence Flow */}
-        <Route path="/dl/continue" element={<DLIntroPage />} />
+        <Route path="/dl/verify" element={<DLIntroPage />} />
         <Route path="/dl/intro" element={<DLIntroPage />} />
-        <Route path="/dl/confirm-vehicle" element={<DLConfirmVehiclePage />} />
-        <Route path="/dl/confirm-applicant" element={<DLConfirmDetailsPage />} />
-        <Route path="/dl/confirm-address" element={<DLConfirmDetailsPage />} />
-        <Route path="/dl/doc-verification" element={<DLConfirmDetailsPage />} />
-        <Route path="/dl/submitted" element={<DLConfirmDetailsPage />} />
+        <Route path="/dl/ll-found" element={<DLLearnerFoundPage />} />
+        <Route path="/dl/start" element={<DLStartIntroPage />} />
+        <Route path="/dl/confirm-intro" element={<DLStartIntroPage />} />
+        <Route path="/dl/address" element={<DLConfirmAddressPage />} />
+        <Route path="/dl/confirm-address" element={<DLConfirmAddressPage />} />
+        <Route path="/dl/documents" element={<DLVerifiedDocumentsPage />} />
+        <Route path="/dl/doc-verification" element={<DLVerifiedDocumentsPage />} />
         <Route path="/dl/fee-summary" element={<DLPaymentCheckoutPage />} />
         <Route path="/dl/payment" element={<DLPaymentCheckoutPage />} />
-        <Route path="/dl/payment-success" element={<DLPaymentCheckoutPage />} />
         <Route path="/dl/test-center" element={<DLTestSlotBookingPage />} />
-        <Route path="/dl/test-date" element={<DLTestSlotBookingPage />} />
-        <Route path="/dl/seat-selection" element={<DLTestSlotBookingPage />} />
         <Route path="/dl/dashboard" element={<MyJourneyTimelinePage initialStage="dl" />} />
         <Route path="/dl/test-result" element={<DrivingTestResultPage />} />
         <Route path="/dl/dispatch" element={<LicenceDispatchPage />} />
