@@ -8,16 +8,35 @@ export function DashboardPage() {
   const [searchParams] = useSearchParams();
   const [upcomingVisit, setUpcomingVisit] = useState(null);
   const [importantNotice, setImportantNotice] = useState(null);
-  const [isLLCompleted, setIsLLCompleted] = useState(false);
+  const [showProcessedNotification, setShowProcessedNotification] = useState(false);
+  const [activeFlow, setActiveFlow] = useState(null);
+  const [flowTitle, setFlowTitle] = useState('');
+  const [flowFee, setFlowFee] = useState('250');
 
   useEffect(() => {
-    // Check LL completion flag
-    const paramCompleted = searchParams.get('ll_completed');
-    const localCompleted = localStorage.getItem('ll_completed');
-    if (paramCompleted === 'true' || localCompleted === 'true') {
-      setIsLLCompleted(true);
-    }
+    // Determine currently processed flow
+    const paramFlow = searchParams.get('processed');
+    const localFlow = localStorage.getItem('last_processed_flow');
+    const flow = paramFlow || localFlow;
 
+    const title = searchParams.get('title') || localStorage.getItem('last_processed_title') || 'Licence Service';
+    const fee = localStorage.getItem('last_processed_fee') || '250';
+
+    if (flow) {
+      setActiveFlow(flow);
+      setFlowTitle(title);
+      setFlowFee(fee);
+
+      // 2-Second Delay before popping in notification on Dashboard
+      const timer = setTimeout(() => {
+        setShowProcessedNotification(true);
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
     // Check for active booked appointments
     api.appointments()
       .then((res) => {
@@ -29,7 +48,7 @@ export function DashboardPage() {
           }
         }
       })
-      .catch(() => {});
+      .catch(() => { });
 
     // Check for urgent unread notifications
     api.notifications()
@@ -48,242 +67,406 @@ export function DashboardPage() {
           }
         }
       })
-      .catch(() => {});
-  }, [searchParams]);
+      .catch(() => { });
+  }, []);
 
   return (
     <div className="page-dashboard-container" style={{ background: '#f7f9fb', minHeight: 'calc(100vh - 72px)', padding: '32px 0 60px 0', fontFamily: 'Inter, system-ui, sans-serif' }}>
       <div style={{ maxWidth: '1184px', margin: '0 auto', padding: '0 24px', display: 'flex', flexDirection: 'column', gap: '48px' }}>
-        
-        {/* 1. DYNAMIC UPCOMING VISIT / NOTIFICATION BANNER */}
-        {upcomingVisit ? (
-          <div style={{ display: 'flex', justifyContent: 'center' }}>
-            <div style={{
-              background: '#ffffff',
-              border: '1px solid #e2e8f0',
-              borderRadius: '16px',
-              padding: '16px 24px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: '24px',
-              width: '100%',
-              maxWidth: '840px',
-              boxShadow: '0 2px 10px rgba(0, 37, 66, 0.03)'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                <div style={{
-                  position: 'relative',
-                  width: '42px',
-                  height: '42px',
-                  borderRadius: '12px',
-                  background: '#f1f5f9',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#173b57'
-                }}>
-                  <Calendar size={20} />
-                  <span style={{
-                    position: 'absolute',
-                    top: '10px',
-                    right: '10px',
-                    width: '7px',
-                    height: '7px',
-                    borderRadius: '50%',
-                    background: '#e88a2d'
-                  }} />
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                  <span style={{ fontSize: '11px', fontWeight: 800, color: '#476179', letterSpacing: '0.8px', textTransform: 'uppercase' }}>
-                    UPCOMING FOR YOU
-                  </span>
-                  <span style={{ fontSize: '15px', fontWeight: 600, color: '#173b57' }}>
-                    RTO Visit: {upcomingVisit.vehicleClass || 'Driving Licence Test'} <span style={{ color: '#94a3b8', margin: '0 6px' }}>·</span> {upcomingVisit.date}, {upcomingVisit.time || upcomingVisit.slot || '10:30 AM'}
-                  </span>
-                </div>
-              </div>
 
-              <button
-                onClick={() => navigate('/appointments')}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  color: '#173b57',
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  padding: '6px 12px',
-                  borderRadius: '8px',
-                  transition: 'all 0.15s ease'
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.background = '#f1f5f9')}
-                onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
-              >
-                View appointment <ArrowRight size={15} />
-              </button>
-            </div>
-          </div>
-        ) : isLLCompleted ? (
-          <div style={{ display: 'flex', justifyContent: 'center' }}>
-            <div style={{
-              background: '#ffffff',
-              border: '2px solid #e88a2d',
-              borderRadius: '18px',
-              padding: '18px 26px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: '24px',
-              width: '100%',
-              maxWidth: '860px',
-              boxShadow: '0 4px 20px rgba(232, 138, 45, 0.12)'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                <div style={{
-                  position: 'relative',
-                  width: '46px',
-                  height: '46px',
-                  borderRadius: '14px',
-                  background: '#fff7ed',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#e88a2d',
-                  flexShrink: 0
-                }}>
-                  <Car size={22} />
-                  <span style={{
-                    position: 'absolute',
-                    top: '8px',
-                    right: '8px',
-                    width: '9px',
-                    height: '9px',
-                    borderRadius: '50%',
-                    background: '#e88a2d',
-                    boxShadow: '0 0 0 2px #ffffff'
-                  }} />
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <div style={{ fontSize: '11px', fontWeight: 800, color: '#e88a2d', letterSpacing: '0.8px', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#e88a2d' }} />
-                    UPCOMING FOR YOU · DL APPLICATION WAITING
+        {/* 1. DYNAMIC NOTIFICATION BANNER (SHOWS ONLY THE CURRENTLY PROCESSED FLOW AFTER 2-SECOND DELAY) */}
+        <AnimatePresence mode="wait">
+          {showProcessedNotification && activeFlow === 'dl_passed' && (
+            <motion.div
+              key="dl-passed-notification"
+              initial={{ opacity: 0, y: -20, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+              style={{ display: 'flex', justifyContent: 'center' }}
+            >
+              <div style={{
+                background: 'linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%)',
+                border: '2px solid #bbf7d0',
+                borderRadius: '20px',
+                padding: '20px 28px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: '24px',
+                width: '100%',
+                maxWidth: '860px',
+                boxShadow: '0 8px 30px rgba(22, 163, 74, 0.12)'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
+                  <div style={{
+                    position: 'relative',
+                    width: '50px',
+                    height: '50px',
+                    borderRadius: '16px',
+                    background: '#dcfce7',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#16a34a',
+                    flexShrink: 0
+                  }}>
+                    <CheckCircle2 size={26} strokeWidth={2.5} />
+                    <span style={{
+                      position: 'absolute',
+                      top: '6px',
+                      right: '6px',
+                      width: '10px',
+                      height: '10px',
+                      borderRadius: '50%',
+                      background: '#16a34a',
+                      boxShadow: '0 0 0 2px #ffffff'
+                    }} />
                   </div>
-                  <div style={{ fontSize: '15px', fontWeight: 800, color: '#173b57' }}>
-                    Learner Licence Approved — Driving Licence (DL) is waiting!
-                  </div>
-                  <div style={{ fontSize: '13px', color: '#64748b', fontWeight: 500 }}>
-                    Your LL is active. Click to open your DL Dashboard and book your driving test slot.
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                    <div style={{ fontSize: '11px', fontWeight: 800, color: '#16a34a', letterSpacing: '0.8px', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#16a34a' }} />
+                      STAGE 4 COMPLETED · DL PRACTICAL TEST PASSED
+                    </div>
+                    <div style={{ fontSize: '16px', fontWeight: 800, color: '#173b57' }}>
+                      Congratulations! You've passed your driving test.
+                    </div>
+                    <div style={{ fontSize: '13px', color: '#64748b', fontWeight: 500 }}>
+                      Your skill test results have been verified and submitted for official approval.
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <button
-                onClick={() => navigate('/dl/intro')}
-                style={{
-                  background: '#002542',
-                  border: 'none',
-                  color: '#ffffff',
-                  fontSize: '14px',
-                  fontWeight: 800,
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  padding: '12px 20px',
-                  borderRadius: '10px',
-                  boxShadow: '0 4px 12px rgba(0, 37, 66, 0.2)',
-                  flexShrink: 0,
-                  transition: 'all 0.15s ease'
-                }}
-              >
-                Go to DL Flow <ArrowRight size={16} />
-              </button>
-            </div>
-          </div>
-        ) : importantNotice ? (
-          <div style={{ display: 'flex', justifyContent: 'center' }}>
-            <div style={{
-              background: '#ffffff',
-              border: '1px solid #e2e8f0',
-              borderRadius: '16px',
-              padding: '16px 24px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: '24px',
-              width: '100%',
-              maxWidth: '840px',
-              boxShadow: '0 2px 10px rgba(0, 37, 66, 0.03)'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                <div style={{
-                  position: 'relative',
-                  width: '42px',
-                  height: '42px',
-                  borderRadius: '12px',
-                  background: '#fef3e9',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#e88a2d'
-                }}>
-                  <Bell size={20} />
-                  <span style={{
-                    position: 'absolute',
-                    top: '10px',
-                    right: '10px',
-                    width: '7px',
-                    height: '7px',
-                    borderRadius: '50%',
-                    background: '#e88a2d'
-                  }} />
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                  <span style={{ fontSize: '11px', fontWeight: 800, color: '#e88a2d', letterSpacing: '0.8px', textTransform: 'uppercase' }}>
-                    IMPORTANT UPDATE
-                  </span>
-                  <span style={{ fontSize: '15px', fontWeight: 600, color: '#173b57' }}>
-                    {importantNotice.title} <span style={{ color: '#94a3b8', margin: '0 6px' }}>·</span> {importantNotice.body}
-                  </span>
-                </div>
+                <button
+                  onClick={() => navigate('/dl/test-result')}
+                  style={{
+                    background: '#002542',
+                    color: '#ffffff',
+                    fontSize: '14px',
+                    fontWeight: 800,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '12px 22px',
+                    borderRadius: '12px',
+                    border: 'none',
+                    boxShadow: '0 4px 14px rgba(0, 37, 66, 0.2)',
+                    flexShrink: 0
+                  }}
+                >
+                  View Test Result <ArrowRight size={16} />
+                </button>
               </div>
+            </motion.div>
+          )}
 
-              <button
-                onClick={() => navigate('/notifications')}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  color: '#173b57',
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  padding: '6px 12px',
-                  borderRadius: '8px',
-                  transition: 'all 0.15s ease'
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.background = '#f1f5f9')}
-                onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
-              >
-                View notification <ArrowRight size={15} />
-              </button>
+          {showProcessedNotification && activeFlow === 'licence_service' && (
+            <motion.div
+              key="licence-service-notification"
+              initial={{ opacity: 0, y: -20, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+              style={{ display: 'flex', justifyContent: 'center' }}
+            >
+              <div style={{
+                background: 'linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%)',
+                border: '2px solid #bae6fd',
+                borderRadius: '20px',
+                padding: '20px 28px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: '24px',
+                width: '100%',
+                maxWidth: '860px',
+                boxShadow: '0 8px 30px rgba(3, 105, 161, 0.12)'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
+                  <div style={{
+                    position: 'relative',
+                    width: '50px',
+                    height: '50px',
+                    borderRadius: '16px',
+                    background: '#e0f2fe',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#0369a1',
+                    flexShrink: 0
+                  }}>
+                    <Award size={26} strokeWidth={2.5} />
+                    <span style={{
+                      position: 'absolute',
+                      top: '6px',
+                      right: '6px',
+                      width: '10px',
+                      height: '10px',
+                      borderRadius: '50%',
+                      background: '#0369a1',
+                      boxShadow: '0 0 0 2px #ffffff'
+                    }} />
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                    <div style={{ fontSize: '11px', fontWeight: 800, color: '#0369a1', letterSpacing: '0.8px', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#0369a1' }} />
+                      LICENCE SERVICE SUBMITTED
+                    </div>
+                    <div style={{ fontSize: '16px', fontWeight: 800, color: '#173b57' }}>
+                      {flowTitle} Processed Successfully!
+                    </div>
+                    <div style={{ fontSize: '13px', color: '#64748b', fontWeight: 500 }}>
+                      Your application fee payment of ₹{flowFee}.00 was processed securely and submitted to RTO.
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => navigate('/manage-licence')}
+                  style={{
+                    background: '#002542',
+                    color: '#ffffff',
+                    fontSize: '14px',
+                    fontWeight: 800,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '12px 22px',
+                    borderRadius: '12px',
+                    border: 'none',
+                    boxShadow: '0 4px 14px rgba(0, 37, 66, 0.2)',
+                    flexShrink: 0
+                  }}
+                >
+                  View Licence Wallet <ArrowRight size={16} />
+                </button>
+              </div>
+            </motion.div>
+          )}
+
+          {showProcessedNotification && activeFlow === 'dl_appointment' && (
+            <motion.div
+              key="dl-appointment-notification"
+              initial={{ opacity: 0, y: -20, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+              style={{ display: 'flex', justifyContent: 'center' }}
+            >
+              <div style={{
+                background: 'linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%)',
+                border: '2px solid #bae6fd',
+                borderRadius: '20px',
+                padding: '20px 28px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: '24px',
+                width: '100%',
+                maxWidth: '860px',
+                boxShadow: '0 8px 30px rgba(3, 105, 161, 0.12)'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
+                  <div style={{
+                    position: 'relative',
+                    width: '50px',
+                    height: '50px',
+                    borderRadius: '16px',
+                    background: '#e0f2fe',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#002542',
+                    flexShrink: 0
+                  }}>
+                    <Calendar size={26} strokeWidth={2.5} />
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                    <div style={{ fontSize: '11px', fontWeight: 800, color: '#0369a1', letterSpacing: '0.8px', textTransform: 'uppercase' }}>
+                      APPOINTMENT CONFIRMED · DL PRACTICAL TEST
+                    </div>
+                    <div style={{ fontSize: '16px', fontWeight: 800, color: '#173b57' }}>
+                      Driving Test Appointment Fixed at Pune RTO!
+                    </div>
+                    <div style={{ fontSize: '13px', color: '#64748b', fontWeight: 500 }}>
+                      Scheduled for Oct 24, 2026 at 10:30 AM. Bring your original LL & identity proof.
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => navigate('/dl/appointment-fixed')}
+                  style={{
+                    background: '#002542',
+                    color: '#ffffff',
+                    fontSize: '14px',
+                    fontWeight: 800,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '12px 22px',
+                    borderRadius: '12px',
+                    border: 'none',
+                    boxShadow: '0 4px 14px rgba(0, 37, 66, 0.2)',
+                    flexShrink: 0
+                  }}
+                >
+                  View Appointment <ArrowRight size={16} />
+                </button>
+              </div>
+            </motion.div>
+          )}
+
+          {showProcessedNotification && activeFlow === 'll' && (
+            <motion.div
+              key="ll-completed-notification"
+              initial={{ opacity: 0, y: -20, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+              style={{ display: 'flex', justifyContent: 'center' }}
+            >
+              <div style={{
+                background: 'linear-gradient(135deg, #ffffff 0%, #fff7ed 100%)',
+                border: '2px solid #fed7aa',
+                borderRadius: '20px',
+                padding: '20px 28px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: '24px',
+                width: '100%',
+                maxWidth: '860px',
+                boxShadow: '0 8px 30px rgba(232, 138, 45, 0.12)'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
+                  <div style={{
+                    position: 'relative',
+                    width: '50px',
+                    height: '50px',
+                    borderRadius: '16px',
+                    background: '#ffedd5',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#c2410c',
+                    flexShrink: 0
+                  }}>
+                    <Car size={26} strokeWidth={2.5} />
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                    <div style={{ fontSize: '11px', fontWeight: 800, color: '#c2410c', letterSpacing: '0.8px', textTransform: 'uppercase' }}>
+                      STAGE 1 COMPLETED · LEARNER LICENCE ACTIVE
+                    </div>
+                    <div style={{ fontSize: '16px', fontWeight: 800, color: '#173b57' }}>
+                      Learner Licence Application Verified!
+                    </div>
+                    <div style={{ fontSize: '13px', color: '#64748b', fontWeight: 500 }}>
+                      Your Learner Licence is issued. You can now apply for your permanent Driving Licence.
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => navigate('/journey?stage=dl')}
+                  style={{
+                    background: '#002542',
+                    color: '#ffffff',
+                    fontSize: '14px',
+                    fontWeight: 800,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '12px 22px',
+                    borderRadius: '12px',
+                    border: 'none',
+                    boxShadow: '0 4px 14px rgba(0, 37, 66, 0.2)',
+                    flexShrink: 0
+                  }}
+                >
+                  Continue to DL <ArrowRight size={16} />
+                </button>
+              </div>
+            </motion.div>
+          )}
+
+          {!showProcessedNotification && upcomingVisit && (
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <div style={{
+                background: '#ffffff',
+                border: '1px solid #e2e8f0',
+                borderRadius: '16px',
+                padding: '16px 24px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: '24px',
+                width: '100%',
+                maxWidth: '840px',
+                boxShadow: '0 2px 10px rgba(0, 37, 66, 0.03)'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                  <div style={{
+                    position: 'relative',
+                    width: '42px',
+                    height: '42px',
+                    borderRadius: '12px',
+                    background: '#f1f5f9',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#173b57'
+                  }}>
+                    <Calendar size={20} />
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                    <span style={{ fontSize: '11px', fontWeight: 800, color: '#476179', letterSpacing: '0.8px', textTransform: 'uppercase' }}>
+                      UPCOMING FOR YOU
+                    </span>
+                    <span style={{ fontSize: '15px', fontWeight: 600, color: '#173b57' }}>
+                      RTO Visit: {upcomingVisit.vehicleClass || 'Driving Licence Test'} <span style={{ color: '#94a3b8', margin: '0 6px' }}>·</span> {upcomingVisit.date}, {upcomingVisit.time || upcomingVisit.slot || '10:30 AM'}
+                    </span>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => navigate('/appointments')}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    color: '#173b57',
+                    fontSize: '14px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '6px 12px',
+                    borderRadius: '8px'
+                  }}
+                >
+                  View appointment <ArrowRight size={15} />
+                </button>
+              </div>
             </div>
-          </div>
-        ) : null}
+          )}
+        </AnimatePresence>
 
         {/* 2. HERO SECTION ("Namaste, Yanshi 👋") */}
         <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(360px, 480px)', gap: '40px', alignItems: 'center', padding: '20px 0' }}>
-          
+
           {/* Left Text */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <h1 style={{ fontSize: '54px', fontWeight: 700, color: '#173b57', margin: 0, lineHeight: 1.1, letterSpacing: '-1.5px' }}>
-              Namaste, Yanshi 👋
+              Namaste, Yanshi 🙏
             </h1>
             <div style={{ fontSize: '22px', color: '#173b57', fontWeight: 600, lineHeight: 1.4 }}>
               Welcome to Indian Drives.
@@ -370,7 +553,7 @@ export function DashboardPage() {
 
           {/* 3 Interactive Destination Cards with Smooth Hover Animations */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '32px' }}>
-            
+
             {/* Card 01: Starting Fresh */}
             <div
               className="journey-destination-card"

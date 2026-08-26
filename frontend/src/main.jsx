@@ -156,7 +156,9 @@ import {
   DLConfirmAddressPage,
   DLVerifiedDocumentsPage,
   DLPaymentCheckoutPage,
+  DLTestCenterSelectionPage,
   DLTestSlotBookingPage,
+  DLAppointmentFixedPage,
   DLDashboardPage,
   DrivingTestResultPage,
   LicenceDispatchPage
@@ -165,9 +167,12 @@ import {
 import {
   LicenceServicesHubPage,
   ManageDrivingLicencePage,
+  LicenceFoundPage,
   UpdateLicenceDetailsPage,
   RenewDrivingLicencePage,
   DuplicateDrivingLicencePage,
+  LicenceServicePaymentCheckoutPage,
+  LicenceServicePaymentSuccessPage,
   MyJourneyTimelinePage
 } from "./pages/licence-services";
 
@@ -233,7 +238,9 @@ function ProtectedApp() {
         <Route path="/dl/doc-verification" element={<DLVerifiedDocumentsPage />} />
         <Route path="/dl/fee-summary" element={<DLPaymentCheckoutPage />} />
         <Route path="/dl/payment" element={<DLPaymentCheckoutPage />} />
-        <Route path="/dl/test-center" element={<DLTestSlotBookingPage />} />
+        <Route path="/dl/test-center" element={<DLTestCenterSelectionPage />} />
+        <Route path="/dl/test-slot" element={<DLTestSlotBookingPage />} />
+        <Route path="/dl/appointment-fixed" element={<DLAppointmentFixedPage />} />
         <Route path="/dl/dashboard" element={<MyJourneyTimelinePage initialStage="dl" />} />
         <Route path="/dl/test-result" element={<DrivingTestResultPage />} />
         <Route path="/dl/dispatch" element={<LicenceDispatchPage />} />
@@ -241,12 +248,14 @@ function ProtectedApp() {
         {/* Licence Services & Maintenance */}
         <Route path="/licence-services" element={<LicenceServicesHubPage />} />
         <Route path="/manage-licence" element={<ManageDrivingLicencePage />} />
-        <Route path="/licence-verified" element={<ManageDrivingLicencePage />} />
+        <Route path="/licence-verified" element={<LicenceFoundPage />} />
         <Route path="/update-licence" element={<UpdateLicenceDetailsPage />} />
         <Route path="/update-submitted" element={<UpdateLicenceDetailsPage />} />
         <Route path="/renew-licence" element={<RenewDrivingLicencePage />} />
         <Route path="/renewal-submitted" element={<RenewDrivingLicencePage />} />
         <Route path="/duplicate-licence" element={<DuplicateDrivingLicencePage />} />
+        <Route path="/licence-services/payment" element={<LicenceServicePaymentCheckoutPage />} />
+        <Route path="/licence-services/payment-success" element={<LicenceServicePaymentSuccessPage />} />
         <Route path="/journey" element={<MyJourneyTimelinePage />} />
         <Route path="/review-application-form" element={<LLApplicationReviewPage />} />
 
@@ -259,6 +268,16 @@ function ProtectedApp() {
 function Shell({ children }) {
   const { language, setLanguage } = useContext(LanguageContext);
   const { user, logout } = useContext(AuthContext);
+
+  const [hasUnread, setHasUnread] = useState(() => {
+    return localStorage.getItem('indian-drives-unread-notifications') !== 'false';
+  });
+
+  useEffect(() => {
+    const handleRead = () => setHasUnread(false);
+    window.addEventListener('notifications-read', handleRead);
+    return () => window.removeEventListener('notifications-read', handleRead);
+  }, []);
 
   return (
     <div className="app-shell">
@@ -281,8 +300,22 @@ function Shell({ children }) {
 
         <div className="top-actions">
           <LanguageSelector currentLanguage={language} onSelectLanguage={setLanguage} />
-          <Link className="icon-button" to="/notifications" aria-label="Notifications">
+          <Link className="icon-button" to="/notifications" aria-label="Notifications" style={{ position: 'relative' }}>
             <Bell size={18} />
+            {hasUnread && (
+              <span
+                style={{
+                  position: 'absolute',
+                  top: '6px',
+                  right: '6px',
+                  width: '8px',
+                  height: '8px',
+                  borderRadius: '50%',
+                  background: '#ef4444',
+                  boxShadow: '0 0 0 2px #ffffff'
+                }}
+              />
+            )}
           </Link>
           <Link className="profile-pill" to="/profile" aria-label="Profile" style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#f1f5f9', color: '#173b57', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '14px' }}>
             A
