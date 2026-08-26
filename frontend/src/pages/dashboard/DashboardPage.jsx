@@ -31,11 +31,17 @@ export function DashboardPage() {
       // 2-Second Delay before popping in notification on Dashboard
       const timer = setTimeout(() => {
         setShowProcessedNotification(true);
+
+        // ✅ Clear so the notification ONLY shows once — not on every revisit
+        localStorage.removeItem('last_processed_flow');
+        localStorage.removeItem('last_processed_title');
+        localStorage.removeItem('last_processed_fee');
       }, 2000);
 
       return () => clearTimeout(timer);
     }
   }, [searchParams]);
+
 
   useEffect(() => {
     // Check for active booked appointments
