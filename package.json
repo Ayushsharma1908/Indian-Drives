@@ -1,0 +1,17 @@
+{
+  "name": "indian-drives",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Indian Drives full-stack hackathon prototype",
+  "scripts": {
+    "dev": "npm-run-all --parallel dev:backend dev:frontend",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev:backend": "npm --prefix backend run dev",
+    "build": "npm --prefix frontend run build",
+    "start": "npm --prefix backend start",
+    "install:all": "npm install && npm install --prefix frontend && npm install --prefix backend"
+  },
+  "devDependencies": {
+    "npm-run-all": "^4.1.5"
+  }
+}
