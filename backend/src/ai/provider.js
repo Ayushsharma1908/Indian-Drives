@@ -8,7 +8,6 @@ export async function streamChatCompletion({ messages = [], userMessage = '', co
   const apiKey = process.env.AI_API_KEY || process.env.GEMINI_API_KEY || process.env.OPENAI_API_KEY || process.env.ANTHROPIC_API_KEY;
 
   if (!apiKey || apiKey.trim() === '' || apiKey.startsWith('YOUR_')) {
-    // Send structured setup error
     res.writeHead(200, {
       'Content-Type': 'text/event-stream',
       'Cache-Control': 'no-cache',
@@ -21,8 +20,8 @@ export async function streamChatCompletion({ messages = [], userMessage = '', co
       message: 'AI API Key is not configured in backend/.env',
       details: {
         envLocation: 'backend/.env',
-        variables: ['AI_API_KEY', 'GEMINI_API_KEY', 'OPENAI_API_KEY'],
-        instructions: 'Please add your API key to backend/.env and restart the server.\nExample: GEMINI_API_KEY=AIzaSy...\nGet free Gemini key at: https://aistudio.google.com/app/apikey'
+        variables: ['AI_API_KEY', 'GEMINI_API_KEY'],
+        instructions: 'Add GEMINI_API_KEY to backend/.env and restart server.'
       }
     };
 
@@ -34,7 +33,6 @@ export async function streamChatCompletion({ messages = [], userMessage = '', co
 
   const systemPrompt = buildSystemPrompt(context);
 
-  // Set SSE Headers
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache',
@@ -49,7 +47,6 @@ export async function streamChatCompletion({ messages = [], userMessage = '', co
     } else if (provider === 'anthropic') {
       await streamAnthropic({ apiKey, systemPrompt, messages, userMessage, res });
     } else {
-      // Default to Gemini
       await streamGemini({ apiKey, systemPrompt, messages, userMessage, res });
     }
   } catch (error) {
@@ -61,15 +58,18 @@ export async function streamChatCompletion({ messages = [], userMessage = '', co
 }
 
 /**
- * Google Gemini SSE Streaming Provider
+ * Google Gemini SSE Streaming Provider with Automatic Fallback
  */
 async function streamGemini({ apiKey, systemPrompt, messages, userMessage, res }) {
-  const model = process.env.AI_MODEL || 'gemini-2.0-flash';
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?key=${apiKey}&alt=sse`;
+  const modelsToTry = [
+    process.env.AI_MODEL || 'gemini-3.6-flash',
+    'gemini-flash-latest',
+    'gemini-2.5-flash',
+    'gemini-3.7-flash'
+  ];
 
   const contents = [];
 
-  // Map conversation history
   for (const m of messages) {
     if (m.text || m.content) {
       contents.push({
@@ -79,7 +79,6 @@ async function streamGemini({ apiKey, systemPrompt, messages, userMessage, res }
     }
   }
 
-  // Current query
   if (userMessage) {
     contents.push({
       role: 'user',
@@ -98,51 +97,62 @@ async function streamGemini({ apiKey, systemPrompt, messages, userMessage, res }
     }
   };
 
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
-  });
+  let lastError = null;
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Gemini API Error (${response.status}): ${errorText}`);
-  }
+  for (const model of modelsToTry) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?key=${apiKey}&alt=sse`;
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
 
-  const reader = response.body.getReader();
-  const decoder = new TextDecoder();
-  let buffer = '';
+      if (!response.ok) {
+        const errorText = await response.text();
+        lastError = new Error(`Gemini Error (${response.status} ${model}): ${errorText}`);
+        continue; // Try next model
+      }
 
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
 
-    buffer += decoder.decode(value, { stream: true });
-    const lines = buffer.split('\n');
-    buffer = lines.pop() || '';
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
 
-    for (const line of lines) {
-      if (line.startsWith('data: ')) {
-        const jsonStr = line.slice(6).trim();
-        if (!jsonStr) continue;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || '';
 
-        try {
-          const parsed = JSON.parse(jsonStr);
-          const candidate = parsed.candidates?.[0];
-          const textChunk = candidate?.content?.parts?.[0]?.text;
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const jsonStr = line.slice(6).trim();
+            if (!jsonStr) continue;
 
-          if (textChunk) {
-            res.write(`data: ${JSON.stringify({ type: 'token', text: textChunk })}\n\n`);
+            try {
+              const parsed = JSON.parse(jsonStr);
+              const candidate = parsed.candidates?.[0];
+              const textChunk = candidate?.content?.parts?.[0]?.text;
+
+              if (textChunk) {
+                res.write(`data: ${JSON.stringify({ type: 'token', text: textChunk })}\n\n`);
+              }
+            } catch (e) {}
           }
-        } catch (e) {
-          // ignore parse errors on partial JSON chunks
         }
       }
+
+      res.write('data: [DONE]\n\n');
+      res.end();
+      return; // Succeeded!
+    } catch (err) {
+      lastError = err;
     }
   }
 
-  res.write('data: [DONE]\n\n');
-  res.end();
+  throw lastError || new Error('Could not connect to any Gemini model');
 }
 
 /**
