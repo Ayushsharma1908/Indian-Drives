@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Sparkles,
   Send,
@@ -24,42 +24,53 @@ import { ConfirmationModal } from '../../features/assistant/components/Confirmat
 
 export function AskIndianDrivesPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { context, loading } = useJourneyContext();
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [modalConfig, setModalConfig] = useState({ isOpen: false });
   const messagesEndRef = useRef(null);
+  const initialPromptTriggered = useRef(false);
 
   const [messages, setMessages] = useState([]);
 
   // Initialize personalized greeting on context load
   useEffect(() => {
     if (context && messages.length === 0) {
-      setMessages([
-        {
-          id: 'welcome',
-          sender: 'assistant',
-          timestamp: 'Just now',
-          text: `Namaste, ${context.userName}! I am your Indian Drives AI Guide. Your Learner Licence (${context.learnerLicenceNumber}) is verified and active. You are currently at the **Driving Licence (DL) Application** stage.`,
-          statusBadge: { type: 'government', text: 'Government Record: Scrutiny Cleared' },
-          action: {
-            id: 'CONTINUE_DL_APPLICATION',
-            label: 'Continue DL Application',
-            shortLabel: 'Continue DL',
-            route: '/dl/confirm-intro',
-            icon: 'ArrowRight',
-            description: 'Confirm applicant profile and vehicle categories for permanent DL.'
-          },
-          followUps: [
-            "What do I do next?",
-            "Check driving test eligibility",
-            "What documents do I need?",
-            "What should I bring to the RTO?"
-          ]
-        }
-      ]);
+      const initialGreeting = {
+        id: 'welcome',
+        sender: 'assistant',
+        timestamp: 'Just now',
+        text: `Namaste, ${context.userName}! I am your Indian Drives AI Guide. Your Learner Licence (${context.learnerLicenceNumber}) is verified and active. You are currently at the **Driving Licence (DL) Application** stage.`,
+        statusBadge: { type: 'government', text: 'Government Record: Scrutiny Cleared' },
+        action: {
+          id: 'CONTINUE_DL_APPLICATION',
+          label: 'Continue DL Application',
+          shortLabel: 'Continue DL',
+          route: '/dl/confirm-intro',
+          icon: 'ArrowRight',
+          description: 'Confirm applicant profile and vehicle categories for permanent DL.'
+        },
+        followUps: [
+          "What do I do next?",
+          "Check driving test eligibility",
+          "What documents do I need?",
+          "What should I bring to the RTO?"
+        ]
+      };
+
+      setMessages([initialGreeting]);
+
+      // Check for incoming query parameter e.g. /ask?q=... or /ask?prompt=...
+      const incomingQuery = searchParams.get('q') || searchParams.get('prompt');
+      if (incomingQuery && !initialPromptTriggered.current) {
+        initialPromptTriggered.current = true;
+        setTimeout(() => {
+          handleSendMessage(incomingQuery);
+        }, 300);
+      }
     }
-  }, [context]);
+  }, [context, searchParams]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
