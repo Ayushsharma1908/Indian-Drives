@@ -6,7 +6,7 @@ export function AskIndianDrivesPage() {
   const [messages, setMessages] = useState([
     {
       sender: 'bot',
-      text: 'Namaste! I am your Indian Drives AI Assistant. How can I help you with your Learner Licence exam, Driving Licence application, or RTO slot booking today?'
+      text: 'Namaste! I am your DriveSeva AI Assistant. How can I help you with your Learner Licence exam, Driving Licence application, or RTO slot booking today?'
     }
   ]);
 
@@ -31,7 +31,7 @@ export function AskIndianDrivesPage() {
     <div className="page page-ask">
       <div className="page-header" style={{ marginBottom: '20px' }}>
         <span className="eye-badge" style={{ background: 'var(--saffron-soft)', color: '#000' }}><Sparkles size={14} /> AI DRIVING ASSISTANT</span>
-        <h1>Ask Indian Drives</h1>
+        <h1>Ask DriveSeva</h1>
         <p>Instant answers on RTO rules, traffic sign quizzes, and application guidelines.</p>
       </div>
 
@@ -39,7 +39,7 @@ export function AskIndianDrivesPage() {
         <div style={{ padding: '16px 24px', background: 'var(--primary)', color: '#fff', display: 'flex', alignItems: 'center', gap: '12px' }}>
           <Bot size={24} />
           <div>
-            <h3 style={{ margin: 0, fontSize: '16px' }}>Indian Drives AI Helper</h3>
+            <h3 style={{ margin: 0, fontSize: '16px' }}>DriveSeva AI Helper</h3>
             <span style={{ fontSize: '11px', color: '#93c5fd' }}>Online • 24/7 Official Guidance</span>
           </div>
         </div>

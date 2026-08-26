@@ -1,85 +1,195 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, ArrowRight, Car, FileText, Shield, Sparkles } from 'lucide-react';
+import { Calendar, ArrowRight, Car, FileText, Shield, Bell } from 'lucide-react';
+import { api } from '../services/api';
 
 export function DashboardPage() {
   const navigate = useNavigate();
+  const [upcomingVisit, setUpcomingVisit] = useState(null);
+  const [importantNotice, setImportantNotice] = useState(null);
+
+  useEffect(() => {
+    // Check for active booked appointments
+    api.appointments()
+      .then((res) => {
+        if (Array.isArray(res) && res.length > 0) {
+          const booked = res.find((a) => a.status === 'booked' || a.status === 'scheduled');
+          if (booked) {
+            setUpcomingVisit(booked);
+            return;
+          }
+        }
+      })
+      .catch(() => {});
+
+    // Check for urgent unread notifications
+    api.notifications()
+      .then((res) => {
+        if (Array.isArray(res)) {
+          const urgent = res.find(
+            (n) => !n.read && (
+              n.title.toLowerCase().includes('verified') ||
+              n.title.toLowerCase().includes('ready') ||
+              n.title.toLowerCase().includes('retest') ||
+              n.title.toLowerCase().includes('important')
+            )
+          );
+          if (urgent) {
+            setImportantNotice(urgent);
+          }
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   return (
     <div className="page-dashboard-container" style={{ background: '#f7f9fb', minHeight: 'calc(100vh - 72px)', padding: '32px 0 60px 0', fontFamily: 'Inter, system-ui, sans-serif' }}>
       <div style={{ maxWidth: '1184px', margin: '0 auto', padding: '0 24px', display: 'flex', flexDirection: 'column', gap: '48px' }}>
         
-        {/* 1. UPCOMING FOR YOU BANNER */}
-        <div style={{ display: 'flex', justifyContent: 'center' }}>
-          <div style={{
-            background: '#ffffff',
-            border: '1px solid #e2e8f0',
-            borderRadius: '16px',
-            padding: '16px 24px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: '24px',
-            width: '100%',
-            maxWidth: '840px',
-            boxShadow: '0 2px 10px rgba(0, 37, 66, 0.03)'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <div style={{
-                position: 'relative',
-                width: '42px',
-                height: '42px',
-                borderRadius: '12px',
-                background: '#f1f5f9',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#173b57'
-              }}>
-                <Calendar size={20} />
-                <span style={{
-                  position: 'absolute',
-                  top: '10px',
-                  right: '10px',
-                  width: '7px',
-                  height: '7px',
-                  borderRadius: '50%',
-                  background: '#e88a2d'
-                }} />
+        {/* 1. DYNAMIC UPCOMING VISIT / NOTIFICATION BANNER (Shows only when there is an active visit or urgent notification) */}
+        {upcomingVisit ? (
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <div style={{
+              background: '#ffffff',
+              border: '1px solid #e2e8f0',
+              borderRadius: '16px',
+              padding: '16px 24px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '24px',
+              width: '100%',
+              maxWidth: '840px',
+              boxShadow: '0 2px 10px rgba(0, 37, 66, 0.03)'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                <div style={{
+                  position: 'relative',
+                  width: '42px',
+                  height: '42px',
+                  borderRadius: '12px',
+                  background: '#f1f5f9',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#173b57'
+                }}>
+                  <Calendar size={20} />
+                  <span style={{
+                    position: 'absolute',
+                    top: '10px',
+                    right: '10px',
+                    width: '7px',
+                    height: '7px',
+                    borderRadius: '50%',
+                    background: '#e88a2d'
+                  }} />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                  <span style={{ fontSize: '11px', fontWeight: 800, color: '#476179', letterSpacing: '0.8px', textTransform: 'uppercase' }}>
+                    UPCOMING FOR YOU
+                  </span>
+                  <span style={{ fontSize: '15px', fontWeight: 600, color: '#173b57' }}>
+                    RTO Visit: {upcomingVisit.vehicleClass || 'Driving Licence Test'} <span style={{ color: '#94a3b8', margin: '0 6px' }}>·</span> {upcomingVisit.date}, {upcomingVisit.time || upcomingVisit.slot || '10:30 AM'}
+                  </span>
+                </div>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                <span style={{ fontSize: '11px', fontWeight: 800, color: '#476179', letterSpacing: '0.8px', textTransform: 'uppercase' }}>
-                  UPCOMING FOR YOU
-                </span>
-                <span style={{ fontSize: '15px', fontWeight: 600, color: '#173b57' }}>
-                  RTO Visit: Driving Licence Test <span style={{ color: '#94a3b8', margin: '0 6px' }}>·</span> 18 September 2026, 10:30 AM
-                </span>
-              </div>
-            </div>
 
-            <button
-              onClick={() => navigate('/appointments')}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                color: '#173b57',
-                fontSize: '14px',
-                fontWeight: 600,
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '6px 12px',
-                borderRadius: '8px',
-                transition: 'all 0.15s ease'
-              }}
-              onMouseEnter={(e) => e.target.style.background = '#f1f5f9'}
-              onMouseLeave={(e) => e.target.style.background = 'transparent'}
-            >
-              View appointment <ArrowRight size={15} />
-            </button>
+              <button
+                onClick={() => navigate('/appointments')}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#173b57',
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '6px 12px',
+                  borderRadius: '8px',
+                  transition: 'all 0.15s ease'
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = '#f1f5f9')}
+                onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+              >
+                View appointment <ArrowRight size={15} />
+              </button>
+            </div>
           </div>
-        </div>
+        ) : importantNotice ? (
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <div style={{
+              background: '#ffffff',
+              border: '1px solid #e2e8f0',
+              borderRadius: '16px',
+              padding: '16px 24px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '24px',
+              width: '100%',
+              maxWidth: '840px',
+              boxShadow: '0 2px 10px rgba(0, 37, 66, 0.03)'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                <div style={{
+                  position: 'relative',
+                  width: '42px',
+                  height: '42px',
+                  borderRadius: '12px',
+                  background: '#fef3e9',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#e88a2d'
+                }}>
+                  <Bell size={20} />
+                  <span style={{
+                    position: 'absolute',
+                    top: '10px',
+                    right: '10px',
+                    width: '7px',
+                    height: '7px',
+                    borderRadius: '50%',
+                    background: '#e88a2d'
+                  }} />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                  <span style={{ fontSize: '11px', fontWeight: 800, color: '#e88a2d', letterSpacing: '0.8px', textTransform: 'uppercase' }}>
+                    IMPORTANT UPDATE
+                  </span>
+                  <span style={{ fontSize: '15px', fontWeight: 600, color: '#173b57' }}>
+                    {importantNotice.title} <span style={{ color: '#94a3b8', margin: '0 6px' }}>·</span> {importantNotice.body}
+                  </span>
+                </div>
+              </div>
+
+              <button
+                onClick={() => navigate('/notifications')}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#173b57',
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '6px 12px',
+                  borderRadius: '8px',
+                  transition: 'all 0.15s ease'
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = '#f1f5f9')}
+                onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+              >
+                View notification <ArrowRight size={15} />
+              </button>
+            </div>
+          </div>
+        ) : null}
 
         {/* 2. HERO SECTION ("Namaste, Yanshi 👋") */}
         <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(360px, 480px)', gap: '40px', alignItems: 'center', padding: '20px 0' }}>
@@ -101,10 +211,14 @@ export function DashboardPage() {
           <div style={{ position: 'relative', width: '100%', height: '180px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <svg width="440" height="160" viewBox="0 0 440 160" fill="none" xmlns="http://www.w3.org/2000/svg">
               <defs>
+                <filter id="premium-glow" x="-50%" y="-50%" width="200%" height="200%">
+                  <feGaussianBlur stdDeviation="4" result="blur" />
+                  <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                </filter>
                 <linearGradient id="roadmapGradient" x1="0%" y1="100%" x2="100%" y2="0%">
                   <stop offset="0%" stopColor="#e88a2d" />
                   <stop offset="45%" stopColor="#173b57" />
-                  <stop offset="100%" stopColor="#173b57" />
+                  <stop offset="100%" stopColor="#16805a" />
                 </linearGradient>
               </defs>
               {/* Outer Soft Thick Track */}
@@ -115,7 +229,7 @@ export function DashboardPage() {
                 strokeLinecap="round"
                 opacity="0.8"
               />
-              {/* Single Continuous Gradient Curve (Orange to Navy Blue) */}
+              {/* Center Dotted Highway Line */}
               <path
                 d="M 30 130 C 120 130, 140 35, 210 35 C 270 35, 300 85, 390 85"
                 stroke="url(#roadmapGradient)"
@@ -125,9 +239,10 @@ export function DashboardPage() {
 
               {/* Node 1: START */}
               <g transform="translate(30, 130)">
+                <circle r="12" fill="#e88a2d" fillOpacity="0.15" filter="url(#premium-glow)" />
                 <circle r="10" fill="#f7f9fb" stroke="#e88a2d" strokeWidth="4" />
                 <circle r="4" fill="#e88a2d" />
-                <text x="0" y="24" textAnchor="middle" fill="#e88a2d" fontSize="11" fontWeight="800" letterSpacing="0.5">START</text>
+                <text x="0" y="26" textAnchor="middle" fill="#e88a2d" fontSize="11" fontWeight="800" letterSpacing="1">START</text>
               </g>
 
               {/* Node 2: LL */}
@@ -138,15 +253,15 @@ export function DashboardPage() {
 
               {/* Node 3: TEST */}
               <g transform="translate(305, 48)">
-                <circle r="6" fill="#173b57" />
+                <circle r="6" fill="#173b57" opacity="0.6" />
                 <text x="0" y="-14" textAnchor="middle" fill="#476179" fontSize="11" fontWeight="700">TEST</text>
               </g>
 
               {/* Node 4: DL */}
               <g transform="translate(390, 85)">
-                <circle r="10" fill="#f7f9fb" stroke="#173b57" strokeWidth="2" strokeDasharray="3 3" />
-                <circle r="4" fill="#173b57" />
-                <text x="0" y="24" textAnchor="middle" fill="#173b57" fontSize="11" fontWeight="800">DL</text>
+                <circle r="12" fill="none" stroke="#16805a" strokeWidth="2" strokeDasharray="3 3" />
+                <circle r="5" fill="#16805a" />
+                <text x="0" y="26" textAnchor="middle" fill="#16805a" fontSize="11" fontWeight="800">DL</text>
               </g>
             </svg>
           </div>
@@ -167,115 +282,73 @@ export function DashboardPage() {
             </h2>
           </div>
 
-          {/* 3 Clean Editorial Columns */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '40px' }}>
+          {/* 3 Interactive Destination Cards with Smooth Hover Animations */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '32px' }}>
             
-            {/* Column 01: Starting Fresh */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#476179' }}>
-                <Car size={16} />
-                <span style={{ fontSize: '13px', fontWeight: 700 }}>01</span>
+            {/* Card 01: Starting Fresh */}
+            <div
+              className="journey-destination-card"
+              onClick={() => navigate('/ll/intro')}
+            >
+              <div className="dest-icon-circle">
+                <Car size={24} />
               </div>
-
-              <h3 style={{ fontSize: '22px', fontWeight: 700, color: '#173b57', margin: 0 }}>
-                Starting Fresh
+              <div className="dest-step-tag">
+                01 · STARTING FRESH
+              </div>
+              <h3 className="dest-heading">
+                I'm starting from scratch
               </h3>
-
-              <p style={{ fontSize: '15px', color: '#476179', margin: 0, lineHeight: 1.5 }}>
+              <p className="dest-description">
                 I don't have a Learner Licence yet.
               </p>
-
-              <button
-                onClick={() => navigate('/ll/intro')}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  color: '#173b57',
-                  fontSize: '15px',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  padding: 0,
-                  marginTop: '8px',
-                  width: 'fit-content'
-                }}
-              >
-                Start with LL <ArrowRight size={16} />
-              </button>
+              <div className="dest-action-btn">
+                Start with LL <ArrowRight size={16} className="dest-btn-arrow" />
+              </div>
             </div>
 
-            {/* Column 02: Continue Your Journey */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#476179' }}>
-                <FileText size={16} />
-                <span style={{ fontSize: '13px', fontWeight: 700 }}>02</span>
+            {/* Card 02: Continue Your Journey */}
+            <div
+              className="journey-destination-card"
+              onClick={() => navigate('/dl/intro')}
+            >
+              <div className="dest-icon-circle">
+                <FileText size={24} />
               </div>
-
-              <h3 style={{ fontSize: '22px', fontWeight: 700, color: '#173b57', margin: 0 }}>
-                Continue Your Journey
+              <div className="dest-step-tag">
+                02 · CONTINUE YOUR JOURNEY
+              </div>
+              <h3 className="dest-heading">
+                I have a Learner Licence
               </h3>
-
-              <p style={{ fontSize: '15px', color: '#476179', margin: 0, lineHeight: 1.5 }}>
+              <p className="dest-description">
                 Continue towards your Driving Licence.
               </p>
-
-              <button
-                onClick={() => navigate('/dl/intro')}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  color: '#173b57',
-                  fontSize: '15px',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  padding: 0,
-                  marginTop: '8px',
-                  width: 'fit-content'
-                }}
-              >
-                Continue to DL <ArrowRight size={16} />
-              </button>
+              <div className="dest-action-btn">
+                Continue to DL <ArrowRight size={16} className="dest-btn-arrow" />
+              </div>
             </div>
 
-            {/* Column 03: Existing Licence */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#476179' }}>
-                <Shield size={16} />
-                <span style={{ fontSize: '13px', fontWeight: 700 }}>03</span>
+            {/* Card 03: Existing Licence */}
+            <div
+              className="journey-destination-card"
+              onClick={() => navigate('/licence-services')}
+            >
+              <div className="dest-icon-circle">
+                <Shield size={24} />
               </div>
-
-              <h3 style={{ fontSize: '22px', fontWeight: 700, color: '#173b57', margin: 0 }}>
-                Existing Licence
+              <div className="dest-step-tag">
+                03 · EXISTING LICENCE
+              </div>
+              <h3 className="dest-heading">
+                I already have a Driving Licence
               </h3>
-
-              <p style={{ fontSize: '15px', color: '#476179', margin: 0, lineHeight: 1.5 }}>
+              <p className="dest-description">
                 Manage services related to your existing licence.
               </p>
-
-              <button
-                onClick={() => navigate('/licence-services')}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  color: '#173b57',
-                  fontSize: '15px',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  padding: 0,
-                  marginTop: '8px',
-                  width: 'fit-content'
-                }}
-              >
-                View licence services <ArrowRight size={16} />
-              </button>
+              <div className="dest-action-btn">
+                View licence services <ArrowRight size={16} className="dest-btn-arrow" />
+              </div>
             </div>
 
           </div>
@@ -285,3 +358,4 @@ export function DashboardPage() {
     </div>
   );
 }
+

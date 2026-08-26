@@ -33,11 +33,28 @@ const JourneyContext = createContext(null);
 
 const languages = [
   { code: "en", label: "English" },
-  { code: "hi", label: "हिन्दी" },
-  { code: "bn", label: "বাংলা" },
-  { code: "ta", label: "தமிழ்" },
-  { code: "te", label: "తెలుగు" },
-  { code: "mr", label: "मराठी" }
+  { code: "hi", label: "हिन्दी (Hindi)" },
+  { code: "bn", label: "বাংলা (Bengali)" },
+  { code: "te", label: "తెలుగు (Telugu)" },
+  { code: "ta", label: "தமிழ் (Tamil)" },
+  { code: "mr", label: "मराठी (Marathi)" },
+  { code: "gu", label: "ગુજરાતી (Gujarati)" },
+  { code: "kn", label: "ಕನ್ನಡ (Kannada)" },
+  { code: "ml", label: "മലയാളം (Malayalam)" },
+  { code: "pa", label: "ਪੰਜਾਬੀ (Punjabi)" },
+  { code: "or", label: "ଓଡ଼ିଆ (Odia)" },
+  { code: "as", label: "অসমীয়া (Assamese)" },
+  { code: "ur", label: "اردو (Urdu)" },
+  { code: "sa", label: "संस्कृतम् (Sanskrit)" },
+  { code: "mai", label: "मैथिली (Maithili)" },
+  { code: "sat", label: "संथाली (Santali)" },
+  { code: "ks", label: "کٲشُر (Kashmiri)" },
+  { code: "ne", label: "नेपाली (Nepali)" },
+  { code: "kok", label: "कोंकणी (Konkani)" },
+  { code: "sd", label: "سنڌي (Sindhi)" },
+  { code: "doi", label: "डोगरी (Dogri)" },
+  { code: "brx", label: "बड़ो (Bodo)" },
+  { code: "mni", label: "মৈতৈলোন্ (Manipuri)" }
 ];
 
 const fadeUp = {
@@ -105,6 +122,7 @@ function App() {
 }
 
 import { ScreenSwitcher } from "./components/layout/ScreenSwitcher";
+import { LanguageSelector } from "./components/layout/LanguageSelector";
 import { DashboardPage } from "./pages/DashboardPage";
 import { DocumentsCenterPage } from "./pages/DocumentsCenterPage";
 import { AppointmentsPage } from "./pages/AppointmentsPage";
@@ -241,9 +259,8 @@ function Shell({ children }) {
   return (
     <div className="app-shell">
       <header className="topbar">
-        <Link to="/dashboard" className="brand">
-          <img src="/indian-drives-logo.png" alt="" onError={(e) => { e.target.style.display = 'none'; }} />
-          <span>Indian Drives</span>
+        <Link to="/dashboard" className="brand" aria-label="Indian Drives Home">
+          <img src="/indian-drives-logo.png" alt="Indian Drives Logo" className="brand-logo-img" onError={(e) => { e.target.style.display = 'none'; }} />
         </Link>
         
         <nav className="navlinks" aria-label="Primary">
@@ -253,21 +270,16 @@ function Shell({ children }) {
           <NavLink to="/journey" className={({ isActive }) => isActive ? "active" : ""}>
             My Journey
           </NavLink>
-          <NavLink to="/ask" style={{ color: '#e88a2d', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-            <span style={{ color: '#e88a2d', fontSize: '14px' }}>✦</span> Ask Indian Drives
-          </NavLink>
           <NavLink to="/help" className={({ isActive }) => isActive ? "active" : ""}>
             Help
+          </NavLink>
+          <NavLink to="/ask" style={{ color: '#e88a2d', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ color: '#e88a2d', fontSize: '14px' }}>✦</span> Ask DriveSeva
           </NavLink>
         </nav>
 
         <div className="top-actions">
-          <label className="language-select">
-            <select value={language} onChange={(event) => setLanguage(event.target.value)} aria-label="Language">
-              <option value="en">English ▍</option>
-              <option value="hi">हिन्दी</option>
-            </select>
-          </label>
+          <LanguageSelector currentLanguage={language} onSelectLanguage={setLanguage} />
           <Link className="icon-button" to="/notifications" aria-label="Notifications">
             <Bell size={18} />
           </Link>
@@ -309,7 +321,7 @@ function Landing() {
   return (
     <motion.div className="landing stitch-pattern" {...fadeUp}>
       <div className="landing-nav">
-        <div className="brand"><img src="/indian-drives-logo.png" alt="" /><span>Indian Drives</span></div>
+        <div className="brand"><img src="/indian-drives-logo.png" alt="Indian Drives Logo" className="brand-logo-img" /></div>
         <Link className="button secondary" to="/login">{tr("common.login")}</Link>
       </div>
       <section className="hero">
