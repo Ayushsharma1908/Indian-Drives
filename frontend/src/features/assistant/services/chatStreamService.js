@@ -1,6 +1,6 @@
 import { ACTION_CATALOG } from '../actions/actionCatalog';
 
-const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:5001";
 
 /**
  * Stream conversational responses from the backend LLM provider

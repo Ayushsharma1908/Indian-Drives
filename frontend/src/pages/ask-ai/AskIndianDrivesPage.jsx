@@ -45,7 +45,7 @@ export function AskIndianDrivesPage() {
 
   // Check backend AI config on mount
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"}/api/ai/config`)
+    fetch(`${import.meta.env.VITE_API_BASE_URL || "http://localhost:5001"}/api/ai/config`)
       .then(res => res.json())
       .then(data => {
         if (data.success && data.data) {

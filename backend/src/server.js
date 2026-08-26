@@ -8,7 +8,7 @@ import { streamChatCompletion } from "./ai/provider.js";
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 5001;
 const origin = process.env.CLIENT_ORIGIN || "http://localhost:5173";
 
 app.use(cors({ origin, credentials: true }));
