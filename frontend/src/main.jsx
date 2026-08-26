@@ -235,60 +235,65 @@ function ProtectedApp() {
 }
 
 function Shell({ children }) {
-  const { tr, language, setLanguage } = useContext(LanguageContext);
+  const { language, setLanguage } = useContext(LanguageContext);
   const { user, logout } = useContext(AuthContext);
-  const nav = [
-    { to: "/dashboard", label: tr("nav.dashboard") || "Dashboard", icon: LayoutDashboard },
-    { to: "/services", label: "Services", icon: ShieldCheck },
-    { to: "/journey", label: tr("nav.journey") || "Journey", icon: Gauge },
-    { to: "/ask", label: tr("nav.ask") || "Ask AI", icon: MessageCircle },
-    { to: "/help", label: tr("nav.help") || "Help", icon: CircleHelp }
-  ];
 
   return (
     <div className="app-shell">
-      <ScreenSwitcher />
       <header className="topbar">
         <Link to="/dashboard" className="brand">
           <img src="/indian-drives-logo.png" alt="" onError={(e) => { e.target.style.display = 'none'; }} />
           <span>Indian Drives</span>
         </Link>
+        
         <nav className="navlinks" aria-label="Primary">
-          {nav.map((item) => (
-            <NavLink key={item.to} to={item.to}>
-              <item.icon size={18} />
-              {item.label}
-            </NavLink>
-          ))}
+          <NavLink to="/dashboard" className={({ isActive }) => isActive ? "active" : ""}>
+            Dashboard
+          </NavLink>
+          <NavLink to="/journey">
+            My Journey
+          </NavLink>
+          <NavLink to="/ask" style={{ color: '#e88a2d', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ color: '#e88a2d', fontSize: '14px' }}>✦</span> Ask Indian Drives
+          </NavLink>
         </nav>
+
         <div className="top-actions">
           <label className="language-select">
-            <Languages size={18} />
-            <select value={language} onChange={(event) => setLanguage(event.target.value)} aria-label={tr("common.language")}>
-              {languages.map((item) => <option key={item.code} value={item.code}>{item.label}</option>)}
+            <select value={language} onChange={(event) => setLanguage(event.target.value)} aria-label="Language">
+              <option value="en">English ▍</option>
+              <option value="hi">हिन्दी</option>
             </select>
           </label>
-          <Link className="icon-button" to="/notifications" aria-label={tr("nav.notifications")}><Bell size={19} /></Link>
-          <Link className="profile-pill" to="/profile" aria-label={tr("nav.profile")}><span>{user?.avatar || "RS"}</span><User size={17} /></Link>
-          <button className="icon-button" type="button" onClick={logout} aria-label={tr("common.logout")}><LogOut size={18} /></button>
+          <Link className="icon-button" to="/notifications" aria-label="Notifications">
+            <Bell size={18} />
+          </Link>
+          <Link className="profile-pill" to="/profile" aria-label="Profile" style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#f1f5f9', color: '#173b57', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '14px' }}>
+            A
+          </Link>
         </div>
       </header>
+
       <main>{children}</main>
+
       <Footer />
     </div>
   );
 }
 
-
 function Footer() {
-  const { tr } = useContext(LanguageContext);
   return (
-    <footer className="footer">
-      <b>Indian Drives</b>
-      <span>{tr("footer.line")}</span>
+    <footer style={{ background: '#ffffff', borderTop: '1px solid #e2e8f0', padding: '20px 48px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px', fontSize: '13px', color: '#476179' }}>
       <div>
-        <Link to="/help">{tr("nav.help")}</Link>
-        <a href="https://parivahan.gov.in/" target="_blank" rel="noreferrer">Parivahan</a>
+        Indian Drives — A citizen experience concept for driving licence services.
+      </div>
+      <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
+        <Link to="/help" style={{ color: '#476179' }}>Privacy</Link>
+        <Link to="/help" style={{ color: '#476179' }}>Terms</Link>
+        <Link to="/help" style={{ color: '#476179' }}>Accessibility</Link>
+        <Link to="/help" style={{ color: '#476179' }}>Help</Link>
+        <Link to="/help" style={{ color: '#476179' }}>Contact</Link>
+        <Link to="/help" style={{ color: '#476179' }}>Feedback</Link>
       </div>
     </footer>
   );

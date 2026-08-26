@@ -1,93 +1,286 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  LayoutDashboard, FileCheck2, Car, CalendarDays, CreditCard, ShieldCheck,
-  ArrowRight, Clock, CheckCircle2, Sparkles, AlertCircle
-} from 'lucide-react';
-import { StatusBadge } from '../components/ui/StatusBadge';
+import { Calendar, ArrowRight, Car, FileText, Shield, Sparkles } from 'lucide-react';
 
 export function DashboardPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="page page-dashboard">
-      <div className="services-panel" style={{ padding: '28px', marginBottom: '24px', background: 'linear-gradient(135deg, #00253e 0%, #173b57 100%)', color: '#fff', borderRadius: '16px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+    <div className="page-dashboard-container" style={{ background: '#f7f9fb', minHeight: 'calc(100vh - 72px)', padding: '32px 0 60px 0', fontFamily: 'Inter, system-ui, sans-serif' }}>
+      <div style={{ maxWidth: '1184px', margin: '0 auto', padding: '0 24px', display: 'flex', flexDirection: 'column', gap: '48px' }}>
+        
+        {/* 1. UPCOMING FOR YOU BANNER */}
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <div style={{
+            background: '#ffffff',
+            border: '1px solid #e2e8f0',
+            borderRadius: '16px',
+            padding: '16px 24px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '24px',
+            width: '100%',
+            maxWidth: '840px',
+            boxShadow: '0 2px 10px rgba(0, 37, 66, 0.03)'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <div style={{
+                position: 'relative',
+                width: '42px',
+                height: '42px',
+                borderRadius: '12px',
+                background: '#f1f5f9',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#173b57'
+              }}>
+                <Calendar size={20} />
+                <span style={{
+                  position: 'absolute',
+                  top: '10px',
+                  right: '10px',
+                  width: '7px',
+                  height: '7px',
+                  borderRadius: '50%',
+                  background: '#e88a2d'
+                }} />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                <span style={{ fontSize: '11px', fontWeight: 800, color: '#476179', letterSpacing: '0.8px', textTransform: 'uppercase' }}>
+                  UPCOMING FOR YOU
+                </span>
+                <span style={{ fontSize: '15px', fontWeight: 600, color: '#173b57' }}>
+                  RTO Visit: Driving Licence Test <span style={{ color: '#94a3b8', margin: '0 6px' }}>·</span> 18 September 2026, 10:30 AM
+                </span>
+              </div>
+            </div>
+
+            <button
+              onClick={() => navigate('/appointments')}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: '#173b57',
+                fontSize: '14px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '6px 12px',
+                borderRadius: '8px',
+                transition: 'all 0.15s ease'
+              }}
+              onMouseEnter={(e) => e.target.style.background = '#f1f5f9'}
+              onMouseLeave={(e) => e.target.style.background = 'transparent'}
+            >
+              View appointment <ArrowRight size={15} />
+            </button>
+          </div>
+        </div>
+
+        {/* 2. HERO SECTION ("Namaste, Yanshi 👋") */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(360px, 480px)', gap: '40px', alignItems: 'center', padding: '20px 0' }}>
+          
+          {/* Left Text */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <h1 style={{ fontSize: '54px', fontWeight: 700, color: '#173b57', margin: 0, lineHeight: 1.1, letterSpacing: '-1.5px' }}>
+              Namaste, Yanshi 👋
+            </h1>
+            <div style={{ fontSize: '22px', color: '#173b57', fontWeight: 600, lineHeight: 1.4 }}>
+              Welcome to Indian Drives.
+              <div style={{ color: '#476179', fontWeight: 400, marginTop: '4px' }}>
+                We'll guide you every step of the way.
+              </div>
+            </div>
+          </div>
+
+          {/* Right S-Curve Roadmap SVG Graphic */}
+          <div style={{ position: 'relative', width: '100%', height: '180px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <svg width="440" height="160" viewBox="0 0 440 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="roadmapGradient" x1="0%" y1="100%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#e88a2d" />
+                  <stop offset="45%" stopColor="#173b57" />
+                  <stop offset="100%" stopColor="#173b57" />
+                </linearGradient>
+              </defs>
+              {/* Outer Soft Thick Track */}
+              <path
+                d="M 30 130 C 120 130, 140 35, 210 35 C 270 35, 300 85, 390 85"
+                stroke="#e2e8f0"
+                strokeWidth="14"
+                strokeLinecap="round"
+                opacity="0.8"
+              />
+              {/* Single Continuous Gradient Curve (Orange to Navy Blue) */}
+              <path
+                d="M 30 130 C 120 130, 140 35, 210 35 C 270 35, 300 85, 390 85"
+                stroke="url(#roadmapGradient)"
+                strokeWidth="4"
+                strokeLinecap="round"
+              />
+
+              {/* Node 1: START */}
+              <g transform="translate(30, 130)">
+                <circle r="10" fill="#f7f9fb" stroke="#e88a2d" strokeWidth="4" />
+                <circle r="4" fill="#e88a2d" />
+                <text x="0" y="24" textAnchor="middle" fill="#e88a2d" fontSize="11" fontWeight="800" letterSpacing="0.5">START</text>
+              </g>
+
+              {/* Node 2: LL */}
+              <g transform="translate(210, 35)">
+                <circle r="6" fill="#173b57" />
+                <text x="0" y="-14" textAnchor="middle" fill="#476179" fontSize="11" fontWeight="700">LL</text>
+              </g>
+
+              {/* Node 3: TEST */}
+              <g transform="translate(305, 48)">
+                <circle r="6" fill="#173b57" />
+                <text x="0" y="-14" textAnchor="middle" fill="#476179" fontSize="11" fontWeight="700">TEST</text>
+              </g>
+
+              {/* Node 4: DL */}
+              <g transform="translate(390, 85)">
+                <circle r="10" fill="#f7f9fb" stroke="#173b57" strokeWidth="2" strokeDasharray="3 3" />
+                <circle r="4" fill="#173b57" />
+                <text x="0" y="24" textAnchor="middle" fill="#173b57" fontSize="11" fontWeight="800">DL</text>
+              </g>
+            </svg>
+          </div>
+
+        </div>
+
+        {/* SECTION DIVIDER */}
+        <div style={{ height: '1px', background: '#e2e8f0', width: '100%' }} />
+
+        {/* 3. WHERE ARE YOU IN YOUR DRIVING JOURNEY SECTION */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
           <div>
-            <span style={{ color: 'var(--saffron)', fontSize: '12px', fontWeight: 800 }}>WELCOME BACK</span>
-            <h1 style={{ margin: '4px 0 6px 0', fontSize: '28px' }}>Hello, Rahul Sharma 👋</h1>
-            <p style={{ margin: 0, opacity: 0.85, fontSize: '14px' }}>Your Learner Licence is active. You are eligible to book your permanent DL test slot.</p>
-          </div>
-          <button className="primary-button" style={{ background: 'var(--saffron)', color: '#000', fontWeight: 800, padding: '10px 20px' }} onClick={() => navigate('/dl/intro')}>
-            Book DL Driving Test <ArrowRight size={16} />
-          </button>
-        </div>
-      </div>
-
-      <div className="console-grid" style={{ marginBottom: '24px' }}>
-        <div className="stat-card">
-          <span className="stat-num" style={{ color: 'var(--ok)' }}>1 Active</span>
-          <span className="stat-label">Learner Licence</span>
-        </div>
-        <div className="stat-card">
-          <span className="stat-num" style={{ color: 'var(--saffron)' }}>24 Oct 2026</span>
-          <span className="stat-label">Next RTO Test</span>
-        </div>
-        <div className="stat-card">
-          <span className="stat-num">5</span>
-          <span className="stat-label">Verified Documents</span>
-        </div>
-        <div className="stat-card">
-          <span className="stat-num" style={{ color: 'var(--primary)' }}>₹0.00</span>
-          <span className="stat-label">Pending Dues</span>
-        </div>
-      </div>
-
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px', marginBottom: '24px' }}>
-        <div className="services-panel" style={{ padding: '24px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-            <h3 style={{ margin: 0, fontSize: '18px' }}>Active Credentials</h3>
-            <StatusBadge status="Verified" text="Verified" />
-          </div>
-
-          <div style={{ background: 'var(--surface-low)', padding: '16px', borderRadius: '12px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <div style={{ background: '#dcfce7', color: 'var(--ok)', padding: '10px', borderRadius: '10px' }}>
-                <FileCheck2 size={24} />
-              </div>
-              <div>
-                <h4 style={{ margin: '0 0 2px 0', fontSize: '15px' }}>Learner Licence (LL)</h4>
-                <div style={{ fontSize: '12px', color: 'var(--muted)' }}>NO: <strong>KA01/2026/009182</strong></div>
-              </div>
+            <div style={{ color: '#e88a2d', fontSize: '12px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>
+              WHERE ARE YOU IN YOUR DRIVING JOURNEY?
             </div>
-            <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid var(--outline)', display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: 'var(--muted)' }}>
-              <span>Valid From: 26 Aug 2026</span>
-              <span style={{ color: 'var(--ok)', fontWeight: 700 }}>Valid Until: 26 Feb 2027</span>
+            <h2 style={{ fontSize: '36px', fontWeight: 700, color: '#173b57', margin: 0, letterSpacing: '-0.8px' }}>
+              Tell us where you are, and we'll take you from there.
+            </h2>
+          </div>
+
+          {/* 3 Clean Editorial Columns */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '40px' }}>
+            
+            {/* Column 01: Starting Fresh */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#476179' }}>
+                <Car size={16} />
+                <span style={{ fontSize: '13px', fontWeight: 700 }}>01</span>
+              </div>
+
+              <h3 style={{ fontSize: '22px', fontWeight: 700, color: '#173b57', margin: 0 }}>
+                Starting Fresh
+              </h3>
+
+              <p style={{ fontSize: '15px', color: '#476179', margin: 0, lineHeight: 1.5 }}>
+                I don't have a Learner Licence yet.
+              </p>
+
+              <button
+                onClick={() => navigate('/ll/intro')}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#173b57',
+                  fontSize: '15px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: 0,
+                  marginTop: '8px',
+                  width: 'fit-content'
+                }}
+              >
+                Start with LL <ArrowRight size={16} />
+              </button>
             </div>
+
+            {/* Column 02: Continue Your Journey */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#476179' }}>
+                <FileText size={16} />
+                <span style={{ fontSize: '13px', fontWeight: 700 }}>02</span>
+              </div>
+
+              <h3 style={{ fontSize: '22px', fontWeight: 700, color: '#173b57', margin: 0 }}>
+                Continue Your Journey
+              </h3>
+
+              <p style={{ fontSize: '15px', color: '#476179', margin: 0, lineHeight: 1.5 }}>
+                Continue towards your Driving Licence.
+              </p>
+
+              <button
+                onClick={() => navigate('/dl/intro')}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#173b57',
+                  fontSize: '15px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: 0,
+                  marginTop: '8px',
+                  width: 'fit-content'
+                }}
+              >
+                Continue to DL <ArrowRight size={16} />
+              </button>
+            </div>
+
+            {/* Column 03: Existing Licence */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#476179' }}>
+                <Shield size={16} />
+                <span style={{ fontSize: '13px', fontWeight: 700 }}>03</span>
+              </div>
+
+              <h3 style={{ fontSize: '22px', fontWeight: 700, color: '#173b57', margin: 0 }}>
+                Existing Licence
+              </h3>
+
+              <p style={{ fontSize: '15px', color: '#476179', margin: 0, lineHeight: 1.5 }}>
+                Manage services related to your existing licence.
+              </p>
+
+              <button
+                onClick={() => navigate('/licence-services')}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#173b57',
+                  fontSize: '15px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: 0,
+                  marginTop: '8px',
+                  width: 'fit-content'
+                }}
+              >
+                View licence services <ArrowRight size={16} />
+              </button>
+            </div>
+
           </div>
         </div>
 
-        <div className="services-panel" style={{ padding: '24px' }}>
-          <h3 style={{ margin: '0 0 16px 0', fontSize: '18px' }}>Quick Actions</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-            <button className="secondary-button" style={{ padding: '12px', textAlign: 'left' }} onClick={() => navigate('/dl/intro')}>
-              <Car size={18} color="var(--primary)" />
-              <div style={{ fontWeight: 700, fontSize: '13px', marginTop: '6px' }}>Apply for DL</div>
-            </button>
-            <button className="secondary-button" style={{ padding: '12px', textAlign: 'left' }} onClick={() => navigate('/appointments')}>
-              <CalendarDays size={18} color="var(--saffron)" />
-              <div style={{ fontWeight: 700, fontSize: '13px', marginTop: '6px' }}>My Appointments</div>
-            </button>
-            <button className="secondary-button" style={{ padding: '12px', textAlign: 'left' }} onClick={() => navigate('/documents')}>
-              <FileCheck2 size={18} color="var(--ok)" />
-              <div style={{ fontWeight: 700, fontSize: '13px', marginTop: '6px' }}>Document Vault</div>
-            </button>
-            <button className="secondary-button" style={{ padding: '12px', textAlign: 'left' }} onClick={() => navigate('/ask')}>
-              <Sparkles size={18} color="#9333ea" />
-              <div style={{ fontWeight: 700, fontSize: '13px', marginTop: '6px' }}>Ask AI Helper</div>
-            </button>
-          </div>
-        </div>
       </div>
     </div>
   );
