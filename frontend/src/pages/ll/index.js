@@ -5,6 +5,7 @@ export {
   LLApplicantDetailsPage,
   LLAddressDetailsPage,
   LLApplicationReviewPage,
+  LLFeePaymentPage,
   LLAssessmentCockpitPage,
   LLAssessmentLiveExamPage,
   LLAssessmentResultPage,
