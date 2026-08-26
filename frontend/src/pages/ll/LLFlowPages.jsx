@@ -1568,7 +1568,7 @@ export function LLAssessmentLiveExamPage() {
           {/* Disabled Assistant Notice */}
           <div style={{ background: '#f8fafc', borderRadius: '14px', padding: '14px 16px', border: '1px solid #e2e8f0', fontSize: '12px', color: '#64748b', lineHeight: 1.5, display: 'flex', gap: '8px' }}>
             <Info size={16} color="#173b57" style={{ flexShrink: 0, marginTop: '2px' }} />
-            <span>DriveSeva assistant is disabled during the active assessment.</span>
+            <span>Indian Drives assistant is disabled during the active assessment.</span>
           </div>
 
           {/* Exit Assessment */}

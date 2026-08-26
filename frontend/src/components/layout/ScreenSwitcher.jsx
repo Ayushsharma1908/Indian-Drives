@@ -12,7 +12,7 @@ export const ALL_FIGMA_SCREENS = [
   { id: 'help-center', name: 'Help Center', category: 'Core Portal', path: '/help', figmaId: '64:906' },
   { id: 'profile', name: 'Profile', category: 'Core Portal', path: '/profile', figmaId: '64:1121' },
   { id: 'settings', name: 'Settings', category: 'Core Portal', path: '/settings', figmaId: '64:1312' },
-  { id: 'ask-indian-drives', name: 'Ask DriveSeva', category: 'Core Portal', path: '/ask', figmaId: '64:1537' },
+  { id: 'ask-indian-drives', name: 'Ask Indian Drives', category: 'Core Portal', path: '/ask', figmaId: '64:1537' },
   { id: 'dashboard', name: 'Dashboard', category: 'Core Portal', path: '/dashboard', figmaId: '65:4576' },
 
   // Learner Licence Flow
