@@ -156,7 +156,9 @@ import {
   DLConfirmAddressPage,
   DLVerifiedDocumentsPage,
   DLPaymentCheckoutPage,
+  DLTestCenterSelectionPage,
   DLTestSlotBookingPage,
+  DLAppointmentFixedPage,
   DLDashboardPage,
   DrivingTestResultPage,
   LicenceDispatchPage
@@ -165,6 +167,7 @@ import {
 import {
   LicenceServicesHubPage,
   ManageDrivingLicencePage,
+  LicenceFoundPage,
   UpdateLicenceDetailsPage,
   RenewDrivingLicencePage,
   DuplicateDrivingLicencePage,
@@ -233,7 +236,9 @@ function ProtectedApp() {
         <Route path="/dl/doc-verification" element={<DLVerifiedDocumentsPage />} />
         <Route path="/dl/fee-summary" element={<DLPaymentCheckoutPage />} />
         <Route path="/dl/payment" element={<DLPaymentCheckoutPage />} />
-        <Route path="/dl/test-center" element={<DLTestSlotBookingPage />} />
+        <Route path="/dl/test-center" element={<DLTestCenterSelectionPage />} />
+        <Route path="/dl/test-slot" element={<DLTestSlotBookingPage />} />
+        <Route path="/dl/appointment-fixed" element={<DLAppointmentFixedPage />} />
         <Route path="/dl/dashboard" element={<MyJourneyTimelinePage initialStage="dl" />} />
         <Route path="/dl/test-result" element={<DrivingTestResultPage />} />
         <Route path="/dl/dispatch" element={<LicenceDispatchPage />} />
@@ -241,7 +246,7 @@ function ProtectedApp() {
         {/* Licence Services & Maintenance */}
         <Route path="/licence-services" element={<LicenceServicesHubPage />} />
         <Route path="/manage-licence" element={<ManageDrivingLicencePage />} />
-        <Route path="/licence-verified" element={<ManageDrivingLicencePage />} />
+        <Route path="/licence-verified" element={<LicenceFoundPage />} />
         <Route path="/update-licence" element={<UpdateLicenceDetailsPage />} />
         <Route path="/update-submitted" element={<UpdateLicenceDetailsPage />} />
         <Route path="/renew-licence" element={<RenewDrivingLicencePage />} />

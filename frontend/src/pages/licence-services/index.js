@@ -1,6 +1,7 @@
 export {
   LicenceServicesHubPage,
   ManageDrivingLicencePage,
+  LicenceFoundPage,
   UpdateLicenceDetailsPage,
   RenewDrivingLicencePage,
   DuplicateDrivingLicencePage,
