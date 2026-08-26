@@ -189,6 +189,7 @@ function ProtectedApp() {
         <Route path="/ll/payment" element={<LLFeePaymentPage />} />
         <Route path="/ll/dashboard" element={<MyJourneyTimelinePage initialStage="ll" />} />
         <Route path="/ll/verified" element={<LLVerifiedPage />} />
+        <Route path="/ll/issued" element={<LLVerifiedPage />} />
         <Route path="/ll/assessment-cockpit" element={<LLAssessmentCockpitPage />} />
         <Route path="/ll/assessment-exam" element={<LLAssessmentLiveExamPage />} />
         <Route path="/ll/assessment-result" element={<LLAssessmentResultPage />} />
