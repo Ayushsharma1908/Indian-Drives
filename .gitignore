@@ -4,4 +4,9 @@ backend/node_modules/
 frontend/dist/
 .stitch-ui/
 .env
+.env.*
+*.local
 backend/.env
+backend/.env.*
+frontend/.env
+frontend/.env.*
