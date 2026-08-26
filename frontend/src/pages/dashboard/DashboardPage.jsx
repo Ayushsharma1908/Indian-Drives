@@ -186,7 +186,7 @@ export function DashboardPage() {
               </p>
 
               <button
-                onClick={() => navigate('/ll/intro')}
+                onClick={() => navigate('/journey?stage=ll')}
                 style={{
                   background: 'transparent',
                   border: 'none',
@@ -222,7 +222,7 @@ export function DashboardPage() {
               </p>
 
               <button
-                onClick={() => navigate('/dl/intro')}
+                onClick={() => navigate('/journey?stage=dl')}
                 style={{
                   background: 'transparent',
                   border: 'none',

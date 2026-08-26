@@ -4,8 +4,8 @@ import {
   FileCheck2, Car, ShieldCheck, CheckCircle2, ArrowRight, ArrowLeft, Upload,
   Clock, AlertTriangle, Play, HelpCircle, Award, RefreshCw, FileText
 } from 'lucide-react';
-import { Stepper } from '../components/ui/Stepper';
-import { StatusBadge } from '../components/ui/StatusBadge';
+import { Stepper } from '../../components/ui/Stepper';
+import { StatusBadge } from '../../components/ui/StatusBadge';
 
 const LL_STEPS = ['Application Intro', 'Vehicle Select', 'Documents', 'Applicant Details', 'Address', 'Review'];
 

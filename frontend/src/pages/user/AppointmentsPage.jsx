@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { CalendarDays, MapPin, Clock, CheckCircle2, XCircle, ArrowRight, Plus } from 'lucide-react';
-import { StatusBadge } from '../components/ui/StatusBadge';
+import { StatusBadge } from '../../components/ui/StatusBadge';
 
 export function AppointmentsPage() {
   const [tab, setTab] = useState('upcoming');
