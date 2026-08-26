@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import express from "express";
 import mongoose from "mongoose";
 import { knowledge } from "./rag/knowledge.js";
+import { streamChatCompletion } from "./ai/provider.js";
 
 dotenv.config();
 
@@ -337,6 +338,32 @@ app.patch("/api/notifications/:id/read", (req, res) => {
   res.json(ok(notification));
 });
 
+app.get("/api/ai/config", (_req, res) => {
+  const provider = (process.env.AI_PROVIDER || "gemini").toLowerCase();
+  const apiKey = process.env.AI_API_KEY || process.env.GEMINI_API_KEY || process.env.OPENAI_API_KEY || process.env.ANTHROPIC_API_KEY;
+  const isConfigured = Boolean(apiKey && apiKey.trim() !== "" && !apiKey.startsWith("YOUR_"));
+  const model = process.env.AI_MODEL || (provider === "openai" ? "gpt-4o-mini" : "gemini-2.0-flash");
+
+  res.json(ok({
+    isConfigured,
+    provider,
+    model,
+    envVariable: provider === "openai" ? "OPENAI_API_KEY" : "GEMINI_API_KEY (or AI_API_KEY)"
+  }));
+});
+
+// SSE Real-time Streaming AI Chat
+app.post("/api/chat/stream", async (req, res) => {
+  const { messages = [], message = "", context = {} } = req.body;
+  await streamChatCompletion({
+    messages,
+    userMessage: message,
+    context,
+    res
+  });
+});
+
+// Legacy / Fallback endpoint
 app.post("/api/ai/chat", (req, res) => {
   const message = String(req.body.message || "").toLowerCase();
   const current = db.journey.steps.find((step) => step.status === "current") || db.journey.steps.at(-1);

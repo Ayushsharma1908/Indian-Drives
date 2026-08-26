@@ -12,27 +12,48 @@ import {
   HelpCircle,
   Phone,
   Compass,
-  AlertCircle
+  AlertCircle,
+  Square,
+  KeyRound,
+  Zap
 } from 'lucide-react';
 import { useJourneyContext } from '../../features/assistant/context/JourneyContextEngine';
-import { sendAssistantQuery } from '../../features/assistant/services/assistantService';
+import { streamAssistantResponse } from '../../features/assistant/services/chatStreamService';
 import { executeAction } from '../../features/assistant/actions/actionCatalog';
 import { ActionCard } from '../../features/assistant/components/ActionCard';
 import { MultiStepCheckCard } from '../../features/assistant/components/MultiStepCheckCard';
 import { RTOChecklistCard } from '../../features/assistant/components/RTOChecklistCard';
 import { ConfirmationModal } from '../../features/assistant/components/ConfirmationModal';
+import { ApiKeySetupModal } from '../../features/assistant/components/ApiKeySetupModal';
 
 export function AskIndianDrivesPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { context, loading } = useJourneyContext();
   const [input, setInput] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
+  const [isStreaming, setIsStreaming] = useState(false);
   const [modalConfig, setModalConfig] = useState({ isOpen: false });
+  const [showKeyModal, setShowKeyModal] = useState(false);
+  const [aiConfig, setAiConfig] = useState(null);
+  const [streamingMessageId, setStreamingMessageId] = useState(null);
+
+  const abortControllerRef = useRef(null);
   const messagesEndRef = useRef(null);
   const initialPromptTriggered = useRef(false);
 
   const [messages, setMessages] = useState([]);
+
+  // Check backend AI config on mount
+  useEffect(() => {
+    fetch(`${import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"}/api/ai/config`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.data) {
+          setAiConfig(data.data);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   // Initialize personalized greeting on context load
   useEffect(() => {
@@ -41,16 +62,9 @@ export function AskIndianDrivesPage() {
         id: 'welcome',
         sender: 'assistant',
         timestamp: 'Just now',
-        text: `Namaste, ${context.userName}! I am your Indian Drives AI Guide. Your Learner Licence (${context.learnerLicenceNumber}) is verified and active. You are currently at the **Driving Licence (DL) Application** stage.`,
-        statusBadge: { type: 'government', text: 'Government Record: Scrutiny Cleared' },
-        action: {
-          id: 'CONTINUE_DL_APPLICATION',
-          label: 'Continue DL Application',
-          shortLabel: 'Continue DL',
-          route: '/dl/confirm-intro',
-          icon: 'ArrowRight',
-          description: 'Confirm applicant profile and vehicle categories for permanent DL.'
-        },
+        text: `Hello, ${context.userName}! 👋 I am your Indian Drives conversational guide. I can help you understand your driving-licence journey, answer your questions, check documents, payments, tests and appointments, and help you take the next step. What would you like help with today?`,
+        statusBadge: { type: 'guidance', text: 'Live AI Assistant' },
+        action: null,
         followUps: [
           "What do I do next?",
           "Check driving test eligibility",
@@ -74,66 +88,127 @@ export function AskIndianDrivesPage() {
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, isTyping]);
+  }, [messages, isStreaming]);
 
   const handleSendMessage = async (textToSend) => {
     const text = textToSend || input;
-    if (!text.trim() || isTyping) return;
+    if (!text.trim() || isStreaming) return;
+
+    const userMsgId = `user-${Date.now()}`;
+    const botMsgId = `bot-${Date.now()}`;
 
     const userMessage = {
-      id: `user-${Date.now()}`,
+      id: userMsgId,
       sender: 'user',
       text: text.trim(),
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    const botPlaceholder = {
+      id: botMsgId,
+      sender: 'assistant',
+      text: '',
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      isPending: true
+    };
+
+    setMessages(prev => [...prev, userMessage, botPlaceholder]);
     setInput('');
-    setIsTyping(true);
+    setIsStreaming(true);
+    setStreamingMessageId(botMsgId);
 
-    try {
-      const response = await sendAssistantQuery(text.trim(), context, messages);
-      setIsTyping(false);
+    const abortCtrl = new AbortController();
+    abortControllerRef.current = abortCtrl;
 
-      const botMessage = {
-        id: `bot-${Date.now()}`,
-        sender: 'assistant',
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        text: response.answer,
-        statusBadge: response.statusBadge,
-        action: response.action,
-        multiStepCheck: response.multiStepCheck,
-        rtoChecklist: response.rtoChecklist,
-        sources: response.sources,
-        followUps: response.followUps
-      };
+    await streamAssistantResponse({
+      messages: messages.filter(m => m.text),
+      userMessage: text.trim(),
+      context,
+      signal: abortCtrl.signal,
+      onToken: (accumulatedText) => {
+        setMessages(prev =>
+          prev.map(m => (m.id === botMsgId ? { ...m, text: accumulatedText, isPending: false } : m))
+        );
+      },
+      onComplete: ({ fullText, action, followUps }) => {
+        setIsStreaming(false);
+        setStreamingMessageId(null);
+        setMessages(prev =>
+          prev.map(m =>
+            m.id === botMsgId
+              ? {
+                  ...m,
+                  text: fullText,
+                  action,
+                  followUps,
+                  isPending: false,
+                  statusBadge: action ? { type: 'government', text: 'Recommended Action' } : null
+                }
+              : m
+          )
+        );
+      },
+      onError: (err) => {
+        setIsStreaming(false);
+        setStreamingMessageId(null);
 
-      setMessages(prev => [...prev, botMessage]);
-    } catch (err) {
-      setIsTyping(false);
-      setMessages(prev => [
-        ...prev,
-        {
-          id: `bot-${Date.now()}`,
-          sender: 'assistant',
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          text: "I couldn't verify that from connected records right now. You can check the official service portal or contact support.",
-          statusBadge: { type: 'attention', text: 'System Notice' },
-          action: {
-            id: 'OPEN_HELP',
-            label: 'Open Help Center',
-            shortLabel: 'Help Center',
-            route: '/help',
-            icon: 'HelpCircle'
-          },
-          followUps: ["What's my next step?", "Check my application status"]
+        if (err?.isMissingKey) {
+          setShowKeyModal(true);
+          setMessages(prev =>
+            prev.map(m =>
+              m.id === botMsgId
+                ? {
+                    ...m,
+                    text: `⚠️ **AI API Key Not Configured**\n\nTo enable real conversational LLM responses, please add your **GEMINI_API_KEY** (or **OPENAI_API_KEY**) into \`backend/.env\` and restart the server.\n\n*Click the button below to view setup instructions.*`,
+                    statusBadge: { type: 'attention', text: 'API Key Required' },
+                    isPending: false,
+                    action: {
+                      id: 'SETUP_API_KEY',
+                      label: 'Configure AI API Key',
+                      shortLabel: 'Setup Key',
+                      route: null,
+                      isTool: true,
+                      icon: 'KeyRound'
+                    },
+                    followUps: ["What do I do next?", "What documents do I need?"]
+                  }
+                : m
+            )
+          );
+        } else {
+          setMessages(prev =>
+            prev.map(m =>
+              m.id === botMsgId
+                ? {
+                    ...m,
+                    text: `I'm having trouble connecting right now (${err.message || 'Connection timeout'}). Please check your network or try again in a moment.`,
+                    statusBadge: { type: 'attention', text: 'Connection Notice' },
+                    isPending: false,
+                    followUps: ["What do I do next?", "Check my application status"]
+                  }
+                : m
+            )
+          );
         }
-      ]);
+      }
+    });
+  };
+
+  const handleStopGeneration = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      setIsStreaming(false);
+      setStreamingMessageId(null);
     }
   };
 
   const handleActionExecute = (action) => {
     if (!action) return;
+
+    if (action.id === 'SETUP_API_KEY') {
+      setShowKeyModal(true);
+      return;
+    }
 
     if (action.requiresConfirm) {
       setModalConfig({
@@ -167,15 +242,9 @@ export function AskIndianDrivesPage() {
         id: `welcome-${Date.now()}`,
         sender: 'assistant',
         timestamp: 'Just now',
-        text: `Chat context reset. Namaste, ${context.userName}! How can I help you with your driving licence journey today?`,
-        statusBadge: { type: 'guidance', text: 'Context Ready' },
-        action: {
-          id: 'CONTINUE_DL_APPLICATION',
-          label: 'Continue DL Application',
-          shortLabel: 'Continue DL',
-          route: '/dl/confirm-intro',
-          icon: 'ArrowRight'
-        },
+        text: `New conversation started. Hello, ${context.userName}! 👋 How can I help you with your driving licence today?`,
+        statusBadge: { type: 'guidance', text: 'Live AI Assistant' },
+        action: null,
         followUps: [
           "What do I do next?",
           "Check driving test eligibility",
@@ -204,38 +273,61 @@ export function AskIndianDrivesPage() {
           <div>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#fff7ed', border: '1px solid #ffedd5', color: '#e88a2d', padding: '4px 10px', borderRadius: '20px', fontSize: '11px', fontWeight: 800, letterSpacing: '0.8px', marginBottom: '8px' }}>
               <Sparkles size={13} />
-              CONTEXT-AWARE ACTION ASSISTANT
+              REAL CONVERSATIONAL AI ASSISTANT
             </div>
             <h1 style={{ fontSize: '32px', fontWeight: 800, color: '#173b57', margin: '0 0 4px 0', letterSpacing: '-0.5px' }}>
               Ask Indian Drives
             </h1>
             <p style={{ fontSize: '15px', color: '#476179', margin: 0 }}>
-              Your guide through the driving licence process — understand, verify, and take action.
+              Your conversational guide through the driving licence process — talk naturally, understand, and take action.
             </p>
           </div>
 
-          <button
-            onClick={handleResetChat}
-            style={{
-              background: '#ffffff',
-              border: '1px solid #cbd5e1',
-              borderRadius: '8px',
-              padding: '8px 14px',
-              fontSize: '13px',
-              fontWeight: 600,
-              color: '#476179',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              cursor: 'pointer',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-              transition: 'all 0.15s ease'
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = '#f8fafc')}
-            onMouseLeave={(e) => (e.currentTarget.style.background = '#ffffff')}
-          >
-            <RefreshCw size={14} /> New Conversation
-          </button>
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <button
+              onClick={() => setShowKeyModal(true)}
+              style={{
+                background: aiConfig?.isConfigured ? '#eefbf4' : '#fff7ed',
+                border: `1px solid ${aiConfig?.isConfigured ? '#bbf7d0' : '#fed7aa'}`,
+                borderRadius: '8px',
+                padding: '8px 14px',
+                fontSize: '12px',
+                fontWeight: 700,
+                color: aiConfig?.isConfigured ? '#16805a' : '#c2410c',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              {aiConfig?.isConfigured ? <Zap size={14} /> : <KeyRound size={14} />}
+              {aiConfig?.isConfigured ? `AI Connected (${aiConfig.model})` : 'Configure AI Key'}
+            </button>
+
+            <button
+              onClick={handleResetChat}
+              style={{
+                background: '#ffffff',
+                border: '1px solid #cbd5e1',
+                borderRadius: '8px',
+                padding: '8px 14px',
+                fontSize: '13px',
+                fontWeight: 600,
+                color: '#476179',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                cursor: 'pointer',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                transition: 'all 0.15s ease'
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = '#f8fafc')}
+              onMouseLeave={(e) => (e.currentTarget.style.background = '#ffffff')}
+            >
+              <RefreshCw size={14} /> New Conversation
+            </button>
+          </div>
         </div>
 
         {/* LIVE CONTEXT STRIP */}
@@ -316,17 +408,34 @@ export function AskIndianDrivesPage() {
               </div>
               <div>
                 <div style={{ fontSize: '14px', fontWeight: 700 }}>
-                  Indian Drives Action Assistant
+                  Indian Drives Conversational AI
                 </div>
                 <div style={{ fontSize: '11px', color: '#93c5fd', display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#4ade80' }} />
-                  Connected to Journey Engine · 24/7 Citizen Guidance
+                  Real-time LLM Streaming · Natural Conversation · Action-Based
                 </div>
               </div>
             </div>
-            <div style={{ fontSize: '11px', color: '#cbd5e1', background: 'rgba(255,255,255,0.08)', padding: '4px 10px', borderRadius: '12px' }}>
-              Parivahan Standards
-            </div>
+            {isStreaming && (
+              <button
+                onClick={handleStopGeneration}
+                style={{
+                  background: 'rgba(255,255,255,0.15)',
+                  border: '1px solid rgba(255,255,255,0.3)',
+                  color: '#ffffff',
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  padding: '4px 10px',
+                  borderRadius: '12px',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px'
+                }}
+              >
+                <Square size={10} fill="#ffffff" /> Stop generating
+              </button>
+            )}
           </div>
 
           {/* MESSAGES SCROLL AREA */}
@@ -384,7 +493,7 @@ export function AskIndianDrivesPage() {
                       lineHeight: '1.6'
                     }}
                   >
-                    {/* Official Record vs Indian Drives Guidance Badge */}
+                    {/* Status badge */}
                     {m.statusBadge && (
                       <div
                         style={{
@@ -406,10 +515,25 @@ export function AskIndianDrivesPage() {
                       </div>
                     )}
 
+                    {/* Pending typing animation */}
+                    {m.isPending && !m.text && (
+                      <div style={{ display: 'flex', gap: '6px', alignItems: 'center', padding: '4px 0' }}>
+                        <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#e88a2d', animation: 'pulse 1s infinite' }} />
+                        <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#173b57', animation: 'pulse 1s infinite 0.2s' }} />
+                        <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#16805a', animation: 'pulse 1s infinite 0.4s' }} />
+                        <span style={{ fontSize: '12px', color: '#64748b', marginLeft: '6px' }}>Thinking...</span>
+                      </div>
+                    )}
+
                     {/* Text Body */}
-                    <div style={{ whiteSpace: 'pre-line' }}>
-                      {m.text}
-                    </div>
+                    {m.text && (
+                      <div style={{ whiteSpace: 'pre-line' }}>
+                        {m.text}
+                        {m.id === streamingMessageId && (
+                          <span style={{ display: 'inline-block', width: '6px', height: '14px', background: '#e88a2d', marginLeft: '3px', verticalAlign: 'middle', animation: 'pulse 0.8s infinite' }} />
+                        )}
+                      </div>
+                    )}
 
                     {/* Multi-Step Prerequisites Check */}
                     {m.multiStepCheck && (
@@ -428,28 +552,10 @@ export function AskIndianDrivesPage() {
                         onExecute={handleActionExecute}
                       />
                     )}
-
-                    {/* Knowledge Sources */}
-                    {m.sources && m.sources.length > 0 && (
-                      <div style={{ marginTop: '12px', paddingTop: '10px', borderTop: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', fontSize: '11px', color: '#94a3b8' }}>
-                        <span>Official Sources:</span>
-                        {m.sources.map((s, idx) => (
-                          <a
-                            key={idx}
-                            href={s.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            style={{ color: '#476179', textDecoration: 'underline', display: 'inline-flex', alignItems: 'center', gap: '3px' }}
-                          >
-                            {s.name} <ExternalLink size={10} />
-                          </a>
-                        ))}
-                      </div>
-                    )}
                   </div>
 
                   {/* Follow-up Prompts */}
-                  {m.followUps && m.followUps.length > 0 && (
+                  {m.followUps && m.followUps.length > 0 && !isStreaming && (
                     <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '4px' }}>
                       {m.followUps.map((chip, idx) => (
                         <button
@@ -487,20 +593,6 @@ export function AskIndianDrivesPage() {
                 </div>
               </div>
             ))}
-
-            {isTyping && (
-              <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                <div style={{ width: '34px', height: '34px', borderRadius: '50%', background: '#002542', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Bot size={18} />
-                </div>
-                <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '12px 18px', display: 'flex', gap: '6px', alignItems: 'center' }}>
-                  <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#e88a2d', animation: 'pulse 1s infinite' }} />
-                  <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#173b57', animation: 'pulse 1s infinite 0.2s' }} />
-                  <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#16805a', animation: 'pulse 1s infinite 0.4s' }} />
-                  <span style={{ fontSize: '12px', color: '#64748b', marginLeft: '6px' }}>Consulting journey context & Parivahan guidelines...</span>
-                </div>
-              </div>
-            )}
 
             <div ref={messagesEndRef} />
           </div>
@@ -551,7 +643,7 @@ export function AskIndianDrivesPage() {
                   handleSendMessage();
                 }
               }}
-              placeholder="Ask about your application, documents, payment, test or next step..."
+              placeholder="What would you like help with? (Ask about your application, documents, payment, tests or next step...)"
               style={{
                 flex: 1,
                 resize: 'none',
@@ -569,20 +661,20 @@ export function AskIndianDrivesPage() {
             />
             <button
               onClick={() => handleSendMessage()}
-              disabled={!input.trim() || isTyping}
+              disabled={!input.trim() || isStreaming}
               style={{
-                background: input.trim() ? '#002542' : '#e2e8f0',
-                color: input.trim() ? '#ffffff' : '#94a3b8',
+                background: input.trim() && !isStreaming ? '#002542' : '#e2e8f0',
+                color: input.trim() && !isStreaming ? '#ffffff' : '#94a3b8',
                 border: 'none',
                 borderRadius: '10px',
                 padding: '12px 20px',
                 fontSize: '14px',
                 fontWeight: 700,
-                cursor: input.trim() ? 'pointer' : 'default',
+                cursor: input.trim() && !isStreaming ? 'pointer' : 'default',
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '8px',
-                boxShadow: input.trim() ? '0 2px 8px rgba(0, 37, 66, 0.2)' : 'none',
+                boxShadow: input.trim() && !isStreaming ? '0 2px 8px rgba(0, 37, 66, 0.2)' : 'none',
                 transition: 'all 0.15s ease'
               }}
             >
@@ -638,6 +730,12 @@ export function AskIndianDrivesPage() {
         message={modalConfig.message}
         onConfirm={modalConfig.onConfirm}
         onCancel={() => setModalConfig({ isOpen: false })}
+      />
+
+      {/* AI Key Configuration Guide Modal */}
+      <ApiKeySetupModal
+        isOpen={showKeyModal}
+        onClose={() => setShowKeyModal(false)}
       />
     </div>
   );
