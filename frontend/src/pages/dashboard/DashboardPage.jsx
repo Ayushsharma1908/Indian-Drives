@@ -1,23 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Calendar, ArrowRight, Car, FileText, Shield, Bell } from 'lucide-react';
 import { api } from '../../services/api';
 
 export function DashboardPage() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
   const [upcomingVisit, setUpcomingVisit] = useState(null);
   const [importantNotice, setImportantNotice] = useState(null);
-  const [isLLCompleted, setIsLLCompleted] = useState(false);
 
   useEffect(() => {
-    // Check LL completion flag
-    const paramCompleted = searchParams.get('ll_completed');
-    const localCompleted = localStorage.getItem('ll_completed');
-    if (paramCompleted === 'true' || localCompleted === 'true') {
-      setIsLLCompleted(true);
-    }
-
     // Check for active booked appointments
     api.appointments()
       .then((res) => {
@@ -49,13 +40,28 @@ export function DashboardPage() {
         }
       })
       .catch(() => {});
+  }, []);
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Calendar, ArrowRight, Car, FileText, Shield, Sparkles, CheckCircle2, Clock } from 'lucide-react';
+
+export function DashboardPage() {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const [isLLCompleted, setIsLLCompleted] = useState(true); // Default to true after LL completion
+
+  useEffect(() => {
+    const paramCompleted = searchParams.get('ll_completed');
+    const localCompleted = localStorage.getItem('ll_completed');
+    if (paramCompleted === 'true' || localCompleted === 'true' || paramCompleted !== 'false') {
+      setIsLLCompleted(true);
+    }
   }, [searchParams]);
 
   return (
     <div className="page-dashboard-container" style={{ background: '#f7f9fb', minHeight: 'calc(100vh - 72px)', padding: '32px 0 60px 0', fontFamily: 'Inter, system-ui, sans-serif' }}>
       <div style={{ maxWidth: '1184px', margin: '0 auto', padding: '0 24px', display: 'flex', flexDirection: 'column', gap: '48px' }}>
         
-        {/* 1. DYNAMIC UPCOMING VISIT / NOTIFICATION BANNER */}
+        {/* 1. DYNAMIC UPCOMING VISIT / NOTIFICATION BANNER (Shows only when there is an active visit or urgent notification) */}
         {upcomingVisit ? (
           <div style={{ display: 'flex', justifyContent: 'center' }}>
             <div style={{
@@ -63,6 +69,15 @@ export function DashboardPage() {
               border: '1px solid #e2e8f0',
               borderRadius: '16px',
               padding: '16px 24px',
+        {/* 1. UPCOMING FOR YOU BANNER (DYNAMICALLY UPDATED ON LL COMPLETION) */}
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          {isLLCompleted ? (
+            /* DL WAITING NOTIFICATION BANNER */
+            <div style={{
+              background: '#ffffff',
+              border: '2px solid #e88a2d',
+              borderRadius: '18px',
+              padding: '18px 26px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
@@ -70,6 +85,8 @@ export function DashboardPage() {
               width: '100%',
               maxWidth: '840px',
               boxShadow: '0 2px 10px rgba(0, 37, 66, 0.03)'
+              maxWidth: '860px',
+              boxShadow: '0 4px 20px rgba(232, 138, 45, 0.12)'
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                 <div style={{
@@ -101,50 +118,6 @@ export function DashboardPage() {
                   <span style={{ fontSize: '15px', fontWeight: 600, color: '#173b57' }}>
                     RTO Visit: {upcomingVisit.vehicleClass || 'Driving Licence Test'} <span style={{ color: '#94a3b8', margin: '0 6px' }}>·</span> {upcomingVisit.date}, {upcomingVisit.time || upcomingVisit.slot || '10:30 AM'}
                   </span>
-                </div>
-              </div>
-
-              <button
-                onClick={() => navigate('/appointments')}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  color: '#173b57',
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  padding: '6px 12px',
-                  borderRadius: '8px',
-                  transition: 'all 0.15s ease'
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.background = '#f1f5f9')}
-                onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
-              >
-                View appointment <ArrowRight size={15} />
-              </button>
-            </div>
-          </div>
-        ) : isLLCompleted ? (
-          <div style={{ display: 'flex', justifyContent: 'center' }}>
-            <div style={{
-              background: '#ffffff',
-              border: '2px solid #e88a2d',
-              borderRadius: '18px',
-              padding: '18px 26px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: '24px',
-              width: '100%',
-              maxWidth: '860px',
-              boxShadow: '0 4px 20px rgba(232, 138, 45, 0.12)'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                <div style={{
-                  position: 'relative',
                   width: '46px',
                   height: '46px',
                   borderRadius: '14px',
@@ -173,16 +146,40 @@ export function DashboardPage() {
                     UPCOMING FOR YOU · DL APPLICATION WAITING
                   </div>
                   <div style={{ fontSize: '15px', fontWeight: 800, color: '#173b57' }}>
-                    Learner Licence Approved — Driving Licence (DL) is waiting!
+                    Learner Licence Approved (LL/24/09/8821) — Driving Licence (DL) is waiting!
                   </div>
                   <div style={{ fontSize: '13px', color: '#64748b', fontWeight: 500 }}>
-                    Your LL is active. Click to open your DL Dashboard and book your driving test slot.
+                    Your LL is active. Click to open your DL Dashboard and track your 30-day unlock progress.
                   </div>
                 </div>
               </div>
 
               <button
-                onClick={() => navigate('/dl/intro')}
+                onClick={() => navigate('/appointments')}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#173b57',
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '6px 12px',
+                  borderRadius: '8px',
+                  transition: 'all 0.15s ease'
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = '#f1f5f9')}
+                onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+              >
+                View appointment <ArrowRight size={15} />
+              </button>
+            </div>
+          </div>
+        ) : importantNotice ? (
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+                onClick={() => navigate('/journey?stage=dl')}
                 style={{
                   background: '#002542',
                   border: 'none',
@@ -200,12 +197,11 @@ export function DashboardPage() {
                   transition: 'all 0.15s ease'
                 }}
               >
-                Go to DL Flow <ArrowRight size={16} />
+                Go to DL Dashboard <ArrowRight size={16} />
               </button>
             </div>
-          </div>
-        ) : importantNotice ? (
-          <div style={{ display: 'flex', justifyContent: 'center' }}>
+          ) : (
+            /* DEFAULT APPOINTMENT BANNER */
             <div style={{
               background: '#ffffff',
               border: '1px solid #e2e8f0',
@@ -232,6 +228,13 @@ export function DashboardPage() {
                   color: '#e88a2d'
                 }}>
                   <Bell size={20} />
+                  background: '#f1f5f9',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#173b57'
+                }}>
+                  <Calendar size={20} />
                   <span style={{
                     position: 'absolute',
                     top: '10px',
@@ -248,12 +251,21 @@ export function DashboardPage() {
                   </span>
                   <span style={{ fontSize: '15px', fontWeight: 600, color: '#173b57' }}>
                     {importantNotice.title} <span style={{ color: '#94a3b8', margin: '0 6px' }}>·</span> {importantNotice.body}
+                  <span style={{ fontSize: '11px', fontWeight: 800, color: '#476179', letterSpacing: '0.8px', textTransform: 'uppercase' }}>
+                    UPCOMING FOR YOU
+                  </span>
+                  <span style={{ fontSize: '15px', fontWeight: 600, color: '#173b57' }}>
+                    RTO Visit: Driving Licence Test <span style={{ color: '#94a3b8', margin: '0 6px' }}>·</span> 18 September 2026, 10:30 AM
                   </span>
                 </div>
               </div>
 
               <button
+<<<<<<< HEAD
                 onClick={() => navigate('/notifications')}
+=======
+                onClick={() => navigate('/appointments')}
+>>>>>>> main
                 style={{
                   background: 'transparent',
                   border: 'none',
@@ -276,6 +288,12 @@ export function DashboardPage() {
             </div>
           </div>
         ) : null}
+              >
+                View appointment <ArrowRight size={15} />
+              </button>
+            </div>
+          )}
+        </div>
 
         {/* 2. HERO SECTION ("Namaste, Yanshi 👋") */}
         <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(360px, 480px)', gap: '40px', alignItems: 'center', padding: '20px 0' }}>
@@ -288,7 +306,7 @@ export function DashboardPage() {
             <div style={{ fontSize: '22px', color: '#173b57', fontWeight: 600, lineHeight: 1.4 }}>
               Welcome to Indian Drives.
               <div style={{ color: '#476179', fontWeight: 400, marginTop: '4px' }}>
-                {"We'll guide you every step of the way."}
+                We'll guide you every step of the way.
               </div>
             </div>
           </div>
@@ -364,7 +382,7 @@ export function DashboardPage() {
               WHERE ARE YOU IN YOUR DRIVING JOURNEY?
             </div>
             <h2 style={{ fontSize: '36px', fontWeight: 700, color: '#173b57', margin: 0, letterSpacing: '-0.8px' }}>
-              {"Tell us where you are, and we'll take you from there."}
+              Tell us where you are, and we'll take you from there.
             </h2>
           </div>
 
@@ -374,7 +392,7 @@ export function DashboardPage() {
             {/* Card 01: Starting Fresh */}
             <div
               className="journey-destination-card"
-              onClick={() => navigate('/journey?stage=ll')}
+              onClick={() => navigate('/ll/intro')}
             >
               <div className="dest-icon-circle">
                 <Car size={24} />
@@ -383,10 +401,10 @@ export function DashboardPage() {
                 01 · STARTING FRESH
               </div>
               <h3 className="dest-heading">
-                {"I'm starting from scratch"}
+                I'm starting from scratch
               </h3>
               <p className="dest-description">
-                {"I don't have a Learner Licence yet."}
+                I don't have a Learner Licence yet.
               </p>
               <div className="dest-action-btn">
                 Start with LL <ArrowRight size={16} className="dest-btn-arrow" />
@@ -396,7 +414,7 @@ export function DashboardPage() {
             {/* Card 02: Continue Your Journey */}
             <div
               className="journey-destination-card"
-              onClick={() => navigate('/journey?stage=dl')}
+              onClick={() => navigate('/dl/intro')}
             >
               <div className="dest-icon-circle">
                 <FileText size={24} />
