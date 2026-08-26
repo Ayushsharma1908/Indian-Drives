@@ -175,19 +175,21 @@ import {
   LicenceServicePaymentSuccessPage,
   MyJourneyTimelinePage
 } from "./pages/licence-services";
+import { LandingPage } from "./pages/landing";
 
 function AnimatedRoutes() {
   const location = useLocation();
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/*" element={<ProtectedApp />} />
       </Routes>
     </AnimatePresence>
   );
 }
+
 
 function ProtectedApp() {
   const { user, authLoading } = useContext(AuthContext);
@@ -196,20 +198,27 @@ function ProtectedApp() {
   if (authLoading) return <FullPageLoading />;
 
   return (
-    <Shell>
-      <Routes>
-        {/* Core Hub */}
-        <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/documents" element={<DocumentsCenterPage />} />
-        <Route path="/appointments" element={<AppointmentsPage />} />
-        <Route path="/services" element={<GovernmentServicesPage />} />
-        <Route path="/payments" element={<PaymentsPage />} />
-        <Route path="/notifications" element={<NotificationsPage />} />
-        <Route path="/help" element={<HelpCenterPage />} />
-        <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/settings" element={<SettingsPage />} />
-        <Route path="/ask" element={<AskIndianDrivesPage />} />
-        <Route path="/ask-ai" element={<AskIndianDrivesPage />} />
+    <Routes>
+      {/* Public Landing & Login */}
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/landing" element={<LandingPage />} />
+
+      {/* Protected Shell Pages */}
+      <Route path="/*" element={
+        <Shell>
+          <Routes>
+            {/* Core Hub */}
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/documents" element={<DocumentsCenterPage />} />
+            <Route path="/appointments" element={<AppointmentsPage />} />
+            <Route path="/services" element={<GovernmentServicesPage />} />
+            <Route path="/payments" element={<PaymentsPage />} />
+            <Route path="/notifications" element={<NotificationsPage />} />
+            <Route path="/help" element={<HelpCenterPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/ask" element={<AskIndianDrivesPage />} />
+            <Route path="/ask-ai" element={<AskIndianDrivesPage />} />
 
         {/* Learner Licence Flow */}
         <Route path="/ll/intro" element={<LLApplicationIntroPage />} />
@@ -259,9 +268,11 @@ function ProtectedApp() {
         <Route path="/journey" element={<MyJourneyTimelinePage />} />
         <Route path="/review-application-form" element={<LLApplicationReviewPage />} />
 
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
-      </Routes>
-    </Shell>
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          </Routes>
+        </Shell>
+      } />
+    </Routes>
   );
 }
 
