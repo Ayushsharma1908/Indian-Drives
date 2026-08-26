@@ -274,11 +274,8 @@ function Shell({ children }) {
           <NavLink to="/journey" className={({ isActive }) => isActive ? "active" : ""}>
             My Journey
           </NavLink>
-          <NavLink to="/help" className={({ isActive }) => isActive ? "active" : ""}>
-            Help
-          </NavLink>
-          <NavLink to="/ask" style={{ color: '#e88a2d', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-            <span style={{ color: '#e88a2d', fontSize: '14px' }}>✦</span> Ask DriveSeva
+          <NavLink to="/ask" className={({ isActive }) => isActive ? "active nav-ask-highlight" : "nav-ask-highlight"} style={({ isActive }) => ({ color: isActive ? '#e88a2d' : '#476179', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px' })}>
+            <span style={{ color: '#e88a2d', fontSize: '14px' }}>✦</span> Ask Indian Drives
           </NavLink>
         </nav>
 

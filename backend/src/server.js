@@ -343,22 +343,32 @@ app.post("/api/ai/chat", (req, res) => {
   let answer = `Your current stage is ${current.label}. `;
   const actions = [];
 
-  if (message.includes("document")) answer = "For a DL application you usually need identity proof, address proof, your learner licence, age proof when required, and passport-size photo. State and RTO requirements can vary.";
-  else if (message.includes("book") || message.includes("next")) {
-    answer += current.id === "test-booking"
-      ? "Your documents and payment are complete. Book a driving test slot next."
-      : "Continue the highlighted journey step to keep your application moving.";
-    actions.push({ label: current.id === "test-booking" ? "Book Driving Test" : "Open Journey", route: current.id === "test-booking" ? "/appointments" : "/journey" });
-  } else if (message.includes("renew")) {
-    answer = "Renewal is available from Licence Services. Keep your DL number, DOB, address proof, and medical/form requirements ready where applicable.";
-    actions.push({ label: "Renew Licence", route: "/services" });
+  if (message.includes("document") || message.includes("proof")) {
+    answer = "For your Driving Licence application in Delhi (DL-01), your Aadhaar card, address proof, and Form 3 Learner Licence are verified. No further document uploads are currently required.";
+    actions.push({ label: "Open Document Center", route: "/documents" });
+  } else if (message.includes("book") || message.includes("slot") || message.includes("test")) {
+    answer = "Your documents and fee payment are complete. You are eligible to select your automated test track and driving skill test slot.";
+    actions.push({ label: "Book Driving Test Slot", route: "/appointments" });
+  } else if (message.includes("bring") || message.includes("rto") || message.includes("visit") || message.includes("prepare")) {
+    answer = "For your RTO visit, please carry: (1) Printed Appointment Confirmation Slip, (2) Original Aadhaar Card / ID Proof, (3) Printed Learner Licence Form 3, (4) Fee Payment Receipt (TXN-882194), and (5) Vehicle with valid RC, Insurance, PUC & 'L' plates.";
+    actions.push({ label: "View Appointment Pass", route: "/appointments" });
+  } else if (message.includes("pay") || message.includes("fee") || message.includes("receipt")) {
+    answer = "Your DL application fee (₹200) was successfully paid under Transaction ID TXN-882194. You can view or download the receipt.";
+    actions.push({ label: "View Payment Receipt", route: "/payments" });
+  } else if (message.includes("renew") || message.includes("duplicate") || message.includes("address")) {
+    answer = "Citizen licence services (Renewal, Duplicate Licence, Address Update) can be accessed directly online through Indian Drives.";
+    actions.push({ label: "Licence Services Hub", route: "/licence-services" });
+  } else if (message.includes("next") || message.includes("step") || message.includes("what")) {
+    answer = "Your Learner Licence is active and verified. The next step is to attend your scheduled driving test at the Burari Automated Track or continue your DL application.";
+    actions.push({ label: "View Appointment", route: "/appointments" });
   } else {
-    answer += "I can help with documents, payments, test booking, renewal, or what to do next.";
+    answer += "I can help with driving test booking, document verification, payment receipts, RTO visit preparation, or licence renewal.";
+    actions.push({ label: "Application Status", route: "/journey" });
   }
 
   res.json(ok({
     answer,
-    sources: knowledge.slice(0, 2).map((item) => ({ name: item.source, url: item.sourceUrl })),
+    sources: knowledge.map((item) => ({ name: item.source, url: item.sourceUrl })),
     actions
   }));
 });
