@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Calendar, ArrowRight, Car, FileText, Shield, Bell, CheckCircle2 } from 'lucide-react';
+import { Calendar, ArrowRight, Car, FileText, Shield, Bell } from 'lucide-react';
 import { api } from '../../services/api';
 
 export function DashboardPage() {
@@ -288,7 +288,7 @@ export function DashboardPage() {
             <div style={{ fontSize: '22px', color: '#173b57', fontWeight: 600, lineHeight: 1.4 }}>
               Welcome to Indian Drives.
               <div style={{ color: '#476179', fontWeight: 400, marginTop: '4px' }}>
-                We'll guide you every step of the way.
+                {"We'll guide you every step of the way."}
               </div>
             </div>
           </div>
@@ -364,7 +364,7 @@ export function DashboardPage() {
               WHERE ARE YOU IN YOUR DRIVING JOURNEY?
             </div>
             <h2 style={{ fontSize: '36px', fontWeight: 700, color: '#173b57', margin: 0, letterSpacing: '-0.8px' }}>
-              Tell us where you are, and we'll take you from there.
+              {"Tell us where you are, and we'll take you from there."}
             </h2>
           </div>
 
@@ -383,10 +383,10 @@ export function DashboardPage() {
                 01 · STARTING FRESH
               </div>
               <h3 className="dest-heading">
-                I'm starting from scratch
+                {"I'm starting from scratch"}
               </h3>
               <p className="dest-description">
-                I don't have a Learner Licence yet.
+                {"I don't have a Learner Licence yet."}
               </p>
               <div className="dest-action-btn">
                 Start with LL <ArrowRight size={16} className="dest-btn-arrow" />
