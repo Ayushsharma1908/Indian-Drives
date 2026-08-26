@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, ArrowRight, Car, FileText, Shield, Bell } from 'lucide-react';
-import { api } from '../services/api';
+import { api } from '../../services/api';
 
 export function DashboardPage() {
   const navigate = useNavigate();

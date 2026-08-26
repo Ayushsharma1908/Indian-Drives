@@ -123,16 +123,17 @@ function App() {
 
 import { ScreenSwitcher } from "./components/layout/ScreenSwitcher";
 import { LanguageSelector } from "./components/layout/LanguageSelector";
-import { DashboardPage } from "./pages/DashboardPage";
-import { DocumentsCenterPage } from "./pages/DocumentsCenterPage";
-import { AppointmentsPage } from "./pages/AppointmentsPage";
-import { GovernmentServicesPage } from "./pages/GovernmentServicesPage";
-import { PaymentsPage } from "./pages/PaymentsPage";
-import { NotificationsPage } from "./pages/NotificationsPage";
-import { HelpCenterPage } from "./pages/HelpCenterPage";
-import { ProfilePage } from "./pages/ProfilePage";
-import { SettingsPage } from "./pages/SettingsPage";
-import { AskIndianDrivesPage } from "./pages/AskIndianDrivesPage";
+import { DashboardPage } from "./pages/dashboard";
+import { DocumentsCenterPage, GovernmentServicesPage } from "./pages/services";
+import {
+  AppointmentsPage,
+  HelpCenterPage,
+  NotificationsPage,
+  PaymentsPage,
+  ProfilePage,
+  SettingsPage
+} from "./pages/user";
+import { AskIndianDrivesPage } from "./pages/ask-ai";
 
 import {
   LLApplicationIntroPage,
@@ -145,7 +146,7 @@ import {
   LLAssessmentLiveExamPage,
   LLAssessmentResultPage,
   LLVerifiedPage
-} from "./pages/LLFlowPages";
+} from "./pages/ll";
 
 import {
   DLIntroPage,
@@ -156,7 +157,7 @@ import {
   DLDashboardPage,
   DrivingTestResultPage,
   LicenceDispatchPage
-} from "./pages/DLFlowPages";
+} from "./pages/dl";
 
 import {
   LicenceServicesHubPage,
@@ -165,7 +166,7 @@ import {
   RenewDrivingLicencePage,
   DuplicateDrivingLicencePage,
   MyJourneyTimelinePage
-} from "./pages/LicenceServicesPages";
+} from "./pages/licence-services";
 
 function AnimatedRoutes() {
   const location = useLocation();
@@ -209,8 +210,7 @@ function ProtectedApp() {
         <Route path="/ll/applicant" element={<LLApplicantDetailsPage />} />
         <Route path="/ll/address" element={<LLAddressDetailsPage />} />
         <Route path="/ll/review" element={<LLApplicationReviewPage />} />
-        <Route path="/ll/learning-dashboard" element={<LLVerifiedPage />} />
-        <Route path="/ll/dashboard" element={<LLVerifiedPage />} />
+        <Route path="/ll/dashboard" element={<MyJourneyTimelinePage initialStage="ll" />} />
         <Route path="/ll/verified" element={<LLVerifiedPage />} />
         <Route path="/ll/assessment-cockpit" element={<LLAssessmentCockpitPage />} />
         <Route path="/ll/assessment-exam" element={<LLAssessmentLiveExamPage />} />
@@ -230,7 +230,7 @@ function ProtectedApp() {
         <Route path="/dl/test-center" element={<DLTestSlotBookingPage />} />
         <Route path="/dl/test-date" element={<DLTestSlotBookingPage />} />
         <Route path="/dl/seat-selection" element={<DLTestSlotBookingPage />} />
-        <Route path="/dl/dashboard" element={<DLDashboardPage />} />
+        <Route path="/dl/dashboard" element={<MyJourneyTimelinePage initialStage="dl" />} />
         <Route path="/dl/test-result" element={<DrivingTestResultPage />} />
         <Route path="/dl/dispatch" element={<LicenceDispatchPage />} />
 

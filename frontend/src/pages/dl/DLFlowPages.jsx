@@ -4,8 +4,8 @@ import {
   Car, ShieldCheck, CheckCircle2, CalendarDays, MapPin, CreditCard, Clock,
   ArrowRight, ArrowLeft, Download, Check, Truck, Award
 } from 'lucide-react';
-import { Stepper } from '../components/ui/Stepper';
-import { StatusBadge } from '../components/ui/StatusBadge';
+import { Stepper } from '../../components/ui/Stepper';
+import { StatusBadge } from '../../components/ui/StatusBadge';
 
 const DL_STEPS = ['DL Intro', 'Vehicle Class', 'Details & Address', 'Verification', 'Payment', 'Slot Booking'];
 

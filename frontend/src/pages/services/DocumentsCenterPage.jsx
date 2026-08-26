@@ -1,6 +1,6 @@
 import React from 'react';
 import { FileCheck2, Upload, FileText, CheckCircle2, Clock, AlertTriangle, ShieldCheck, Eye, Download } from 'lucide-react';
-import { StatusBadge } from '../components/ui/StatusBadge';
+import { StatusBadge } from '../../components/ui/StatusBadge';
 
 export function DocumentsCenterPage() {
   const documents = [

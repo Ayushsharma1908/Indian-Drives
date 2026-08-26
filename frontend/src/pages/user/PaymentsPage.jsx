@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { CreditCard, Download, CheckCircle2, Clock, XCircle, ArrowUpRight } from 'lucide-react';
-import { StatusBadge } from '../components/ui/StatusBadge';
+import { StatusBadge } from '../../components/ui/StatusBadge';
 
 export function PaymentsPage() {
   const [filter, setFilter] = useState('all');
