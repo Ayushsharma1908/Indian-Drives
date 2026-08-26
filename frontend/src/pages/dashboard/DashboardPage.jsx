@@ -374,7 +374,7 @@ export function DashboardPage() {
             {/* Card 01: Starting Fresh */}
             <div
               className="journey-destination-card"
-              onClick={() => navigate('/ll/intro')}
+              onClick={() => navigate('/journey?stage=ll')}
             >
               <div className="dest-icon-circle">
                 <Car size={24} />
@@ -396,7 +396,7 @@ export function DashboardPage() {
             {/* Card 02: Continue Your Journey */}
             <div
               className="journey-destination-card"
-              onClick={() => navigate('/dl/intro')}
+              onClick={() => navigate('/journey?stage=dl')}
             >
               <div className="dest-icon-circle">
                 <FileText size={24} />
