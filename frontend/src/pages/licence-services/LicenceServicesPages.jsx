@@ -577,7 +577,7 @@ export function RenewDrivingLicencePage() {
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '14px', color: '#173b57', fontWeight: 600 }}>
                 <CheckCircle2 size={20} color="#16a34a" />
-                No pending traffic challans found against this licence.
+                No pending traffic penalties or violations found against this licence.
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '14px', color: '#64748b', fontWeight: 500 }}>
