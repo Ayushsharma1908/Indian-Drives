@@ -8,8 +8,7 @@ import {
   Shield,
   Bell,
   CheckCircle2,
-  X,
-  Navigation
+  X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { api } from '../../services/api';
@@ -119,13 +118,13 @@ export function DashboardPage() {
         position: 'relative',
         background: '#f8fafc',
         minHeight: 'calc(100vh - 72px)',
-        padding: '36px 0 60px 0',
+        padding: '36px 0 64px 0',
         fontFamily: 'Inter, system-ui, sans-serif',
         overflow: 'hidden'
       }}
     >
       {/* ─────────────────────────────────────────────────────────────
-          1. SUBTLE MINIMAL ROAD BACKGROUND DESIGN
+          1. SUBTLE AMBIENT BACKGROUND ROAD ART (WATERMARK STYLE)
       ───────────────────────────────────────────────────────────── */}
       <div
         aria-hidden="true"
@@ -144,42 +143,26 @@ export function DashboardPage() {
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
           preserveAspectRatio="none"
-          style={{ opacity: 0.45 }}
+          style={{ opacity: 0.35 }}
         >
-          {/* Gentle Sweeping Road Track */}
           <path
-            d="M -80 260 C 320 260, 480 90, 840 90 C 1180 90, 1320 400, 1560 400"
+            d="M -100 320 C 350 320, 520 120, 920 120 C 1260 120, 1380 440, 1600 440"
             stroke="#e2e8f0"
-            strokeWidth="32"
+            strokeWidth="36"
             strokeLinecap="round"
           />
           <path
-            d="M -80 260 C 320 260, 480 90, 840 90 C 1180 90, 1320 400, 1560 400"
+            d="M -100 320 C 350 320, 520 120, 920 120 C 1260 120, 1380 440, 1600 440"
             stroke="#cbd5e1"
             strokeWidth="2"
-            strokeDasharray="10 12"
-            strokeLinecap="round"
-          />
-
-          {/* Lower Connecting Road */}
-          <path
-            d="M 60 840 C 360 840, 560 560, 980 560 C 1240 560, 1380 720, 1560 720"
-            stroke="#edf2f7"
-            strokeWidth="24"
-            strokeLinecap="round"
-          />
-          <path
-            d="M 60 840 C 360 840, 560 560, 980 560 C 1240 560, 1380 720, 1560 720"
-            stroke="#cbd5e1"
-            strokeWidth="1.5"
-            strokeDasharray="8 10"
+            strokeDasharray="12 14"
             strokeLinecap="round"
           />
         </svg>
       </div>
 
       {/* ─────────────────────────────────────────────────────────────
-          2. MAIN DASHBOARD CONTENT
+          2. MAIN DASHBOARD CONTENT CONTAINER
       ───────────────────────────────────────────────────────────── */}
       <div
         style={{
@@ -194,7 +177,7 @@ export function DashboardPage() {
         }}
       >
         
-        {/* DYNAMIC NOTIFICATIONS / APPOINTMENTS */}
+        {/* DYNAMIC NOTIFICATIONS / APPOINTMENTS BANNER */}
         <AnimatePresence mode="wait">
           {showProcessedNotification && activeFlow === 'dl_passed' && (
             <motion.div
@@ -342,200 +325,187 @@ export function DashboardPage() {
         </AnimatePresence>
 
         {/* ─────────────────────────────────────────────────────────────
-            3. HERO SECTION WITH LIVE WORKING ROAD DIAGRAM
+            3. HERO SECTION (GREETING ON LEFT + S-CURVE ROAD ON RIGHT)
         ───────────────────────────────────────────────────────────── */}
         <div
+          className="hero-section-grid"
           style={{
             display: 'grid',
-            gridTemplateColumns: 'minmax(0, 1.15fr) minmax(380px, 500px)',
+            gridTemplateColumns: 'minmax(0, 1.15fr) minmax(360px, 480px)',
             gap: '36px',
             alignItems: 'center',
-            padding: '8px 0 20px 0'
+            padding: '12px 0 20px 0'
           }}
         >
           {/* Left Text */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {/* Minimal Tricolor Top Accent */}
-            <div style={{ display: 'flex', width: '36px', height: '3px', borderRadius: '2px', overflow: 'hidden', marginBottom: '4px' }}>
-              <div style={{ flex: 1, background: '#e88a2d' }} />
-              <div style={{ flex: 1, background: '#cbd5e1' }} />
-              <div style={{ flex: 1, background: '#16805a' }} />
+            <div style={{ display: 'flex', width: '36px', height: '3px', borderRadius: '2px', overflow: 'hidden' }}>
+              <div style={{ flex: 1, background: 'var(--color-saffron)' }} />
+              <div style={{ flex: 1, background: 'var(--color-border)' }} />
+              <div style={{ flex: 1, background: 'var(--color-sage)' }} />
             </div>
 
             <h1
               style={{
                 fontSize: '44px',
                 fontWeight: 700,
-                color: '#002542',
+                color: 'var(--color-deep-navy)',
                 margin: 0,
                 lineHeight: 1.15,
-                letterSpacing: '-1px'
+                letterSpacing: '-1.2px'
               }}
             >
               {t('dashboard.title')}, {profile.firstName || 'Yanshi'} 🙏
             </h1>
 
-            <div style={{ fontSize: '18px', color: '#173b57', fontWeight: 600, lineHeight: 1.4 }}>
+            <div style={{ fontSize: '18px', color: 'var(--color-primary-navy)', fontWeight: 600, lineHeight: 1.4 }}>
               Welcome to Indian Drives.
-              <div style={{ color: '#64748b', fontWeight: 400, fontSize: '15px', marginTop: '2px' }}>
+              <div style={{ color: 'var(--color-text-secondary)', fontWeight: 400, fontSize: '15px', marginTop: '4px' }}>
                 {t('dashboard.subtitle')}
               </div>
             </div>
           </div>
 
           {/* ═══════════════════════════════════════════════════════════
-              RIGHT: LIVE WORKING ROAD DIAGRAM (MINIMAL & PREMIUM)
+              RIGHT: SEAMLESS S-CURVE ROAD DIAGRAM (STITCH SPEC)
           ═══════════════════════════════════════════════════════════ */}
           <div
             style={{
               position: 'relative',
-              background: '#ffffff',
-              border: '1px solid #e2e8f0',
-              borderRadius: '20px',
-              padding: '20px 22px 18px 22px',
+              width: '100%',
+              height: '160px',
               display: 'flex',
-              flexDirection: 'column',
-              gap: '12px',
-              boxShadow: '0 2px 10px rgba(0, 37, 66, 0.03)'
+              alignItems: 'center',
+              justifyContent: 'center'
             }}
           >
-            {/* Top Live Progress Status Header */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#16805a', display: 'inline-block' }} />
-                <span style={{ fontSize: '11px', fontWeight: 800, color: '#002542', letterSpacing: '0.8px', textTransform: 'uppercase' }}>
-                  LIVE JOURNEY TRACK
-                </span>
-              </div>
-              <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 600 }}>
-                Stage: <strong>DL Form 4 Approved</strong>
-              </span>
-            </div>
+            <svg
+              width="100%"
+              height="100%"
+              viewBox="0 0 450 160"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              preserveAspectRatio="xMidYMid meet"
+            >
+              <defs>
+                {/* Centerline Multi-Color Transition Gradient */}
+                <linearGradient id="roadStitchGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#E8892D" />
+                  <stop offset="35%" stopColor="#102D43" />
+                  <stop offset="65%" stopColor="#425B78" />
+                  <stop offset="100%" stopColor="#5D9278" />
+                </linearGradient>
+              </defs>
 
-            {/* SVG Live Road Canvas */}
-            <div style={{ position: 'relative', width: '100%', height: '140px' }}>
-              <svg
-                width="100%"
-                height="100%"
-                viewBox="0 0 440 140"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <defs>
-                  {/* Subtle Road Gradient */}
-                  <linearGradient id="roadAsphalt" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="#1e293b" />
-                    <stop offset="50%" stopColor="#0f172a" />
-                    <stop offset="100%" stopColor="#1e293b" />
-                  </linearGradient>
+              {/* 1. Road Outer Shoulder / Curb Outline */}
+              <path
+                d="M 35 110 C 110 110, 140 28, 210 28 C 270 28, 290 62, 340 62 C 370 62, 385 45, 410 38"
+                stroke="#DCE4EA"
+                strokeWidth="18"
+                strokeLinecap="round"
+              />
 
-                  {/* Completed Progress Path Glow */}
-                  <linearGradient id="completedPathGrad" x1="0%" y1="100%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="#e88a2d" />
-                    <stop offset="60%" stopColor="#0284c7" />
-                    <stop offset="100%" stopColor="#16805a" />
-                  </linearGradient>
+              {/* 2. Road Asphalt Surface Body */}
+              <path
+                d="M 35 110 C 110 110, 140 28, 210 28 C 270 28, 290 62, 340 62 C 370 62, 385 45, 410 38"
+                stroke="#F7F9FB"
+                strokeWidth="14"
+                strokeLinecap="round"
+              />
 
-                  {/* Beacon Radial Blur */}
-                  <filter id="beaconGlow" x="-50%" y="-50%" width="200%" height="200%">
-                    <feGaussianBlur stdDeviation="3" result="blur" />
-                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
-                  </filter>
-                </defs>
+              {/* 3. Live Animated Multi-Color Dashed Center Road Line */}
+              <path
+                className="live-road-dashes"
+                d="M 35 110 C 110 110, 140 28, 210 28 C 270 28, 290 62, 340 62 C 370 62, 385 45, 410 38"
+                stroke="url(#roadStitchGrad)"
+                strokeWidth="2.2"
+                strokeDasharray="5 7"
+                strokeLinecap="round"
+              />
 
-                {/* 1. Road Outer Shoulder / Curb */}
-                <path
-                  d="M 30 108 C 115 108, 130 28, 205 28 C 265 28, 290 68, 385 68"
-                  stroke="#e2e8f0"
-                  strokeWidth="24"
-                  strokeLinecap="round"
+              {/* ──────────────────────────────────────────────────
+                  4 MILESTONE NODES (START, LL, TEST, DL)
+              ────────────────────────────────────────────────── */}
+
+              {/* NODE 1: START (Bottom Left) */}
+              <g transform="translate(35, 110)">
+                <circle r="14" fill="#FFF3E3" fillOpacity="0.8" />
+                <circle r="5.5" fill="#E8892D" />
+                <text
+                  x="0"
+                  y="24"
+                  textAnchor="middle"
+                  fill="#E8892D"
+                  fontSize="11"
+                  fontWeight="800"
+                  letterSpacing="0.8"
+                >
+                  START
+                </text>
+              </g>
+
+              {/* NODE 2: LL (Top Peak Crest) */}
+              <g transform="translate(210, 28)">
+                <circle r="6" fill="#102D43" />
+                <circle r="2" fill="#FFFFFF" />
+                <text
+                  x="0"
+                  y="-12"
+                  textAnchor="middle"
+                  fill="#102D43"
+                  fontSize="11"
+                  fontWeight="800"
+                  letterSpacing="0.4"
+                >
+                  LL
+                </text>
+              </g>
+
+              {/* NODE 3: TEST (Descent Valley) */}
+              <g transform="translate(320, 62)">
+                <circle r="4.5" fill="#8693A2" />
+                <text
+                  x="0"
+                  y="-11"
+                  textAnchor="middle"
+                  fill="#8693A2"
+                  fontSize="10.5"
+                  fontWeight="700"
+                  letterSpacing="0.4"
+                >
+                  TEST
+                </text>
+              </g>
+
+              {/* NODE 4: DL (End Target) */}
+              <g transform="translate(410, 38)">
+                <circle
+                  r="12"
+                  fill="none"
+                  stroke="#5D9278"
+                  strokeWidth="1.8"
+                  strokeDasharray="3 3"
                 />
-
-                {/* 2. Asphalt Road Body */}
-                <path
-                  d="M 30 108 C 115 108, 130 28, 205 28 C 265 28, 290 68, 385 68"
-                  stroke="url(#roadAsphalt)"
-                  strokeWidth="18"
-                  strokeLinecap="round"
-                />
-
-                {/* 3. Live Animated White Dashed Centerline */}
-                <path
-                  className="live-road-dashes"
-                  d="M 30 108 C 115 108, 130 28, 205 28 C 265 28, 290 68, 385 68"
-                  stroke="#ffffff"
-                  strokeWidth="2"
-                  strokeDasharray="6 8"
-                  strokeLinecap="round"
-                  opacity="0.9"
-                />
-
-                {/* ──────────────────────────────────────────────────
-                    WAYPOINTS / MILESTONES
-                ────────────────────────────────────────────────── */}
-
-                {/* WAYPOINT 01: START */}
-                <g transform="translate(30, 108)">
-                  <circle r="10" fill="#ffffff" stroke="#e88a2d" strokeWidth="3" />
-                  <circle r="4" fill="#e88a2d" />
-                  <text x="0" y="24" textAnchor="middle" fill="#c2410c" fontSize="10" fontWeight="800" letterSpacing="0.4">START</text>
-                </g>
-
-                {/* WAYPOINT 02: LL ISSUED (COMPLETED ✓) */}
-                <g transform="translate(205, 28)">
-                  <circle r="9" fill="#002542" stroke="#ffffff" strokeWidth="2" />
-                  <path d="M -2.5 0 L -0.5 2 L 3 -1.5" stroke="#ffffff" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-                  <text x="0" y="-14" textAnchor="middle" fill="#002542" fontSize="10" fontWeight="800">LL (35%)</text>
-                </g>
-
-                {/* LIVE NAVIGATING CAR POSITION (Active between LL & Test at ~52%) */}
-                <g transform="translate(250, 42)">
-                  {/* Pulsing Beacon Ring */}
-                  <circle className="car-pulse-ring" r="14" fill="#0284c7" fillOpacity="0.3" filter="url(#beaconGlow)" />
-                  <circle r="10" fill="#0284c7" stroke="#ffffff" strokeWidth="2" />
-                  
-                  {/* Mini Car Icon on Road */}
-                  <g transform="translate(-5, -5) scale(0.65)">
-                    <path
-                      d="M2 7l1-3h10l1 3M1 10h14a1 1 0 001-1V7a2 2 0 00-2-2H2a2 2 0 00-2 2v2a1 1 0 001 1z"
-                      fill="#ffffff"
-                    />
-                    <circle cx="4" cy="10" r="1.5" fill="#002542" />
-                    <circle cx="12" cy="10" r="1.5" fill="#002542" />
-                  </g>
-                </g>
-
-                {/* WAYPOINT 03: TEST (65%) */}
-                <g transform="translate(305, 52)">
-                  <circle r="7" fill="#ffffff" stroke="#002542" strokeWidth="2.5" />
-                  <circle r="2.5" fill="#002542" />
-                  <text x="0" y="-12" textAnchor="middle" fill="#476179" fontSize="10" fontWeight="700">TEST (65%)</text>
-                </g>
-
-                {/* WAYPOINT 04: DL ISSUED (DESTINATION 100%) */}
-                <g transform="translate(385, 68)">
-                  <circle r="10" fill="#ffffff" stroke="#16805a" strokeWidth="3" />
-                  <circle r="4" fill="#16805a" />
-                  <text x="0" y="24" textAnchor="middle" fill="#16805a" fontSize="10" fontWeight="800">DL ISSUED</text>
-                </g>
-              </svg>
-            </div>
-
-            {/* Bottom Live Micro-Legend */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '4px', borderTop: '1px solid #f1f5f9', fontSize: '11px', color: '#64748b' }}>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#0284c7' }} />
-                Current: <strong>Test Scheduled at Burari Track (18 Sep)</strong>
-              </span>
-              <span style={{ fontWeight: 600, color: '#002542' }}>
-                Progress: <strong>55%</strong>
-              </span>
-            </div>
+                <circle r="5.5" fill="#5D9278" />
+                <text
+                  x="0"
+                  y="24"
+                  textAnchor="middle"
+                  fill="#102D43"
+                  fontSize="11"
+                  fontWeight="800"
+                  letterSpacing="0.4"
+                >
+                  DL
+                </text>
+              </g>
+            </svg>
           </div>
         </div>
 
         {/* SECTION DIVIDER */}
-        <div style={{ height: '1px', background: '#e2e8f0', width: '100%' }} />
+        <div style={{ height: '1px', background: 'var(--color-border)', width: '100%' }} />
 
         {/* ─────────────────────────────────────────────────────────────
             4. CLEAN, BALANCED 3 DESTINATION CARDS
@@ -544,7 +514,7 @@ export function DashboardPage() {
           <div>
             <div
               style={{
-                color: '#476179',
+                color: 'var(--color-indigo)',
                 fontSize: '11px',
                 fontWeight: 700,
                 textTransform: 'uppercase',
@@ -556,9 +526,9 @@ export function DashboardPage() {
             </div>
             <h2
               style={{
-                fontSize: '28px',
+                fontSize: '26px',
                 fontWeight: 700,
-                color: '#002542',
+                color: 'var(--color-deep-navy)',
                 margin: 0,
                 letterSpacing: '-0.5px'
               }}
@@ -567,7 +537,7 @@ export function DashboardPage() {
             </h2>
           </div>
 
-          {/* 3 Balanced Destination Cards */}
+          {/* 3 Destination Cards */}
           <div
             style={{
               display: 'grid',
@@ -579,40 +549,37 @@ export function DashboardPage() {
             {/* CARD 01: STARTING FRESH */}
             <div
               onClick={() => navigate('/journey?stage=ll')}
+              className="card"
               style={{
-                background: '#ffffff',
-                border: '1px solid #e2e8f0',
-                borderRadius: '16px',
                 padding: '28px 24px',
                 display: 'flex',
                 flexDirection: 'column',
                 cursor: 'pointer',
-                boxShadow: '0 1px 3px rgba(0, 37, 66, 0.03)',
                 transition: 'all 0.2s ease'
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = 'translateY(-3px)';
-                e.currentTarget.style.borderColor = '#cbd5e1';
-                e.currentTarget.style.boxShadow = '0 6px 16px rgba(0, 37, 66, 0.05)';
+                e.currentTarget.style.borderColor = 'var(--color-slate-blue)';
+                e.currentTarget.style.boxShadow = 'var(--shadow-hover)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.borderColor = '#e2e8f0';
-                e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 37, 66, 0.03)';
+                e.currentTarget.style.borderColor = 'var(--color-border)';
+                e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
               }}
             >
               <div
                 style={{
-                  width: '46px',
-                  height: '46px',
+                  width: '44px',
+                  height: '44px',
                   borderRadius: '12px',
-                  background: '#f8fafc',
-                  border: '1px solid #e2e8f0',
-                  color: '#002542',
+                  background: 'var(--color-pale-indigo)',
+                  border: '1px solid var(--color-border)',
+                  color: 'var(--color-primary-navy)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  marginBottom: '18px'
+                  marginBottom: '16px'
                 }}
               >
                 <Car size={22} />
@@ -624,17 +591,17 @@ export function DashboardPage() {
                   fontWeight: 700,
                   letterSpacing: '0.8px',
                   textTransform: 'uppercase',
-                  color: '#476179',
+                  color: 'var(--color-text-secondary)',
                   marginBottom: '8px'
                 }}
               >
                 01 · STARTING FRESH
               </div>
 
-              <h3 style={{ fontSize: '20px', fontWeight: 700, color: '#002542', margin: '0 0 8px 0', lineHeight: 1.3 }}>
+              <h3 style={{ fontSize: '19px', fontWeight: 700, color: 'var(--color-deep-navy)', margin: '0 0 8px 0', lineHeight: 1.3 }}>
                 {"I'm starting from scratch"}
               </h3>
-              <p style={{ fontSize: '14px', color: '#476179', lineHeight: 1.6, margin: '0 0 24px 0', flexGrow: 1 }}>
+              <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', lineHeight: 1.6, margin: '0 0 24px 0', flexGrow: 1 }}>
                 {"I don't have a Learner Licence yet. Start your online Form 2 application with Aadhaar."}
               </p>
 
@@ -643,7 +610,7 @@ export function DashboardPage() {
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '6px',
-                  color: '#002542',
+                  color: 'var(--color-primary-navy)',
                   fontSize: '14px',
                   fontWeight: 600,
                   marginTop: 'auto'
@@ -657,41 +624,38 @@ export function DashboardPage() {
             {/* CARD 02: CONTINUE YOUR JOURNEY (ACTIVE) */}
             <div
               onClick={() => navigate('/journey?stage=dl')}
+              className="card"
               style={{
-                background: '#ffffff',
-                border: '1px solid #cbd5e1',
-                borderRadius: '16px',
                 padding: '28px 24px',
                 display: 'flex',
                 flexDirection: 'column',
                 cursor: 'pointer',
-                boxShadow: '0 2px 6px rgba(0, 37, 66, 0.04)',
-                transition: 'all 0.2s ease',
+                border: '1px solid var(--color-slate-blue)',
                 position: 'relative'
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = 'translateY(-3px)';
-                e.currentTarget.style.borderColor = '#002542';
-                e.currentTarget.style.boxShadow = '0 6px 16px rgba(0, 37, 66, 0.07)';
+                e.currentTarget.style.borderColor = 'var(--color-primary-navy)';
+                e.currentTarget.style.boxShadow = 'var(--shadow-hover)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.borderColor = '#cbd5e1';
-                e.currentTarget.style.boxShadow = '0 2px 6px rgba(0, 37, 66, 0.04)';
+                e.currentTarget.style.borderColor = 'var(--color-slate-blue)';
+                e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
               }}
             >
               <div
                 style={{
-                  width: '46px',
-                  height: '46px',
+                  width: '44px',
+                  height: '44px',
                   borderRadius: '12px',
-                  background: '#f1f5f9',
-                  border: '1px solid #cbd5e1',
-                  color: '#002542',
+                  background: 'var(--color-pale-amber)',
+                  border: '1px solid #F6D8B0',
+                  color: 'var(--color-deep-navy)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  marginBottom: '18px'
+                  marginBottom: '16px'
                 }}
               >
                 <FileText size={22} />
@@ -703,17 +667,17 @@ export function DashboardPage() {
                   fontWeight: 700,
                   letterSpacing: '0.8px',
                   textTransform: 'uppercase',
-                  color: '#002542',
+                  color: 'var(--color-deep-navy)',
                   marginBottom: '8px'
                 }}
               >
                 02 · CONTINUE YOUR JOURNEY
               </div>
 
-              <h3 style={{ fontSize: '20px', fontWeight: 700, color: '#002542', margin: '0 0 8px 0', lineHeight: 1.3 }}>
+              <h3 style={{ fontSize: '19px', fontWeight: 700, color: 'var(--color-deep-navy)', margin: '0 0 8px 0', lineHeight: 1.3 }}>
                 I have a Learner Licence
               </h3>
-              <p style={{ fontSize: '14px', color: '#476179', lineHeight: 1.6, margin: '0 0 24px 0', flexGrow: 1 }}>
+              <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', lineHeight: 1.6, margin: '0 0 24px 0', flexGrow: 1 }}>
                 Continue towards your Driving Licence and schedule your practical driving test.
               </p>
 
@@ -722,7 +686,7 @@ export function DashboardPage() {
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '6px',
-                  color: '#002542',
+                  color: 'var(--color-primary-navy)',
                   fontSize: '14px',
                   fontWeight: 600,
                   marginTop: 'auto'
@@ -736,40 +700,37 @@ export function DashboardPage() {
             {/* CARD 03: EXISTING LICENCE */}
             <div
               onClick={() => navigate('/licence-services')}
+              className="card"
               style={{
-                background: '#ffffff',
-                border: '1px solid #e2e8f0',
-                borderRadius: '16px',
                 padding: '28px 24px',
                 display: 'flex',
                 flexDirection: 'column',
                 cursor: 'pointer',
-                boxShadow: '0 1px 3px rgba(0, 37, 66, 0.03)',
                 transition: 'all 0.2s ease'
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = 'translateY(-3px)';
-                e.currentTarget.style.borderColor = '#cbd5e1';
-                e.currentTarget.style.boxShadow = '0 6px 16px rgba(0, 37, 66, 0.05)';
+                e.currentTarget.style.borderColor = 'var(--color-slate-blue)';
+                e.currentTarget.style.boxShadow = 'var(--shadow-hover)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.borderColor = '#e2e8f0';
-                e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 37, 66, 0.03)';
+                e.currentTarget.style.borderColor = 'var(--color-border)';
+                e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
               }}
             >
               <div
                 style={{
-                  width: '46px',
-                  height: '46px',
+                  width: '44px',
+                  height: '44px',
                   borderRadius: '12px',
-                  background: '#f8fafc',
-                  border: '1px solid #e2e8f0',
-                  color: '#002542',
+                  background: 'var(--color-pale-teal)',
+                  border: '1px solid #B8E4DD',
+                  color: 'var(--color-teal)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  marginBottom: '18px'
+                  marginBottom: '16px'
                 }}
               >
                 <Shield size={22} />
@@ -781,17 +742,17 @@ export function DashboardPage() {
                   fontWeight: 700,
                   letterSpacing: '0.8px',
                   textTransform: 'uppercase',
-                  color: '#476179',
+                  color: 'var(--color-text-secondary)',
                   marginBottom: '8px'
                 }}
               >
                 03 · EXISTING LICENCE
               </div>
 
-              <h3 style={{ fontSize: '20px', fontWeight: 700, color: '#002542', margin: '0 0 8px 0', lineHeight: 1.3 }}>
+              <h3 style={{ fontSize: '19px', fontWeight: 700, color: 'var(--color-deep-navy)', margin: '0 0 8px 0', lineHeight: 1.3 }}>
                 I already have a Driving Licence
               </h3>
-              <p style={{ fontSize: '14px', color: '#476179', lineHeight: 1.6, margin: '0 0 24px 0', flexGrow: 1 }}>
+              <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', lineHeight: 1.6, margin: '0 0 24px 0', flexGrow: 1 }}>
                 Manage renewals, duplicate Smart Cards, address updates and citizen services.
               </p>
 
@@ -800,7 +761,7 @@ export function DashboardPage() {
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '6px',
-                  color: '#002542',
+                  color: 'var(--color-primary-navy)',
                   fontSize: '14px',
                   fontWeight: 600,
                   marginTop: 'auto'

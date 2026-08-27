@@ -15,59 +15,59 @@ export function DocumentsCenterPage() {
     <div className="page page-documents">
       <div className="page-header flex-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          <span className="eye-badge"><FileCheck2 size={14} /> Document Vault</span>
-          <h1>Documents Center</h1>
-          <p>Manage the documents used across your Indian Drives applications. Ensure all proofs are up to date for faster processing.</p>
+          <span className="eyebrow"><FileCheck2 size={13} /> Document Vault</span>
+          <h1 style={{ color: 'var(--color-deep-navy)', fontSize: '36px', fontWeight: 700, margin: '4px 0 6px 0' }}>Documents Center</h1>
+          <p style={{ color: 'var(--color-text-secondary)', fontSize: '15px', margin: 0 }}>Manage the documents used across your Indian Drives applications. Ensure all proofs are up to date for faster processing.</p>
         </div>
         <button className="primary-button" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <Upload size={16} /> Upload Document
         </button>
       </div>
 
-      <div className="console-grid" style={{ marginBottom: '24px' }}>
-        <div className="stat-card">
-          <span className="stat-num">5</span>
-          <span className="stat-label">All Documents</span>
+      <div className="console-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
+        <div className="card-standard" style={{ padding: '18px 20px' }}>
+          <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--color-deep-navy)' }}>5</div>
+          <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-secondary)', marginTop: '4px' }}>All Documents</div>
         </div>
-        <div className="stat-card">
-          <span className="stat-num" style={{ color: 'var(--ok)' }}>4</span>
-          <span className="stat-label">Verified</span>
+        <div className="card-standard" style={{ padding: '18px 20px' }}>
+          <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--color-teal)' }}>4</div>
+          <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-secondary)', marginTop: '4px' }}>Verified</div>
         </div>
-        <div className="stat-card">
-          <span className="stat-num" style={{ color: 'var(--saffron)' }}>1</span>
-          <span className="stat-label">Pending</span>
+        <div className="card-standard" style={{ padding: '18px 20px' }}>
+          <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--color-indigo)' }}>1</div>
+          <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-secondary)', marginTop: '4px' }}>Pending</div>
         </div>
-        <div className="stat-card">
-          <span className="stat-num" style={{ color: 'var(--danger)' }}>0</span>
-          <span className="stat-label">Needs Update</span>
+        <div className="card-standard" style={{ padding: '18px 20px' }}>
+          <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--color-text-muted)' }}>0</div>
+          <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-secondary)', marginTop: '4px' }}>Needs Update</div>
         </div>
       </div>
 
-      <div className="service-cards">
+      <div style={{ display: 'grid', gap: '16px' }}>
         {documents.map((doc, idx) => (
-          <div key={idx} className="services-panel" style={{ padding: '20px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div key={idx} className="card-standard" style={{ padding: '20px 24px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
               <div style={{ display: 'flex', gap: '14px' }}>
-                <div style={{ background: '#e0f2fe', color: '#0284c7', padding: '12px', borderRadius: '10px' }}>
-                  <FileText size={24} />
+                <div style={{ width: '42px', height: '42px', borderRadius: '10px', background: 'var(--color-pale-indigo)', color: 'var(--color-primary-navy)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <FileText size={20} />
                 </div>
                 <div>
-                  <span style={{ fontSize: '12px', textTransform: 'uppercase', color: 'var(--muted)', fontWeight: 700 }}>{doc.category}</span>
-                  <h3 style={{ margin: '4px 0 8px 0', fontSize: '16px' }}>{doc.name}</h3>
-                  <div style={{ display: 'flex', gap: '16px', fontSize: '12px', color: 'var(--muted)' }}>
-                    <span>Uploaded: <strong>{doc.date}</strong></span>
-                    <span>Valid Until: <strong>{doc.validUntil}</strong></span>
+                  <span style={{ fontSize: '11px', textTransform: 'uppercase', color: 'var(--color-indigo)', fontWeight: 700, letterSpacing: '0.6px' }}>{doc.category}</span>
+                  <h3 style={{ margin: '4px 0 6px 0', fontSize: '16px', fontWeight: 700, color: 'var(--color-deep-navy)' }}>{doc.name}</h3>
+                  <div style={{ display: 'flex', gap: '16px', fontSize: '13px', color: 'var(--color-text-secondary)' }}>
+                    <span>Uploaded: <strong style={{ color: 'var(--color-text-primary)' }}>{doc.date}</strong></span>
+                    <span>Valid Until: <strong style={{ color: 'var(--color-text-primary)' }}>{doc.validUntil}</strong></span>
                   </div>
                 </div>
               </div>
               <StatusBadge status={doc.status} text={doc.status} />
             </div>
 
-            <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid var(--surface-high)', display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-              <button className="secondary-button" style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 12px', fontSize: '13px' }}>
+            <div style={{ marginTop: '16px', paddingTop: '14px', borderTop: '1px solid var(--color-border-subtle)', display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+              <button className="secondary-button" style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 14px', fontSize: '13px' }}>
                 <Eye size={14} /> View
               </button>
-              <button className="secondary-button" style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 12px', fontSize: '13px' }}>
+              <button className="secondary-button" style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 14px', fontSize: '13px' }}>
                 <Download size={14} /> Download
               </button>
             </div>

@@ -46,9 +46,9 @@ export function AppointmentsPage() {
     <div className="page page-appointments">
       <div className="page-header flex-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          <span className="eye-badge"><CalendarDays size={14} /> Slot Management</span>
-          <h1>{t('userFlow.appointmentsTitle')}</h1>
-          <p>Manage your upcoming tests and view past interactions with RTO centers.</p>
+          <span className="eyebrow"><CalendarDays size={13} /> Slot Management</span>
+          <h1 style={{ color: 'var(--color-deep-navy)', fontSize: '36px', fontWeight: 700, margin: '4px 0 6px 0' }}>{t('userFlow.appointmentsTitle')}</h1>
+          <p style={{ color: 'var(--color-text-secondary)', fontSize: '15px', margin: 0 }}>Manage your upcoming tests and view past interactions with RTO centers.</p>
         </div>
         <button className="primary-button" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <Plus size={16} /> Book New Appointment
@@ -57,19 +57,22 @@ export function AppointmentsPage() {
 
       <div className="filter-tabs" style={{ display: 'flex', gap: '8px', marginBottom: '24px' }}>
         <button
-          className={`secondary-button ${tab === 'upcoming' ? 'primary-button' : ''}`}
+          className={tab === 'upcoming' ? 'primary-button' : 'secondary-button'}
+          style={{ padding: '6px 16px', fontSize: '13px' }}
           onClick={() => setTab('upcoming')}
         >
           Upcoming ({appointments.filter(a => a.type === 'upcoming').length})
         </button>
         <button
-          className={`secondary-button ${tab === 'past' ? 'primary-button' : ''}`}
+          className={tab === 'past' ? 'primary-button' : 'secondary-button'}
+          style={{ padding: '6px 16px', fontSize: '13px' }}
           onClick={() => setTab('past')}
         >
           Past ({appointments.filter(a => a.type === 'past').length})
         </button>
         <button
-          className={`secondary-button ${tab === 'all' ? 'primary-button' : ''}`}
+          className={tab === 'all' ? 'primary-button' : 'secondary-button'}
+          style={{ padding: '6px 16px', fontSize: '13px' }}
           onClick={() => setTab('all')}
         >
           All
@@ -78,40 +81,40 @@ export function AppointmentsPage() {
 
       <div style={{ display: 'grid', gap: '16px' }}>
         {filtered.map(item => (
-          <div key={item.id} className="services-panel" style={{ padding: '24px' }}>
+          <div key={item.id} className="card-standard" style={{ padding: '24px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <h3 style={{ fontSize: '18px', margin: 0 }}>{item.title}</h3>
+                  <h3 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--color-deep-navy)', margin: 0 }}>{item.title}</h3>
                   <StatusBadge status={item.status} text={item.status} />
                 </div>
-                <span style={{ fontSize: '12px', color: 'var(--muted)', marginTop: '4px', display: 'inline-block' }}>
-                  Reference No: <strong>{item.id}</strong> ({item.ref})
+                <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginTop: '4px', display: 'inline-block' }}>
+                  Reference No: <strong style={{ color: 'var(--color-text-primary)' }}>{item.id}</strong> ({item.ref})
                 </span>
               </div>
 
               {item.type === 'upcoming' && (
                 <div style={{ display: 'flex', gap: '8px' }}>
-                  <button className="secondary-button" style={{ padding: '6px 12px', fontSize: '13px' }}>Reschedule</button>
-                  <button className="primary-button" style={{ padding: '6px 12px', fontSize: '13px' }}>Download Pass</button>
+                  <button className="secondary-button" style={{ padding: '6px 14px', fontSize: '13px' }}>Reschedule</button>
+                  <button className="primary-button" style={{ padding: '6px 14px', fontSize: '13px' }}>Download Pass</button>
                 </div>
               )}
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginTop: '20px', background: 'var(--surface-low)', padding: '16px', borderRadius: '10px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginTop: '18px', background: 'var(--color-pale-indigo)', padding: '16px', borderRadius: '10px', border: '1px solid var(--color-border)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <CalendarDays size={18} color="var(--primary)" />
+                <CalendarDays size={18} color="var(--color-primary-navy)" />
                 <div>
-                  <div style={{ fontSize: '11px', color: 'var(--muted)', fontWeight: 700 }}>DATE & TIME</div>
-                  <div style={{ fontSize: '14px', fontWeight: 600 }}>{item.date} • {item.time}</div>
+                  <div style={{ fontSize: '11px', color: 'var(--color-indigo)', fontWeight: 700, letterSpacing: '0.6px' }}>DATE & TIME</div>
+                  <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-deep-navy)' }}>{item.date} • {item.time}</div>
                 </div>
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <MapPin size={18} color="var(--saffron)" />
+                <MapPin size={18} color="var(--color-saffron)" />
                 <div>
-                  <div style={{ fontSize: '11px', color: 'var(--muted)', fontWeight: 700 }}>LOCATION</div>
-                  <div style={{ fontSize: '14px', fontWeight: 600 }}>{item.location}</div>
+                  <div style={{ fontSize: '11px', color: 'var(--color-indigo)', fontWeight: 700, letterSpacing: '0.6px' }}>LOCATION</div>
+                  <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-deep-navy)' }}>{item.location}</div>
                 </div>
               </div>
             </div>
