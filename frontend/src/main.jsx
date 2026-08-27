@@ -22,15 +22,26 @@ import {
   Search,
   ShieldCheck,
   User,
-  WalletCards
+  WalletCards,
+  Menu,
+  X
 } from "lucide-react";
 import { api } from "./services/api";
 import { translations } from "./data/translations";
 import "./styles.css";
 
 export const AuthContext = createContext(null);
-const LanguageContext = createContext(null);
-const JourneyContext = createContext(null);
+export const LanguageContext = createContext(null);
+export const JourneyContext = createContext(null);
+
+export function useLanguage() {
+  const context = useContext(LanguageContext);
+  if (!context) {
+    const fallbackTr = (key) => key.split(".").reduce((v, p) => v?.[p], translations.en) || key;
+    return { language: 'en', setLanguage: () => {}, tr: fallbackTr, t: fallbackTr };
+  }
+  return context;
+}
 
 const languages = [
   { code: "en", label: "English" },
@@ -132,7 +143,7 @@ function App() {
   };
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, tr }}>
+    <LanguageContext.Provider value={{ language, setLanguage, tr, t: tr }}>
       <AuthContext.Provider value={auth}>
         <JourneyContext.Provider value={{ journey, journeyLoading, refreshJourney }}>
           <Router>
@@ -306,10 +317,16 @@ function ProtectedApp() {
 function Shell({ children }) {
   const { language, setLanguage } = useContext(LanguageContext);
   const { user, logout } = useContext(AuthContext);
+  const location = useLocation();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const [hasUnread, setHasUnread] = useState(() => {
     return localStorage.getItem('indian-drives-unread-notifications') !== 'false';
   });
+
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location.pathname]);
 
   useEffect(() => {
     const handleRead = () => setHasUnread(false);
@@ -319,12 +336,12 @@ function Shell({ children }) {
 
   return (
     <div className="app-shell">
-      <header className="topbar">
+      <header className="topbar" style={{ position: 'sticky', top: 0, zIndex: 100 }}>
         <Link to="/dashboard" className="brand" aria-label="Indian Drives Home">
           <img src="/indian-drives-logo.png" alt="Indian Drives Logo" className="brand-logo-img" onError={(e) => { e.target.style.display = 'none'; }} />
         </Link>
 
-        <nav className="navlinks" aria-label="Primary">
+        <nav className="navlinks desktop-only-nav" aria-label="Primary">
           <NavLink to="/dashboard" className={({ isActive }) => isActive ? "active" : ""}>
             Dashboard
           </NavLink>
@@ -361,6 +378,29 @@ function Shell({ children }) {
           <Link className="profile-pill" to="/profile" aria-label="Profile" style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#f1f5f9', color: '#173b57', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '14px' }}>
             A
           </Link>
+          <button
+            className="landing-mobile-toggle"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle Navigation Menu"
+          >
+            {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
+        </div>
+
+        {/* Mobile Slide Drawer */}
+        <div className={`landing-mobile-drawer ${mobileMenuOpen ? 'open' : ''}`}>
+          <NavLink to="/dashboard" className="landing-nav-link" onClick={() => setMobileMenuOpen(false)}>
+            Dashboard
+          </NavLink>
+          <NavLink to="/journey" className="landing-nav-link" onClick={() => setMobileMenuOpen(false)}>
+            My Journey
+          </NavLink>
+          <NavLink to="/ask" className="landing-ai-link" onClick={() => setMobileMenuOpen(false)}>
+            ✦ Ask DriveSeva
+          </NavLink>
+          <NavLink to="/help" className="landing-nav-link" onClick={() => setMobileMenuOpen(false)}>
+            Help
+          </NavLink>
         </div>
       </header>
 

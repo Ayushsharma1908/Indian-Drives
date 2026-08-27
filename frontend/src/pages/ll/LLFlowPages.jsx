@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   FileCheck2, Car, ShieldCheck, CheckCircle2, ArrowRight, ArrowLeft, Upload,
@@ -8,6 +8,7 @@ import {
 import { StatusBadge } from '../../components/ui/StatusBadge';
 import { getStoredUserProfile } from '../../data/userProfileData';
 import { UnifiedStageStepper } from '../../components/ui/UnifiedStageStepper';
+import { LanguageContext } from '../../main';
 
 // ----------------------------------------------------------------------
 // CONSISTENT 5-STEP HORIZONTAL STEPPER DESIGN FLOW
@@ -66,7 +67,7 @@ export function LLApplicationIntroPage() {
         </p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px', marginBottom: '24px' }}>
+      <div className="responsive-split-grid grid-2col" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px', marginBottom: '24px' }}>
         <div style={{ background: '#ffffff', borderRadius: '20px', padding: '32px', border: '1px solid #e2e8f0', boxShadow: '0 4px 16px rgba(0, 37, 66, 0.04)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '28px' }}>
             <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#eef6ff', color: '#173b57', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800 }}>
@@ -429,7 +430,7 @@ export function LLApplicationReviewPage() {
     <LLFlowLayout currentStepIndex={4} title="Application Review">
       
       {/* 2-Column Main Section */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '28px', alignItems: 'start', marginBottom: '32px' }}>
+      <div className="responsive-split-grid grid-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '28px', alignItems: 'start', marginBottom: '32px' }}>
         
         {/* Left Cards Stack */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -1113,39 +1114,41 @@ export function LLFeePaymentPage() {
 // ----------------------------------------------------------------------
 export function LLAssessmentCockpitPage() {
   const navigate = useNavigate();
+  const { tr } = useContext(LanguageContext) || {};
+  const t = (key) => (tr ? tr(key) : key);
 
   return (
-    <div className="page page-ll-cockpit" style={{ width: 'min(1184px, calc(100% - 48px))', margin: '36px auto', fontFamily: 'Inter, system-ui, sans-serif' }}>
+    <div className="page page-ll-cockpit cockpit-page-container">
       
       {/* Top Header Section */}
       <div style={{ marginBottom: '32px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', fontWeight: 800, color: '#e88a2d', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '8px' }}>
-          <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#e88a2d' }} /> NEXT CHECKPOINT
+          <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#e88a2d' }} /> {t('cockpit.nextCheckpoint')}
         </div>
         
-        <h1 style={{ fontSize: '36px', fontWeight: 800, color: '#173b57', margin: '0 0 10px 0', letterSpacing: '-0.5px' }}>
-          Learner Licence Assessment
+        <h1 className="cockpit-title" style={{ fontSize: '36px', fontWeight: 800, color: '#173b57', margin: '0 0 10px 0', letterSpacing: '-0.5px' }}>
+          {t('cockpit.title')}
         </h1>
         
-        <p style={{ color: '#64748b', fontSize: '16px', margin: '0 0 16px 0', maxWidth: '640px', lineHeight: 1.5 }}>
-          Test your road knowledge before you get behind the wheel. Ensure you have a quiet environment and a stable internet connection.
+        <p className="cockpit-subtitle" style={{ color: '#64748b', fontSize: '16px', margin: '0 0 16px 0', maxWidth: '640px', lineHeight: 1.5 }}>
+          {t('cockpit.subtitle')}
         </p>
 
         <span style={{ background: '#f0f4ff', color: '#173b57', padding: '6px 14px', borderRadius: '20px', fontSize: '13px', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-          🧪 Online assessment prototype
+          {t('cockpit.prototypeTag')}
         </span>
       </div>
 
       {/* 2-Column Main Layout */}
-      <div className="grid-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: '28px', alignItems: 'start' }}>
+      <div className="cockpit-main-grid">
         
         {/* Left Column Stack */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           
           {/* Assessment Route Card */}
-          <div style={{ background: '#ffffff', borderRadius: '20px', padding: '24px', border: '1px solid #e2e8f0', boxShadow: '0 4px 16px rgba(0,37,66,0.03)', overflow: 'hidden' }}>
+          <div className="cockpit-card" style={{ overflow: 'hidden' }}>
             <div style={{ fontSize: '13px', fontWeight: 800, color: '#173b57', letterSpacing: '0.5px', marginBottom: '20px' }}>
-              🔀 ASSESSMENT ROUTE
+              {t('cockpit.routeTag')}
             </div>
 
             {/* Checkpoint Track with Smooth Touch Landscape Scroll */}
@@ -1158,12 +1161,12 @@ export function LLAssessmentCockpitPage() {
                 <div style={{ position: 'absolute', top: '16px', left: '28px', width: '58%', height: '3px', background: 'linear-gradient(90deg, #16a34a 0%, #173b57 70%, #e88a2d 100%)', zIndex: 1, borderRadius: '9999px' }} />
 
                 {[
-                  { label: 'APPLICATION', done: true, icon: FileText },
-                  { label: 'DOCUMENTS', done: true, icon: FileCheck2 },
-                  { label: 'PAYMENT', done: true, icon: CreditCard },
-                  { label: 'LL ASSESSMENT', active: true, icon: Laptop },
-                  { label: 'DRIVING TEST', done: false, icon: Car },
-                  { label: 'LICENCE', done: false, icon: ShieldCheck }
+                  { label: t('cockpit.appStep'), done: true, icon: FileText },
+                  { label: t('cockpit.docsStep'), done: true, icon: FileCheck2 },
+                  { label: t('cockpit.payStep'), done: true, icon: CreditCard },
+                  { label: t('cockpit.llStep'), active: true, icon: Laptop },
+                  { label: t('cockpit.dlStep'), done: false, icon: Car },
+                  { label: t('cockpit.licenceStep'), done: false, icon: ShieldCheck }
                 ].map((rt, idx) => {
                   const IconComp = rt.icon;
 
@@ -1205,109 +1208,93 @@ export function LLAssessmentCockpitPage() {
           </div>
 
           {/* Road Knowledge Check */}
-          <div style={{ background: '#ffffff', borderRadius: '20px', padding: '32px', border: '1px solid #e2e8f0', boxShadow: '0 4px 16px rgba(0,37,66,0.03)' }}>
+          <div className="cockpit-card">
             <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#173b57', margin: '0 0 6px 0' }}>
-              Road Knowledge Check
+              {t('cockpit.knowledgeTitle')}
             </h3>
             <p style={{ fontSize: '14px', color: '#64748b', margin: '0 0 24px 0' }}>
-              Before you get behind the wheel, let's check your understanding of India's road rules.
+              {t('cockpit.knowledgeSub')}
             </p>
 
-            <div className="grid-4col-to-2col" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
+            <div className="cockpit-knowledge-grid">
               <div style={{ background: '#f3e8ff', padding: '20px 12px', borderRadius: '16px', textAlign: 'center' }}>
                 <div style={{ fontSize: '24px', marginBottom: '8px' }}>🚥</div>
-                <span style={{ fontSize: '13px', fontWeight: 800, color: '#173b57' }}>Traffic Signals</span>
+                <span style={{ fontSize: '13px', fontWeight: 800, color: '#173b57' }}>{t('cockpit.trafficSignals')}</span>
               </div>
 
               <div style={{ background: '#fee2e2', padding: '20px 12px', borderRadius: '16px', textAlign: 'center' }}>
                 <div style={{ fontSize: '24px', marginBottom: '8px' }}>🛑</div>
-                <span style={{ fontSize: '13px', fontWeight: 800, color: '#173b57' }}>Road Signs</span>
+                <span style={{ fontSize: '13px', fontWeight: 800, color: '#173b57' }}>{t('cockpit.roadSigns')}</span>
               </div>
 
               <div style={{ background: '#dcfce7', padding: '20px 12px', borderRadius: '16px', textAlign: 'center' }}>
                 <div style={{ fontSize: '24px', marginBottom: '8px' }}>🛣️</div>
-                <span style={{ fontSize: '13px', fontWeight: 800, color: '#173b57' }}>Road Rules</span>
+                <span style={{ fontSize: '13px', fontWeight: 800, color: '#173b57' }}>{t('cockpit.roadRules')}</span>
               </div>
 
               <div style={{ background: '#e0f2fe', padding: '20px 12px', borderRadius: '16px', textAlign: 'center' }}>
                 <div style={{ fontSize: '24px', marginBottom: '8px' }}>⚠️</div>
-                <span style={{ fontSize: '13px', fontWeight: 800, color: '#173b57' }}>Safe Driving</span>
+                <span style={{ fontSize: '13px', fontWeight: 800, color: '#173b57' }}>{t('cockpit.safeDriving')}</span>
               </div>
             </div>
 
-            <button style={{ background: '#f8fafc', border: '1px solid #e2e8f0', color: '#173b57', padding: '12px 20px', borderRadius: '10px', fontWeight: 700, fontSize: '14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              ❓ Try One Practice Question <ArrowRight size={16} />
+            <button className="cockpit-btn-practice">
+              {t('cockpit.practiceBtn')} <ArrowRight size={16} />
             </button>
           </div>
 
         </div>
 
         {/* Right Column: Assessment Readiness */}
-        <div style={{ background: '#ffffff', borderRadius: '24px', padding: '32px', border: '1px solid #e2e8f0', boxShadow: '0 4px 20px rgba(0,37,66,0.04)' }}>
+        <div className="cockpit-readiness-card">
           <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#173b57', margin: '0 0 6px 0' }}>
-            Assessment Readiness
+            {t('cockpit.readinessTitle')}
           </h2>
           <p style={{ fontSize: '13px', color: '#64748b', margin: '0 0 24px 0', lineHeight: 1.5 }}>
-            Ensure your camera is active and you are in a well-lit room.
+            {t('cockpit.readinessSub')}
           </p>
 
-          <div style={{ background: '#eef6ff', borderRadius: '16px', padding: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+          <div className="cockpit-readiness-stats">
             <div style={{ display: 'grid', gap: '16px' }}>
               <div>
-                <div style={{ fontSize: '10px', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>TOTAL</div>
-                <div style={{ fontSize: '16px', fontWeight: 800, color: '#173b57' }}>15 Questions</div>
+                <div style={{ fontSize: '10px', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('cockpit.totalQs')}</div>
+                <div style={{ fontSize: '16px', fontWeight: 800, color: '#173b57' }}>{t('cockpit.totalVal')}</div>
               </div>
 
               <div>
-                <div style={{ fontSize: '10px', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>DURATION</div>
-                <div style={{ fontSize: '16px', fontWeight: 800, color: '#173b57' }}>15 Minutes</div>
+                <div style={{ fontSize: '10px', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('cockpit.duration')}</div>
+                <div style={{ fontSize: '16px', fontWeight: 800, color: '#173b57' }}>{t('cockpit.durationVal')}</div>
               </div>
 
               <div>
-                <div style={{ fontSize: '10px', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>PASSING SCORE</div>
-                <div style={{ fontSize: '16px', fontWeight: 800, color: '#173b57' }}>9 / 15</div>
+                <div style={{ fontSize: '10px', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('cockpit.passingScore')}</div>
+                <div style={{ fontSize: '16px', fontWeight: 800, color: '#173b57' }}>{t('cockpit.passingVal')}</div>
               </div>
             </div>
 
             {/* Circular Donut Ring Graphic */}
-            <div style={{ position: 'relative', width: '100px', height: '100px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ position: 'relative', width: '100px', height: '100px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <svg width="100" height="100" viewBox="0 0 100 100">
                 <circle cx="50" cy="50" r="40" fill="none" stroke="#dbeafe" strokeWidth="8" />
                 <circle cx="50" cy="50" r="40" fill="none" stroke="#e88a2d" strokeWidth="8" strokeDasharray="251" strokeDashoffset="251" strokeLinecap="round" transform="rotate(-90 50 50)" />
               </svg>
               <div style={{ position: 'absolute', textAlign: 'center' }}>
                 <div style={{ fontSize: '16px', fontWeight: 800, color: '#173b57' }}>0/15</div>
-                <div style={{ fontSize: '10px', color: '#64748b' }}>Complete</div>
+                <div style={{ fontSize: '10px', color: '#64748b' }}>{t('cockpit.completeText')}</div>
               </div>
             </div>
           </div>
 
           <button
             onClick={() => navigate('/ll/assessment-exam')}
-            style={{
-              width: '100%',
-              background: '#002542',
-              color: '#ffffff',
-              border: 'none',
-              padding: '16px',
-              borderRadius: '12px',
-              fontWeight: 800,
-              fontSize: '16px',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '10px',
-              marginBottom: '16px',
-              boxShadow: '0 4px 14px rgba(0, 37, 66, 0.2)'
-            }}
+            className="cockpit-btn-start"
           >
-            START ASSESSMENT <ArrowRight size={18} />
+            {t('cockpit.startBtn')} <ArrowRight size={18} />
           </button>
 
           <div style={{ background: '#f8fafc', padding: '12px 14px', borderRadius: '10px', fontSize: '11px', color: '#64748b', lineHeight: 1.5, display: 'flex', gap: '8px' }}>
             <Info size={14} color="#173b57" style={{ flexShrink: 0, marginTop: '2px' }} />
-            <span>By starting, you agree to the automated proctoring terms. Your camera and microphone will be recorded.</span>
+            <span>{t('cockpit.proctorNotice')}</span>
           </div>
 
         </div>
@@ -1640,7 +1627,7 @@ export function LLAssessmentResultPage() {
       </div>
 
       {/* 2-Column Results Grid */}
-      <div className="grid-2col" style={{ display: 'grid', gridTemplateColumns: '380px 1fr', gap: '28px', alignItems: 'start', marginBottom: '32px' }}>
+      <div className="grid-2col responsive-split-grid" style={{ display: 'grid', gridTemplateColumns: '380px 1fr', gap: '28px', alignItems: 'start', marginBottom: '32px' }}>
         
         {/* Left Column: Final Score Donut Card */}
         <div style={{ background: '#ffffff', borderRadius: '24px', padding: '36px', border: '1px solid #e2e8f0', boxShadow: '0 4px 20px rgba(0,37,66,0.04)', textAlign: 'center' }}>
@@ -1810,7 +1797,7 @@ export function LLVerifiedPage() {
       </div>
 
       {/* 2-Column Split Layout */}
-      <div className="grid-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: '32px', alignItems: 'start' }}>
+      <div className="grid-2col responsive-split-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: '32px', alignItems: 'start' }}>
         
         {/* Left Column: Digital Preview Card */}
         <div>

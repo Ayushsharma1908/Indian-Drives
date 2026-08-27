@@ -1920,35 +1920,33 @@ select:focus {
   }
 
   /* Universal 2-column to 1-column responsive layout grids (FORCES right section to come BELOW on tablet and mobile) */
+  .responsive-split-grid,
   .grid-2col, 
   .hero-section-grid,
   .dashboard-main-grid,
   .journey-cockpit-grid,
+  .cockpit-main-grid,
   .ask-ai-grid,
   .ll-review-grid,
   .dl-review-grid,
-  div[style*="gridTemplateColumns: '1fr 380px'"],
-  div[style*="gridTemplateColumns: '1fr 340px'"],
-  div[style*="gridTemplateColumns: '1fr 360px'"],
-  div[style*="gridTemplateColumns: '1fr 320px'"],
-  div[style*="gridTemplateColumns: '380px 1fr'"],
-  div[style*="gridTemplateColumns: '340px 1fr'"],
-  div[style*="gridTemplateColumns: '360px 1fr'"],
-  div[style*="gridTemplateColumns: '320px 1fr'"],
-  div[style*="gridTemplateColumns: '2fr 1fr'"],
-  div[style*="gridTemplateColumns: '1fr 2fr'"],
-  div[style*="gridTemplateColumns: '260px 1fr'"],
-  div[style*="gridTemplateColumns: 1fr 380px"],
-  div[style*="gridTemplateColumns: 1fr 340px"],
-  div[style*="gridTemplateColumns: 1fr 360px"],
-  div[style*="gridTemplateColumns: 1fr 320px"],
-  div[style*="gridTemplateColumns: 380px 1fr"],
-  div[style*="gridTemplateColumns: 340px 1fr"],
-  div[style*="gridTemplateColumns: 360px 1fr"],
-  div[style*="gridTemplateColumns: 320px 1fr"],
+  div[style*="gridTemplateColumns"],
+  div[style*="1fr 380px"],
+  div[style*="1fr 340px"],
+  div[style*="1fr 360px"],
+  div[style*="1fr 320px"],
+  div[style*="380px 1fr"],
+  div[style*="340px 1fr"],
+  div[style*="360px 1fr"],
+  div[style*="320px 1fr"],
+  div[style*="440px 1fr"],
+  div[style*="1fr 440px"],
+  div[style*="2fr 1fr"],
+  div[style*="1fr 2fr"],
+  div[style*="260px 1fr"],
   form[style*="gridTemplateColumns"] {
     grid-template-columns: 1fr !important;
     gap: 24px !important;
+    width: 100% !important;
   }
 
   /* Help Center categories */
@@ -2064,16 +2062,13 @@ select:focus {
     height: 34px !important;
   }
 
-  .topbar .navlinks {
-    order: 3;
-    width: 100%;
-    justify-content: flex-start;
-    border-top: 1px solid #f1f5f9;
-    padding-top: 10px;
-    margin-top: 4px;
-    overflow-x: auto;
-    white-space: nowrap;
-    -webkit-overflow-scrolling: touch;
+  .topbar .desktop-only-nav,
+  .topbar .navlinks.desktop-only-nav {
+    display: none !important;
+  }
+
+  .topbar .landing-mobile-toggle {
+    display: flex !important;
   }
 
   .top-actions {
@@ -2184,6 +2179,170 @@ select:focus {
     transform: scale(0.85);
     transform-origin: center top;
     margin-bottom: -40px;
+  }
+}
+
+/* ==========================================================================
+   LL ASSESSMENT COCKPIT RESPONSIVE DESIGN STYLES
+   ========================================================================== */
+
+.cockpit-page-container {
+  width: min(1184px, calc(100% - 48px));
+  margin: 36px auto;
+  font-family: 'Hanken Grotesk', 'Inter', system-ui, sans-serif;
+  box-sizing: border-box;
+}
+
+.cockpit-main-grid {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 28px;
+  align-items: start;
+}
+
+.cockpit-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 32px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 16px rgba(0, 37, 66, 0.03);
+}
+
+.cockpit-knowledge-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.cockpit-readiness-card {
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 32px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 20px rgba(0, 37, 66, 0.04);
+}
+
+.cockpit-readiness-stats {
+  background: #eef6ff;
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.cockpit-btn-practice {
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  color: #173b57;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.2s ease;
+}
+
+.cockpit-btn-practice:hover {
+  background: #f1f5f9;
+}
+
+.cockpit-btn-start {
+  width: 100%;
+  background: #002542;
+  color: #ffffff;
+  border: none;
+  padding: 16px;
+  border-radius: 12px;
+  font-weight: 800;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 14px rgba(0, 37, 66, 0.2);
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.cockpit-btn-start:hover {
+  transform: translateY(-1px);
+  background: #00335a;
+}
+
+@media (max-width: 1023px) {
+  .cockpit-page-container {
+    width: 100% !important;
+    margin: 20px 0 !important;
+    padding: 0 16px !important;
+  }
+
+  .cockpit-main-grid {
+    grid-template-columns: 1fr !important;
+    gap: 24px !important;
+  }
+
+  .cockpit-knowledge-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .cockpit-title {
+    font-size: 26px !important;
+    letter-spacing: -0.5px !important;
+    margin-bottom: 8px !important;
+  }
+
+  .cockpit-subtitle {
+    font-size: 14px !important;
+    margin-bottom: 14px !important;
+  }
+
+  .cockpit-card {
+    padding: 20px 16px !important;
+    border-radius: 16px !important;
+  }
+
+  .cockpit-readiness-card {
+    padding: 20px 16px !important;
+    border-radius: 16px !important;
+  }
+
+  .cockpit-readiness-stats {
+    padding: 16px !important;
+    gap: 16px !important;
+  }
+
+  .cockpit-btn-practice {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  .cockpit-btn-start {
+    width: 100% !important;
+    padding: 14px !important;
+    font-size: 15px !important;
+  }
+}
+
+@media (max-width: 479px) {
+  .cockpit-knowledge-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  .cockpit-readiness-stats {
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
   }
 }
 

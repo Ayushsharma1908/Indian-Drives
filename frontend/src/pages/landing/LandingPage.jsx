@@ -5,12 +5,15 @@ import {
   CreditCard, Truck, Award, HelpCircle, Lock, User, FileText, Search, Phone,
   Check, X, Zap, ChevronRight, MapPin, Eye, Info, Menu
 } from 'lucide-react';
-import { AuthContext } from '../../main';
+import { AuthContext, LanguageContext } from '../../main';
+import { LanguageSelector } from '../../components/layout/LanguageSelector';
 import './LandingPage.css';
 
 export function LandingPage() {
   const navigate = useNavigate();
   const auth = useContext(AuthContext);
+  const { language, setLanguage, tr } = useContext(LanguageContext) || {};
+  const t = (key) => (tr ? tr(key) : key);
 
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -57,22 +60,26 @@ export function LandingPage() {
 
         {/* Center Desktop Nav Links */}
         <nav className="landing-desktop-nav">
-          <a href="#how-it-works" className="landing-nav-link">How It Works</a>
-          <a href="#features" className="landing-nav-link">Key Features</a>
-          <a href="#paths" className="landing-nav-link">Citizen Journeys</a>
+          <a href="#how-it-works" className="landing-nav-link">{t('nav.howItWorks')}</a>
+          <a href="#features" className="landing-nav-link">{t('nav.keyFeatures')}</a>
+          <a href="#paths" className="landing-nav-link">{t('nav.citizenJourneys')}</a>
           <a
             href="#ask-ai"
             onClick={(e) => { e.preventDefault(); navigate('/ask'); }}
             className="landing-ai-link"
           >
-            ✦ Ask DriveSeva AI
+            ✦ {t('nav.ask')}
           </a>
         </nav>
 
-        {/* Right CTA Actions & Mobile Toggle */}
+        {/* Right CTA Actions & Language Selector */}
         <div className="landing-nav-actions">
+          {setLanguage && (
+            <LanguageSelector currentLanguage={language || 'en'} onSelectLanguage={setLanguage} />
+          )}
+
           <button onClick={handleStartJourney} className="landing-start-btn">
-            Start Your Journey <ArrowRight size={16} />
+            {t('nav.startJourney')} <ArrowRight size={16} />
           </button>
           
           <button
@@ -86,18 +93,18 @@ export function LandingPage() {
 
         {/* Mobile Slide-Down Menu Drawer */}
         <div className={`landing-mobile-drawer ${mobileMenuOpen ? 'open' : ''}`}>
-          <a href="#how-it-works" className="landing-nav-link" onClick={() => setMobileMenuOpen(false)}>How It Works</a>
-          <a href="#features" className="landing-nav-link" onClick={() => setMobileMenuOpen(false)}>Key Features</a>
-          <a href="#paths" className="landing-nav-link" onClick={() => setMobileMenuOpen(false)}>Citizen Journeys</a>
+          <a href="#how-it-works" className="landing-nav-link" onClick={() => setMobileMenuOpen(false)}>{t('nav.howItWorks')}</a>
+          <a href="#features" className="landing-nav-link" onClick={() => setMobileMenuOpen(false)}>{t('nav.keyFeatures')}</a>
+          <a href="#paths" className="landing-nav-link" onClick={() => setMobileMenuOpen(false)}>{t('nav.citizenJourneys')}</a>
           <a
             href="#ask-ai"
             onClick={(e) => { e.preventDefault(); setMobileMenuOpen(false); navigate('/ask'); }}
             className="landing-ai-link"
           >
-            ✦ Ask DriveSeva AI
+            ✦ {t('nav.ask')}
           </a>
           <button onClick={handleStartJourney} className="landing-start-btn" style={{ width: '100%', justifyContent: 'center', marginTop: '8px' }}>
-            Start Your Journey <ArrowRight size={16} />
+            {t('nav.startJourney')} <ArrowRight size={16} />
           </button>
         </div>
       </header>
@@ -107,34 +114,34 @@ export function LandingPage() {
         {/* Left Column Text */}
         <div>
           <div className="landing-hero-badge">
-            <Sparkles size={14} color="#f97316" /> RE-IMAGINING CITIZEN DRIVING LICENCE SERVICES
+            <Sparkles size={14} color="#f97316" /> {t('landing.badge')}
           </div>
 
           <h1 className="landing-hero-title">
-            Driving Licence Services, <span style={{ color: '#e88a2d' }}>Simplified & Misguidance-Free.</span>
+            {t('landing.title')} <span style={{ color: '#e88a2d' }}>{t('landing.titleHighlight')}</span>
           </h1>
 
           <p className="landing-hero-subtitle">
-            Experience India’s smartest driving licence portal. No long queues, no middlemen, and zero misguidance. Clear step-by-step guidance for Learner Licence, Practical Tests, and Smartcard Maintenance.
+            {t('landing.subtitle')}
           </p>
 
           {/* Action Buttons */}
           <div className="landing-hero-actions">
             <button onClick={handleStartJourney} className="landing-hero-btn-primary">
-              Start Your Journey <ArrowRight size={18} />
+              {t('landing.startJourney')} <ArrowRight size={18} />
             </button>
           </div>
 
           {/* Trust Badges Bar */}
           <div className="landing-trust-badges">
             <span className="landing-trust-item">
-              <ShieldCheck size={16} color="#16a34a" /> 100% Aadhaar Verified
+              <ShieldCheck size={16} color="#16a34a" /> {t('landing.trustAadhaar')}
             </span>
             <span className="landing-trust-item">
-              <Laptop size={16} color="#0369a1" /> Remote Proctored Exam
+              <Laptop size={16} color="#0369a1" /> {t('landing.trustRemote')}
             </span>
             <span className="landing-trust-item">
-              <Truck size={16} color="#e88a2d" /> Live Smartcard Tracking
+              <Truck size={16} color="#e88a2d" /> {t('landing.trustTracking')}
             </span>
           </div>
         </div>
@@ -157,10 +164,10 @@ export function LandingPage() {
             {/* Dashboard Speedometer Track Preview */}
             <div className="landing-speedometer-preview">
               <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', letterSpacing: '0.8px', textTransform: 'uppercase', marginBottom: '8px' }}>
-                SPEEDOMETER ROADMAP TRACKER
+                {t('landing.speedometerTitle')}
               </div>
               <div style={{ fontSize: '16px', fontWeight: 800, color: '#ffffff', marginBottom: '12px' }}>
-                Learner Licence Active → DL Exam Ready
+                {t('landing.speedometerSub')}
               </div>
 
               {/* Progress Line */}
@@ -169,22 +176,22 @@ export function LandingPage() {
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '12px', fontSize: '11px', fontWeight: 700, flexWrap: 'wrap', gap: '6px' }}>
-                <span style={{ color: '#10b981' }}>✓ LL Issued</span>
-                <span style={{ color: '#f97316' }}>⏱ Test Scheduled</span>
-                <span style={{ color: '#94a3b8' }}>Smartcard Dispatch</span>
+                <span style={{ color: '#10b981' }}>{t('landing.llIssued')}</span>
+                <span style={{ color: '#f97316' }}>{t('landing.testScheduled')}</span>
+                <span style={{ color: '#94a3b8' }}>{t('landing.smartcardDispatch')}</span>
               </div>
             </div>
 
             {/* Quick Cards Stack */}
             <div className="landing-quick-cards-grid">
               <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                <div style={{ fontSize: '11px', fontWeight: 800, color: '#0369a1', marginBottom: '4px' }}>ONLINE LL TEST</div>
-                <div style={{ fontSize: '13px', fontWeight: 800, color: '#0a2540' }}>15 Min Remote Assessment</div>
+                <div style={{ fontSize: '11px', fontWeight: 800, color: '#0369a1', marginBottom: '4px' }}>{t('landing.onlineTest')}</div>
+                <div style={{ fontSize: '13px', fontWeight: 800, color: '#0a2540' }}>{t('landing.onlineTestDesc')}</div>
               </div>
 
               <div style={{ background: '#fff7ed', padding: '16px', borderRadius: '12px', border: '1px solid #fed7aa' }}>
-                <div style={{ fontSize: '11px', fontWeight: 800, color: '#c2410c', marginBottom: '4px' }}>SLOT BOOKING</div>
-                <div style={{ fontSize: '13px', fontWeight: 800, color: '#0a2540' }}>Car-Seat Visual Selection</div>
+                <div style={{ fontSize: '11px', fontWeight: 800, color: '#c2410c', marginBottom: '4px' }}>{t('landing.slotBooking')}</div>
+                <div style={{ fontSize: '13px', fontWeight: 800, color: '#0a2540' }}>{t('landing.slotBookingDesc')}</div>
               </div>
             </div>
           </div>
@@ -200,13 +207,13 @@ export function LandingPage() {
           
           <div className="landing-section-header">
             <span className="landing-section-tag">
-              TRANSPARENT & GUIDED CITIZEN WORKFLOW
+              {t('landing.pathsTag')}
             </span>
             <h2 className="landing-section-title">
-              Never Get Misguided Again. One Portal, 3 Streamlined Paths.
+              {t('landing.pathsTitle')}
             </h2>
             <p className="landing-section-desc">
-              Unlike legacy portals with confusing menus, DriveSeva dynamically detects where you are in your driving journey and shows only what you need to process next.
+              {t('landing.pathsDesc')}
             </p>
           </div>
 
@@ -231,26 +238,26 @@ export function LandingPage() {
                 </div>
 
                 <span style={{ background: '#e0f2fe', color: '#0369a1', fontSize: '11px', fontWeight: 800, padding: '4px 10px', borderRadius: '6px' }}>
-                  PATH 1
+                  {t('landing.path1Tag')}
                 </span>
 
                 <h3 style={{ fontSize: '22px', fontWeight: 800, color: '#0a2540', margin: '12px 0 10px 0' }}>
-                  Learner Licence (LL)
+                  {t('landing.path1Title')}
                 </h3>
 
                 <p style={{ fontSize: '14px', color: '#64748b', lineHeight: 1.5, marginBottom: '24px' }}>
-                  Apply online with Aadhaar details, upload identity proof, pay standard RTO fees, and take the 15-minute proctored road safety test right from home.
+                  {t('landing.path1Desc')}
                 </p>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '13px', fontWeight: 700, color: '#0a2540' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><CheckCircle2 size={16} color="#16a34a" /> Zero physical RTO queue</div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><CheckCircle2 size={16} color="#16a34a" /> Automated camera proctoring</div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><CheckCircle2 size={16} color="#16a34a" /> Instant LL certificate download</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><CheckCircle2 size={16} color="#16a34a" /> {t('landing.path1Check1')}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><CheckCircle2 size={16} color="#16a34a" /> {t('landing.path1Check2')}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><CheckCircle2 size={16} color="#16a34a" /> {t('landing.path1Check3')}</div>
                 </div>
               </div>
 
               <button onClick={handleDemoLogin} className="landing-path-card-btn-outlined">
-                Apply for LL <ArrowRight size={16} />
+                {t('landing.path1Btn')} <ArrowRight size={16} />
               </button>
             </div>
 
@@ -272,26 +279,26 @@ export function LandingPage() {
                 </div>
 
                 <span style={{ background: '#ffedd5', color: '#c2410c', fontSize: '11px', fontWeight: 800, padding: '4px 10px', borderRadius: '6px' }}>
-                  PATH 2
+                  {t('landing.path2Tag')}
                 </span>
 
                 <h3 style={{ fontSize: '22px', fontWeight: 800, color: '#0a2540', margin: '12px 0 10px 0' }}>
-                  Driving Licence (DL) Test
+                  {t('landing.path2Title')}
                 </h3>
 
                 <p style={{ fontSize: '14px', color: '#64748b', lineHeight: 1.5, marginBottom: '24px' }}>
-                  Holders of active LL can verify their address, pick test slots using a car-seat visual selector, get mandatory document checklists, and track smartcard dispatch.
+                  {t('landing.path2Desc')}
                 </p>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '13px', fontWeight: 700, color: '#0a2540' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><CheckCircle2 size={16} color="#16a34a" /> Visual car-seat slot picker</div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><CheckCircle2 size={16} color="#16a34a" /> What-to-carry checklist</div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><CheckCircle2 size={16} color="#16a34a" /> Speed Post live tracking</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><CheckCircle2 size={16} color="#16a34a" /> {t('landing.path2Check1')}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><CheckCircle2 size={16} color="#16a34a" /> {t('landing.path2Check2')}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><CheckCircle2 size={16} color="#16a34a" /> {t('landing.path2Check3')}</div>
                 </div>
               </div>
 
               <button onClick={handleDemoLogin} className="landing-path-card-btn-filled">
-                Book Practical Test <ArrowRight size={16} />
+                {t('landing.path2Btn')} <ArrowRight size={16} />
               </button>
             </div>
 
@@ -313,26 +320,26 @@ export function LandingPage() {
                 </div>
 
                 <span style={{ background: '#dcfce7', color: '#16a34a', fontSize: '11px', fontWeight: 800, padding: '4px 10px', borderRadius: '6px' }}>
-                  PATH 3
+                  {t('landing.path3Tag')}
                 </span>
 
                 <h3 style={{ fontSize: '22px', fontWeight: 800, color: '#0a2540', margin: '12px 0 10px 0' }}>
-                  Licence Services & Maintenance
+                  {t('landing.path3Title')}
                 </h3>
 
                 <p style={{ fontSize: '14px', color: '#64748b', lineHeight: 1.5, marginBottom: '24px' }}>
-                  Existing licence holders can renew their DL, request duplicate smartcards, or update specific details (Name, Address, Contact) with live fee calculation.
+                  {t('landing.path3Desc')}
                 </p>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '13px', fontWeight: 700, color: '#0a2540' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><CheckCircle2 size={16} color="#16a34a" /> 1-Click Licence Renewal</div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><CheckCircle2 size={16} color="#16a34a" /> Interactive details updater</div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><CheckCircle2 size={16} color="#16a34a" /> Digital Licence Wallet</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><CheckCircle2 size={16} color="#16a34a" /> {t('landing.path3Check1')}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><CheckCircle2 size={16} color="#16a34a" /> {t('landing.path3Check2')}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><CheckCircle2 size={16} color="#16a34a" /> {t('landing.path3Check3')}</div>
                 </div>
               </div>
 
               <button onClick={handleDemoLogin} className="landing-path-card-btn-outlined">
-                Manage Licence <ArrowRight size={16} />
+                {t('landing.path3Btn')} <ArrowRight size={16} />
               </button>
             </div>
 
@@ -345,13 +352,13 @@ export function LandingPage() {
       <section id="features" className="landing-section-alt">
         <div className="landing-section-header">
           <span className="landing-section-tag">
-            ENGINEERED FOR CITIZENS
+            {t('landing.featTag')}
           </span>
           <h2 className="landing-section-title">
-            Everything You Need to Manage Your Driving Licence
+            {t('landing.featTitle')}
           </h2>
           <p className="landing-section-desc">
-            Designed with state-of-the-art UI, transparent fee breakdowns, and real-time status tracking.
+            {t('landing.featDesc')}
           </p>
         </div>
 
@@ -359,43 +366,43 @@ export function LandingPage() {
           {[
             {
               icon: Laptop,
-              title: 'Proctored Online Assessment',
-              desc: 'Take the official Learner Licence computer test online with automated web-camera identity verification.',
+              title: t('landing.feat1Title'),
+              desc: t('landing.feat1Desc'),
               color: '#0369a1',
               bg: '#e0f2fe'
             },
             {
               icon: Calendar,
-              title: 'Car-Seat Layout Slot Booking',
-              desc: 'Choose your preferred RTO test center, date, and time slot using an interactive visual seat selection matrix.',
+              title: t('landing.feat2Title'),
+              desc: t('landing.feat2Desc'),
               color: '#c2410c',
               bg: '#ffedd5'
             },
             {
               icon: Truck,
-              title: 'Live Smartcard Dispatch Tracking',
-              desc: 'Track your physical driving licence smartcard printing and Speed Post delivery with step-by-step progress bars.',
+              title: t('landing.feat3Title'),
+              desc: t('landing.feat3Desc'),
               color: '#15803d',
               bg: '#dcfce7'
             },
             {
               icon: FileText,
-              title: 'Interactive Details Update Engine',
-              desc: 'Selectively update Name, Address, or Contact details with dynamic live fee calculation and instant doc uploads.',
+              title: t('landing.feat4Title'),
+              desc: t('landing.feat4Desc'),
               color: '#7c3aed',
               bg: '#f3e8ff'
             },
             {
               icon: Award,
-              title: 'Verified Digital Licence Wallet',
-              desc: 'Access your official QR-verified digital driving licence anytime on mobile or desktop for instant verification.',
+              title: t('landing.feat5Title'),
+              desc: t('landing.feat5Desc'),
               color: '#b45309',
               bg: '#fef3c7'
             },
             {
               icon: Sparkles,
-              title: 'Ask DriveSeva 24/7 AI Assistant',
-              desc: 'Get instant, accurate answers about RTO rules, required documents, fee structures, and application queries.',
+              title: t('landing.feat6Title'),
+              desc: t('landing.feat6Desc'),
               color: '#0a2540',
               bg: '#f1f5f9'
             }
@@ -435,15 +442,15 @@ export function LandingPage() {
       <section className="landing-cta-banner">
         <div style={{ maxWidth: '800px', margin: '0 auto' }}>
           <h2 className="landing-cta-title">
-            Ready to Experience Misguidance-Free Driving Licence Services?
+            {t('landing.ctaTitle')}
           </h2>
           <p className="landing-cta-desc">
-            Join thousands of citizens managing their driving licences effortlessly on DriveSeva.
+            {t('landing.ctaDesc')}
           </p>
 
           <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
             <button onClick={handleStartJourney} className="landing-cta-btn">
-              Start Your Journey <ArrowRight size={18} />
+              {t('landing.ctaBtn')} <ArrowRight size={18} />
             </button>
           </div>
         </div>
@@ -453,12 +460,12 @@ export function LandingPage() {
       <footer className="landing-footer">
         <div className="landing-footer-container">
           <div>
-            <strong style={{ color: '#ffffff' }}>Indian Drives (DriveSeva)</strong> — Official Citizen Driving Licence Portal Concept.
+            <strong style={{ color: '#ffffff' }}>Indian Drives (DriveSeva)</strong> — {t('landing.footerText')}
           </div>
 
           <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
-            <span style={{ cursor: 'pointer' }} onClick={() => navigate('/help')}>Help & Support</span>
-            <span style={{ cursor: 'pointer' }} onClick={handleStartJourney}>Start Your Journey</span>
+            <span style={{ cursor: 'pointer' }} onClick={() => navigate('/help')}>{t('nav.help')}</span>
+            <span style={{ cursor: 'pointer' }} onClick={handleStartJourney}>{t('nav.startJourney')}</span>
           </div>
         </div>
       </footer>
@@ -505,10 +512,10 @@ export function LandingPage() {
               </div>
 
               <h2 style={{ fontSize: '24px', fontWeight: 900, color: '#0a2540', margin: '0 0 6px 0' }}>
-                Citizen Portal Login
+                {t('landing.loginTitle')}
               </h2>
               <p style={{ fontSize: '14px', color: '#64748b', margin: 0 }}>
-                Enter your mobile number or Aadhaar to securely sign in.
+                {t('landing.loginSub')}
               </p>
             </div>
 
@@ -529,7 +536,7 @@ export function LandingPage() {
                   boxShadow: loginMethod === 'phone' ? '0 2px 6px rgba(0, 37, 66, 0.06)' : 'none'
                 }}
               >
-                Mobile Number
+                {t('landing.mobileTab')}
               </button>
 
               <button
@@ -547,7 +554,7 @@ export function LandingPage() {
                   boxShadow: loginMethod === 'aadhaar' ? '0 2px 6px rgba(0, 37, 66, 0.06)' : 'none'
                 }}
               >
-                Aadhaar e-KYC
+                {t('landing.aadhaarTab')}
               </button>
             </div>
 
@@ -556,7 +563,7 @@ export function LandingPage() {
               {loginMethod === 'phone' ? (
                 <div>
                   <label style={{ fontSize: '12px', fontWeight: 800, color: '#476179', display: 'block', marginBottom: '6px' }}>
-                    MOBILE NUMBER
+                    {t('landing.mobileLabel')}
                   </label>
                   <div style={{ position: 'relative' }}>
                     <span style={{ position: 'absolute', left: '14px', top: '12px', fontSize: '14px', fontWeight: 700, color: '#64748b' }}>+91</span>
@@ -572,7 +579,7 @@ export function LandingPage() {
               ) : (
                 <div>
                   <label style={{ fontSize: '12px', fontWeight: 800, color: '#476179', display: 'block', marginBottom: '6px' }}>
-                    12-DIGIT AADHAAR NUMBER
+                    {t('landing.aadhaarLabel')}
                   </label>
                   <input
                     type="text"
@@ -587,7 +594,7 @@ export function LandingPage() {
               {otpSent && (
                 <div>
                   <label style={{ fontSize: '12px', fontWeight: 800, color: '#16a34a', display: 'block', marginBottom: '6px' }}>
-                    ENTER 4-DIGIT OTP SENT TO YOUR DEVICE
+                    {t('landing.enterOtpLabel')}
                   </label>
                   <input
                     type="text"
@@ -620,7 +627,7 @@ export function LandingPage() {
                     marginTop: '8px'
                   }}
                 >
-                  Send OTP <ArrowRight size={16} />
+                  {t('landing.sendOtpBtn')} <ArrowRight size={16} />
                 </button>
               ) : (
                 <button
@@ -642,7 +649,7 @@ export function LandingPage() {
                     marginTop: '8px'
                   }}
                 >
-                  Verify & Login <Check size={18} />
+                  {t('landing.verifyBtn')} <Check size={18} />
                 </button>
               )}
             </form>
@@ -668,7 +675,7 @@ export function LandingPage() {
                 gap: '8px'
               }}
             >
-              ⚡ Instant Demo Citizen Login (Yanshi Chauhan)
+              {t('landing.demoLoginBtn')}
             </button>
 
           </div>

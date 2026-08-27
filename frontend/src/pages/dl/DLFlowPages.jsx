@@ -452,7 +452,7 @@ export function DLConfirmAddressPage() {
       
       {!isEditing ? (
         /* NORMAL CONFIRM ADDRESS VIEW (IMAGE 4) */
-        <div style={{ display: 'grid', gridTemplateColumns: '380px 1fr', gap: '48px', alignItems: 'start', marginBottom: '40px' }}>
+        <div className="responsive-split-grid grid-2col" style={{ display: 'grid', gridTemplateColumns: '380px 1fr', gap: '48px', alignItems: 'start', marginBottom: '40px' }}>
           
           {/* Left Column: Heading & Subtext */}
           <div>
@@ -1019,7 +1019,7 @@ export function DLPaymentCheckoutPage() {
       </div>
 
       {/* 2-Column Checkout Layout */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: '36px', alignItems: 'start', marginBottom: '32px' }}>
+      <div className="responsive-split-grid grid-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: '36px', alignItems: 'start', marginBottom: '32px' }}>
         
         {/* Left Column: Payment Options */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -1222,7 +1222,7 @@ export function DLTestCenterSelectionPage() {
       </div>
 
       {/* Main 2-Column Grid (Left: List, Right: Map Preview) */}
-      <div style={{ display: 'grid', gridTemplateColumns: '440px 1fr', gap: '32px', alignItems: 'start' }}>
+      <div className="responsive-split-grid grid-2col" style={{ display: 'grid', gridTemplateColumns: '440px 1fr', gap: '32px', alignItems: 'start' }}>
         
         {/* Left Column: Search & Test Center Cards */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -1521,7 +1521,7 @@ export function DLTestSlotBookingPage() {
       </div>
 
       {/* Main 2-Column Layout */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: '32px', alignItems: 'start' }}>
+      <div className="responsive-split-grid grid-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: '32px', alignItems: 'start' }}>
         
         {/* Left Column: CAR SEAT SHAPED LAYOUT CARD (1:1 IMAGE 1) */}
         <div style={{
