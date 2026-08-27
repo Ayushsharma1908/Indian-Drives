@@ -313,26 +313,34 @@ app.get("/api/test-centres/:id/slots", (req, res) => {
 app.get("/api/appointments", (_req, res) => res.json(ok(db.appointments)));
 app.get("/api/appointments/:id", (req, res) => res.json(ok(db.appointments.find((item) => item.id === req.params.id))));
 app.post("/api/appointments", async (req, res) => {
-  const { testCentreId, date, slot, vehicleClass } = req.body;
-  if (!testCentreId || !date || !slot || !vehicleClass) fail("Test centre, date, slot, and vehicle class are required");
-  const conflict = db.appointments.some((item) => item.testCentreId === testCentreId && item.date === date && item.slot === slot);
-  if (conflict) fail("This slot is already booked", 409);
+  const { testCentreId, date, slot, time, vehicleClass, centerName, centerAddress, applicationId, title } = req.body;
+  const appointmentDate = date || new Date().toISOString().slice(0, 10);
+  const appointmentSlot = slot || time || "10:00 AM";
+  const appointmentVehicle = vehicleClass || "LMV (Light Motor Vehicle)";
+  const appointmentAppId = applicationId || "IND-2026-98124";
+  const appointmentCentreId = testCentreId || "rto-001";
+
   const appointment = {
     id: `apt-${ids.appointment++}`,
-    applicationId: "app-dl-001",
-    testCentreId,
-    date,
-    time: slot,
-    slot,
-    vehicleClass,
+    applicationId: appointmentAppId,
+    testCentreId: appointmentCentreId,
+    title: title || "Driving Skill Test",
+    date: appointmentDate,
+    time: appointmentSlot,
+    slot: appointmentSlot,
+    vehicleClass: appointmentVehicle,
     status: "booked"
   };
   db.appointments.unshift(appointment);
   setJourney("processing");
-  addNotification("Driving test booked", `Your ${vehicleClass} test is booked for ${date} at ${slot}.`);
+  addNotification("Driving test booked", `Your ${appointmentVehicle} test is booked for ${appointmentDate} at ${appointmentSlot}.`);
 
-  // Fire Real-Time SMS & Email
-  const centre = db.centres.find((c) => c.id === testCentreId) || { name: "ARTO Kashipur Driving Test Track", address: "Kashipur, Uttarakhand" };
+  // Fire Real-Time SMS & Email with accurate data
+  const centre = db.centres.find((c) => c.id === appointmentCentreId) || {
+    name: centerName || "Automated Driving Test Track (ADTT)",
+    address: centerAddress || "RTO Driving Test Ground"
+  };
+
   NotificationService.notifySlotBooking({
     user: db.user,
     appointment,

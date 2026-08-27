@@ -389,28 +389,35 @@ class CentralDataStore {
       }
     });
 
+    const activeApp = this.state.applications[0];
+    const appNumber = slotData.applicationNo || slotData.appId || activeApp?.id || 'IND-2026-98124';
+    const testCenterName = slotData.location || slotData.testCenterName || slotData.center || slotData.centre || activeApp?.rto || 'ARTO Kashipur Driving Test Track';
+    const vehicleClass = slotData.vehicleClass || activeApp?.vehicleClass || 'LMV (Light Motor Vehicle)';
+    const title = slotData.title || (slotData.stage === 'll' ? 'Learner Licence Test' : 'Automated Driving Licence Skill Test');
+
     const newApt = {
-      id: `APT-JH05-${Math.floor(10000 + Math.random() * 90000)}`,
-      ref: `IND-DL-SLOT-${Math.floor(100 + Math.random() * 900)}`,
-      title: 'Automated Driving Licence Skill Test',
-      date: slotData.date || '24 Oct 2026',
-      dateRaw: slotData.dateRaw || '2026-10-24',
-      time: slotData.time || '10:00 AM - 11:00 AM',
-      location: slotData.location || 'Jamshedpur RTO Test Track, Sakchi, Jamshedpur (JH-05)',
-      testCentreId: slotData.testCentreId || 'rto001',
-      slot: slotData.slot || '10:00 AM',
+      id: `APT-${Math.floor(10000 + Math.random() * 90000)}`,
+      ref: appNumber,
+      title,
+      date: slotData.date || '28 Oct 2026',
+      dateRaw: slotData.dateRaw || '2026-10-28',
+      time: slotData.time || slotData.slot || '10:00 AM',
+      location: testCenterName,
+      testCenterName: testCenterName,
+      testCentreId: slotData.testCentreId || 'rto-001',
+      slot: slotData.slot || slotData.time || '10:00 AM',
       type: 'upcoming',
       status: 'Scheduled',
-      vehicleClass: 'LMV (Light Motor Vehicle)',
-      trackBay: 'Bay 3',
+      vehicleClass,
+      trackBay: slotData.trackBay || 'Bay 2',
       reportingTime: slotData.reportingTime || '09:45 AM'
     };
 
     this.state.appointments.unshift(newApt);
     this.addNotification({
       category: 'appointments',
-      title: 'Appointment Scheduled',
-      body: `Test appointment booked for ${newApt.date} at ${newApt.time} (${newApt.location}).`,
+      title: 'Driving Test Booked',
+      body: `Your slot is confirmed for ${newApt.date} at ${newApt.time} at ${newApt.testCenterName}.`,
       route: '/appointments'
     });
     this.saveToStorage();
@@ -424,8 +431,11 @@ class CentralDataStore {
         body: JSON.stringify({
           testCentreId: newApt.testCentreId,
           date: newApt.date,
-          slot: newApt.slot || newApt.time,
-          vehicleClass: newApt.vehicleClass
+          slot: newApt.slot,
+          vehicleClass: newApt.vehicleClass,
+          centerName: newApt.testCenterName,
+          title: newApt.title,
+          applicationId: newApt.ref
         })
       }).catch((err) => console.warn("Backend appointment notification trigger skipped:", err.message));
     } catch (e) {
