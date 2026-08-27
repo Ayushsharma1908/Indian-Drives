@@ -5,7 +5,8 @@ import {
   ArrowRight, ArrowLeft, Download, Check, Truck, Award, Lock, Info, Calendar,
   User, FileText, Home, ExternalLink, Shield, Sparkles, Building2, HelpCircle,
   Search, Navigation, Compass, LocateFixed, SlidersHorizontal, Settings,
-  Smartphone
+  Smartphone,
+  Edit3, AlertCircle, X, ChevronRight, Filter, CheckCircle
 } from 'lucide-react';
 import { StatusBadge } from '../../components/ui/StatusBadge';
 import { centralDataStore } from '../../data/centralDataStore';
@@ -135,7 +136,7 @@ export function DLIntroPage() {
                   boxSizing: 'border-box'
                 }}
               />
-              <Calendar size={18} color="#94a3b8" style={{ position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)' }} />
+              {/* <Calendar size={18} color="#94a3b8" style={{ position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)' }} /> */}
             </div>
           </div>
 
@@ -437,56 +438,60 @@ export function DLStartIntroPage() {
 export function DLConfirmAddressPage() {
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const profile = centralDataStore.getUserProfile() || {};
+  const savedDraft = centralDataStore.getDraftForm('dl_address');
   const [isEditing, setIsEditing] = useState(false);
   const [unchanged, setUnchanged] = useState(true);
 
-  // Editable Current Address Form State
-  const initialAddress = centralDataStore.getDraftForm('dl_address') || {
-    flatNo: '28-A Royal Enclave',
-    area: 'Gautam Nagar',
-    city: 'Kashipur',
-    stateName: 'Uttarakhand',
-    pincode: '244713',
-    fullAddress: '28-A Royal Enclave, Gautam Nagar, Kashipur, Uttarakhand 244713'
-  };
-
-  const [flatNo, setFlatNo] = useState(initialAddress.flatNo || '28-A Royal Enclave');
-  const [area, setArea] = useState(initialAddress.area || 'Gautam Nagar');
-  const [city, setCity] = useState(initialAddress.city || 'Kashipur');
-  const [stateName, setStateName] = useState(initialAddress.stateName || 'Uttarakhand');
-  const [pincode, setPincode] = useState(initialAddress.pincode || '244713');
-
-  const getFullAddressObj = () => ({
-    flatNo,
-    area,
-    city,
-    stateName,
-    pincode,
-    fullAddress: `${flatNo}, ${area}, ${city}, ${stateName} – ${pincode}`,
-    unchanged
-  });
-
-  const handleConfirmAddress = () => {
-    const chosenAddress = getFullAddressObj();
-    centralDataStore.saveDraftForm('dl_address', chosenAddress);
-    navigate('/dl/documents');
-  };
+  // Editable Address Form State
+  const [flatNo, setFlatNo] = useState(savedDraft.flatNo || profile.streetAddress || 'Flat 402, Green Park Heights');
+  const [area, setArea] = useState(savedDraft.area || profile.district || 'Sakchi');
+  const [city, setCity] = useState(savedDraft.city || profile.city || 'Jamshedpur');
+  const [stateName, setStateName] = useState(savedDraft.stateName || profile.state || 'Jharkhand');
+  const [pincode, setPincode] = useState(savedDraft.pincode || profile.pincode || '831001');
+  const [docUploaded, setDocUploaded] = useState(true);
 
   const handleSaveUpdatedAddress = (e) => {
     e.preventDefault();
     setUnchanged(false);
     setIsEditing(false);
-    const updated = {
+    const fullAddr = `${flatNo}, ${area}, ${city}, ${stateName} - ${pincode}`;
+    const addressObj = {
       flatNo,
       area,
       city,
       stateName,
       pincode,
-      fullAddress: `${flatNo}, ${area}, ${city}, ${stateName} – ${pincode}`,
-      unchanged: false
+      fullAddress: fullAddr,
+      type: 'Updated Dispatch Address',
+      recipientName: profile.name || 'Yanshi Chauhan',
+      mobile: profile.mobile || '+91 98765 43210'
     };
-    centralDataStore.saveDraftForm('dl_address', updated);
-    alert("Address updated successfully! Proceeding to document verification.");
+    centralDataStore.saveDraftForm('dl_address', addressObj);
+    centralDataStore.updateUserProfile({
+      streetAddress: `${flatNo}, ${area}`,
+      city,
+      state: stateName,
+      pincode,
+      fullAddress: fullAddr
+    });
+    navigate('/dl/documents');
+  };
+
+  const handleConfirmAddressAndContinue = () => {
+    const fullAddr = `${flatNo}, ${area}, ${city}, ${stateName} - ${pincode}`;
+    const addressObj = {
+      flatNo,
+      area,
+      city,
+      stateName,
+      pincode,
+      fullAddress: fullAddr,
+      type: unchanged ? 'Learner Licence Registered Address' : 'Updated Dispatch Address',
+      recipientName: profile.name || 'Yanshi Chauhan',
+      mobile: profile.mobile || '+91 98765 43210'
+    };
+    centralDataStore.saveDraftForm('dl_address', addressObj);
     navigate('/dl/documents');
   };
 
@@ -570,7 +575,7 @@ export function DLConfirmAddressPage() {
             {/* Action Buttons */}
             <div style={{ display: 'flex', gap: '16px', marginTop: '8px' }}>
               <button
-                onClick={handleConfirmAddress}
+                onClick={handleConfirmAddressAndContinue}
                 style={{
                   background: '#002542',
                   color: '#ffffff',
@@ -2835,7 +2840,10 @@ export function DLTestCenterSelectionPage() {
             return (
               <div
                 key={c.id}
-                onClick={() => setSelectedCenter(c.id)}
+                onClick={() => {
+                  setSelectedCenter(c.id);
+                  centralDataStore.saveDraftForm('dl_test_center', c);
+                }}
                 style={{
                   background: '#ffffff',
                   borderRadius: '20px',
@@ -2875,7 +2883,7 @@ export function DLTestCenterSelectionPage() {
 
                 <div style={{ display: 'flex', gap: '8px', marginBottom: isSelected ? '20px' : '0' }}>
                   {c.slots.map((s, idx) => (
-                    <span key={idx} style={{ background: '#f0f9ff', color: '#0369a1', padding: '6px 14px', borderRadius: '16px', fontSize: '13px', fontWeight: 700 }}>
+                    <span key={idx} style={{ background: '#f0f9ff', color: '#0369a1', padding: '6px 14px', borderRadius: '16px', fontSize: '12px', fontWeight: 700 }}>
                       {s}
                     </span>
                   ))}
@@ -2885,6 +2893,7 @@ export function DLTestCenterSelectionPage() {
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
+                      centralDataStore.saveDraftForm('dl_test_center', c);
                       navigate('/dl/test-slot');
                     }}
                     style={{
@@ -3059,40 +3068,173 @@ export function DLTestCenterSelectionPage() {
 export function DLTestSlotBookingPage() {
   const navigate = useNavigate();
   const { t } = useLanguage();
+
+  // Retrieve User & Address saved from previous address selection page
+  const user = centralDataStore.getUserProfile() || {};
+  const initialSavedAddress = centralDataStore.getDraftForm('dl_address');
+  const initialSavedCenter = centralDataStore.getDraftForm('dl_test_center');
+
+  // Address state (retrieved from step 3 confirm address page)
+  const [addressData, setAddressData] = useState(() => {
+    if (initialSavedAddress && (initialSavedAddress.flatNo || initialSavedAddress.fullAddress)) {
+      return initialSavedAddress;
+    }
+    return {
+      flatNo: user.streetAddress || 'Flat 402, Green Park Heights',
+      area: user.district || 'Sakchi',
+      city: user.city || 'Jamshedpur',
+      stateName: user.state || 'Jharkhand',
+      pincode: user.pincode || '831001',
+      fullAddress: user.fullAddress || 'Flat 402, Green Park Heights, Sakchi, Jamshedpur, Jharkhand - 831001',
+      recipientName: user.name || 'Yanshi Chauhan',
+      mobile: user.mobile || '+91 98765 43210',
+      type: 'Verified Learner Licence Address'
+    };
+  });
+
+  // Selected Test Center (retrieved from previous step or default)
+  const [testCenter] = useState(() => {
+    if (initialSavedCenter && initialSavedCenter.name) {
+      return initialSavedCenter;
+    }
+    return {
+      id: 'sarai',
+      name: 'Sarai Kale Khan Automated RTO Track',
+      shortName: 'Sarai Kale Khan RTO',
+      code: 'DL-04',
+      address: 'Ring Road, ISBT Sarai Kale Khan, Sakchi, New Delhi - 110013',
+      distance: '3.2 km from your saved address',
+      driveTime: '10 mins drive',
+      tech: 'Automated Overhead Sensors & 360° Cameras'
+    };
+  });
+
+  // Selection states
+  const [selectedMonth, setSelectedMonth] = useState('October 2026');
   const [selectedDay, setSelectedDay] = useState('28');
+  const [sessionFilter, setSessionFilter] = useState('all'); // 'all', 'morning', 'afternoon'
   const [selectedSlot, setSelectedSlot] = useState('10:30 AM');
+  
+  // Modals state
+  const [isEditAddressOpen, setIsEditAddressOpen] = useState(false);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
-  // Days options (Image 1)
+  // Address Edit Form temporary state for inline modal
+  const [editForm, setEditForm] = useState({
+    flatNo: addressData.flatNo || 'Flat 402, Green Park Heights',
+    area: addressData.area || 'Sakchi',
+    city: addressData.city || 'Jamshedpur',
+    stateName: addressData.stateName || 'Jharkhand',
+    pincode: addressData.pincode || '831001',
+    recipientName: addressData.recipientName || user.name || 'Yanshi Chauhan',
+    mobile: addressData.mobile || user.mobile || '+91 98765 43210'
+  });
+
+  const handleSaveModalAddress = (e) => {
+    e.preventDefault();
+    const updatedFull = `${editForm.flatNo}, ${editForm.area}, ${editForm.city}, ${editForm.stateName} - ${editForm.pincode}`;
+    const newAddressObj = {
+      ...editForm,
+      fullAddress: updatedFull,
+      type: 'Updated Smartcard Dispatch Address'
+    };
+    setAddressData(newAddressObj);
+    centralDataStore.saveDraftForm('dl_address', newAddressObj);
+    centralDataStore.updateUserProfile({
+      streetAddress: `${editForm.flatNo}, ${editForm.area}`,
+      city: editForm.city,
+      state: editForm.stateName,
+      pincode: editForm.pincode,
+      fullAddress: updatedFull
+    });
+    setIsEditAddressOpen(false);
+  };
+
+  // Days options with slot counts
   const days = [
-    { day: 'MON', date: '25' },
-    { day: 'TUE', date: '26' },
-    { day: 'WED', date: '27' },
-    { day: 'THU', date: '28' },
-    { day: 'FRI', date: '29' },
-    { day: 'SAT', date: '30' }
+    { day: 'MON', date: '25', count: 8, status: 'available' },
+    { day: 'TUE', date: '26', count: 2, status: 'few' },
+    { day: 'WED', date: '27', count: 6, status: 'available' },
+    { day: 'THU', date: '28', count: 5, status: 'available' },
+    { day: 'FRI', date: '29', count: 7, status: 'available' },
+    { day: 'SAT', date: '30', count: 1, status: 'few' },
+    { day: 'SUN', date: '31', count: 0, status: 'booked' }
   ];
 
-  // Car Seat Styled Slot Options (Image 1)
-  const slots = [
-    { time: '09:00 AM', status: 'booked' },
-    { time: '10:00 AM', status: 'few', tag: 'FEW' },
-    { time: '10:30 AM', status: 'available' },
-    { time: '11:00 AM', status: 'available' },
-    { time: '02:30 PM', status: 'available' },
-    { time: '03:00 PM', status: 'booked' }
+  // Car Cockpit Slot Grid
+  const slotsList = [
+    { time: '09:00 AM', period: 'morning', status: 'booked', bay: 'Track Bay 1', examiner: 'Inspector R. Sharma' },
+    { time: '10:00 AM', period: 'morning', status: 'few', tag: '2 LEFT', bay: 'Track Bay 2', examiner: 'Inspector S. Verma' },
+    { time: '10:30 AM', period: 'morning', status: 'available', bay: 'Track Bay 1 (Parallel Parking)', examiner: 'Inspector R. Sharma' },
+    { time: '11:00 AM', period: 'morning', status: 'available', bay: 'Track Bay 3 (Gradient Hill)', examiner: 'Inspector A. Kumar' },
+    { time: '02:30 PM', period: 'afternoon', status: 'available', bay: 'Track Bay 2 (Reverse S-Curve)', examiner: 'Inspector P. Singh' },
+    { time: '03:00 PM', period: 'afternoon', status: 'booked', bay: 'Track Bay 1', examiner: 'Inspector S. Verma' },
+    { time: '03:30 PM', period: 'afternoon', status: 'available', tag: 'WOMEN PRIORITY', bay: 'Track Bay 3', examiner: 'Inspector M. Roy' }
   ];
+
+  const filteredSlots = slotsList.filter(s => {
+    if (sessionFilter === 'morning') return s.period === 'morning';
+    if (sessionFilter === 'afternoon') return s.period === 'afternoon';
+    return true;
+  });
+
+  const activeSlotObj = slotsList.find(s => s.time === selectedSlot) || slotsList[2];
+
+  const handleConfirmAndProceed = () => {
+    centralDataStore.bookAppointment({
+      date: `${selectedDay} ${selectedMonth}`,
+      time: selectedSlot,
+      slot: selectedSlot,
+      location: testCenter.name,
+      testCenterName: testCenter.name,
+      testCenterAddress: testCenter.address || 'Sakchi RTO Complex, Near Jubilee Park, Jamshedpur',
+      testCenterCode: testCenter.code || 'DL-04',
+      testCentreId: testCenter.id || 'sarai',
+      reportingTime: selectedSlot === '09:00 AM' ? '08:45 AM' : selectedSlot === '10:00 AM' ? '09:45 AM' : selectedSlot === '10:30 AM' ? '10:15 AM' : '02:15 PM',
+      dispatchAddress: addressData.fullAddress || `${addressData.flatNo}, ${addressData.area}, ${addressData.city}, ${addressData.stateName} - ${addressData.pincode}`,
+      recipientName: addressData.recipientName || user.name,
+      recipientMobile: addressData.mobile || user.mobile,
+      trackBay: activeSlotObj.bay
+    });
+    navigate('/dl/appointment-fixed');
+  };
 
   return (
-    <div className="page page-dl-slot-booking" style={{ width: 'min(1120px, calc(100% - 48px))', margin: '32px auto', fontFamily: 'Inter, system-ui, sans-serif' }}>
+    <div className="page page-dl-slot-booking" style={{ width: 'min(1140px, calc(100% - 48px))', margin: '28px auto', fontFamily: 'Inter, system-ui, sans-serif' }}>
       
-      {/* 1:1 Horizontal Header Progress Stepper Track (Image 1 Header) */}
+      {/* Navigation & Action Bar */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+        <button
+          onClick={() => navigate('/dl/test-center')}
+          style={{
+            background: 'transparent',
+            border: 'none',
+            color: '#002542',
+            fontSize: '13px',
+            fontWeight: 700,
+            cursor: 'pointer',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+            padding: '6px 0'
+          }}
+        >
+          <ArrowLeft size={16} /> Back to Test Center Selection
+        </button>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px', fontWeight: 800, color: '#e88a2d', letterSpacing: '0.8px', textTransform: 'uppercase' }}>
+          <Sparkles size={14} /> STEP 4 OF 5 · PRACTICAL TEST SLOT
+        </div>
+      </div>
+
+      {/* Horizontal Header Progress Stepper Track */}
       <div style={{
         background: '#ffffff',
         borderRadius: '20px',
         padding: '16px 28px',
         border: '1px solid #e2e8f0',
         boxShadow: '0 4px 16px rgba(0, 37, 66, 0.03)',
-        marginBottom: '28px',
+        marginBottom: '24px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between'
@@ -3117,7 +3259,8 @@ export function DLTestSlotBookingPage() {
                 alignItems: 'center',
                 justifyContent: 'center',
                 fontSize: '12px',
-                fontWeight: 800
+                fontWeight: 800,
+                boxShadow: st.active ? '0 0 10px rgba(232, 138, 45, 0.4)' : 'none'
               }}>
                 <st.icon size={14} strokeWidth={3} />
               </div>
@@ -3132,30 +3275,143 @@ export function DLTestSlotBookingPage() {
         ))}
       </div>
 
-      {/* Sub-step indicator */}
-      <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '14px' }}>
-        01 DATE &gt; <span style={{ color: '#002542' }}>02 SLOT</span> &gt; 03 REVIEW &gt; 04 CONFIRM
+      {/* PROMINENT CHOSEN DISPATCH & CONTACT ADDRESS CARD (ADDRESS FROM PREVIOUS STEP) */}
+      <div style={{
+        background: 'linear-gradient(135deg, #002542 0%, #001a30 100%)',
+        borderRadius: '20px',
+        padding: '20px 24px',
+        color: '#ffffff',
+        marginBottom: '28px',
+        boxShadow: '0 8px 24px rgba(0, 37, 66, 0.15)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: '16px',
+        border: '1px solid rgba(255, 255, 255, 0.1)'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px', flex: 1, minWidth: '300px' }}>
+          <div style={{
+            width: '44px',
+            height: '44px',
+            borderRadius: '14px',
+            background: 'rgba(232, 138, 45, 0.2)',
+            border: '1px solid #e88a2d',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#e88a2d',
+            flexShrink: 0
+          }}>
+            <Home size={22} />
+          </div>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
+              <span style={{ fontSize: '11px', fontWeight: 800, color: '#e88a2d', letterSpacing: '1px', textTransform: 'uppercase' }}>
+                DISPATCH ADDRESS FROM PREVIOUS STEP
+              </span>
+              <span style={{ background: '#16a34a', color: '#ffffff', fontSize: '9px', fontWeight: 800, padding: '2px 8px', borderRadius: '10px', textTransform: 'uppercase' }}>
+                ✓ Verified
+              </span>
+            </div>
+            
+            <div style={{ fontSize: '15px', fontWeight: 800, color: '#ffffff' }}>
+              {addressData.recipientName || user.name || 'Yanshi Chauhan'} ({addressData.mobile || user.mobile || '+91 98765 43210'})
+            </div>
+            
+            <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: '#cbd5e1', lineHeight: 1.4 }}>
+              {addressData.fullAddress || `${addressData.flatNo}, ${addressData.area}, ${addressData.city}, ${addressData.stateName} - ${addressData.pincode}`}
+            </p>
+
+            <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <MapPin size={12} color="#e88a2d" />
+              <span>Distance to {testCenter.shortName || testCenter.name}: <b>{testCenter.distance || '3.8 km'}</b> ({testCenter.driveTime || '12 mins drive'})</span>
+            </div>
+          </div>
+        </div>
+
+        <button
+          onClick={() => {
+            setEditForm({
+              flatNo: addressData.flatNo || 'Flat 402, Green Park Heights',
+              area: addressData.area || 'Sakchi',
+              city: addressData.city || 'Jamshedpur',
+              stateName: addressData.stateName || 'Jharkhand',
+              pincode: addressData.pincode || '831001',
+              recipientName: addressData.recipientName || user.name || 'Yanshi Chauhan',
+              mobile: addressData.mobile || user.mobile || '+91 98765 43210'
+            });
+            setIsEditAddressOpen(true);
+          }}
+          style={{
+            background: 'rgba(255, 255, 255, 0.12)',
+            color: '#ffffff',
+            border: '1px solid rgba(255, 255, 255, 0.25)',
+            padding: '10px 18px',
+            borderRadius: '12px',
+            fontSize: '13px',
+            fontWeight: 700,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            transition: 'all 0.2s ease',
+            whiteSpace: 'nowrap'
+          }}
+        >
+          <Edit3 size={15} color="#e88a2d" /> Edit Address Details
+        </button>
+      </div>
+
+      {/* Date & Sub-Step Selector Header */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+        <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', letterSpacing: '1px', textTransform: 'uppercase' }}>
+          01 DATE &gt; <span style={{ color: '#002542' }}>02 SLOT &amp; COCKPIT SEAT</span> &gt; 03 REVIEW &gt; 04 CONFIRM
+        </div>
+
+        <select
+          value={selectedMonth}
+          onChange={(e) => setSelectedMonth(e.target.value)}
+          style={{
+            background: '#ffffff',
+            border: '1px solid #cbd5e1',
+            borderRadius: '10px',
+            padding: '6px 14px',
+            fontSize: '13px',
+            fontWeight: 700,
+            color: '#002542',
+            cursor: 'pointer'
+          }}
+        >
+          <option value="October 2026">October 2026</option>
+          <option value="November 2026">November 2026</option>
+          <option value="December 2026">December 2026</option>
+        </select>
       </div>
 
       {/* Horizontal Date Selection Bar */}
-      <div style={{ display: 'flex', gap: '14px', marginBottom: '28px' }}>
+      <div style={{ display: 'flex', gap: '14px', marginBottom: '28px', overflowX: 'auto', paddingBottom: '4px' }}>
         {days.map((d) => {
           const isActive = selectedDay === d.date;
+          const isBooked = d.status === 'booked';
+          const isFew = d.status === 'few';
+
           return (
             <div
               key={d.date}
-              onClick={() => setSelectedDay(d.date)}
+              onClick={() => !isBooked && setSelectedDay(d.date)}
               style={{
-                background: isActive ? '#002542' : '#ffffff',
-                color: isActive ? '#ffffff' : '#173b57',
+                background: isActive ? '#002542' : isBooked ? '#f8fafc' : '#ffffff',
+                color: isActive ? '#ffffff' : isBooked ? '#94a3b8' : '#173b57',
                 borderRadius: '16px',
-                padding: '14px 22px',
+                padding: '14px 20px',
                 textAlign: 'center',
-                border: isActive ? 'none' : '1px solid #e2e8f0',
-                boxShadow: isActive ? '0 4px 14px rgba(0, 37, 66, 0.2)' : 'none',
-                cursor: 'pointer',
-                minWidth: '64px',
-                transition: 'all 0.15s ease'
+                border: isActive ? '2px solid #002542' : isFew ? '1px solid #f59e0b' : '1px solid #e2e8f0',
+                boxShadow: isActive ? '0 6px 18px rgba(0, 37, 66, 0.2)' : 'none',
+                cursor: isBooked ? 'not-allowed' : 'pointer',
+                minWidth: '72px',
+                transition: 'all 0.15s ease',
+                position: 'relative'
               }}
             >
               <div style={{ fontSize: '10px', fontWeight: 800, opacity: isActive ? 0.8 : 0.6, letterSpacing: '0.5px' }}>
@@ -3163,6 +3419,16 @@ export function DLTestSlotBookingPage() {
               </div>
               <div style={{ fontSize: '22px', fontWeight: 800, marginTop: '2px' }}>
                 {d.date}
+              </div>
+              
+              {/* Availability Tag */}
+              <div style={{
+                fontSize: '9px',
+                fontWeight: 800,
+                marginTop: '4px',
+                color: isActive ? '#e88a2d' : isBooked ? '#94a3b8' : isFew ? '#b45309' : '#16a34a'
+              }}>
+                {isBooked ? 'Full' : `${d.count} slots`}
               </div>
             </div>
           );
@@ -3172,7 +3438,7 @@ export function DLTestSlotBookingPage() {
       {/* Main 2-Column Layout */}
       <div className="responsive-split-grid grid-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: '32px', alignItems: 'start' }}>
         
-        {/* Left Column: CAR SEAT SHAPED LAYOUT CARD (1:1 IMAGE 1) */}
+        {/* Left Column: CAR COCKPIT SEAT SHAPED LAYOUT CARD */}
         <div style={{
           background: '#ffffff',
           borderRadius: '24px',
@@ -3180,33 +3446,87 @@ export function DLTestSlotBookingPage() {
           border: '1px solid #e2e8f0',
           boxShadow: '0 6px 24px rgba(0, 37, 66, 0.04)'
         }}>
-          <h2 style={{ fontSize: '24px', fontWeight: 800, color: '#173b57', margin: '0 0 6px 0' }}>
-            Select a Test Slot
-          </h2>
-          <p style={{ color: '#64748b', fontSize: '14px', margin: '0 0 32px 0' }}>
-            Choose your preferred seat and time for the practical driving test.
+          
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+            <h2 style={{ fontSize: '22px', fontWeight: 800, color: '#173b57', margin: 0 }}>
+              Select a Practical Test Slot
+            </h2>
+            <div style={{ fontSize: '12px', fontWeight: 700, color: '#64748b', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Car size={16} color="#002542" /> LMV Automated Track
+            </div>
+          </div>
+
+          <p style={{ color: '#64748b', fontSize: '14px', margin: '0 0 24px 0' }}>
+            Pick your preferred seat & time slot for the practical driving test on {selectedDay} {selectedMonth}.
           </p>
 
-          {/* STYLIZED CAR VAN/BUS OUTLINE CONTAINER */}
+          {/* Session Filters (All, Morning, Afternoon) */}
+          <div style={{ display: 'flex', gap: '8px', marginBottom: '24px', background: '#f8fafc', padding: '6px', borderRadius: '14px', border: '1px solid #e2e8f0' }}>
+            {[
+              { id: 'all', label: 'All Sessions' },
+              { id: 'morning', label: '🌅 Morning (9AM - 12PM)' },
+              { id: 'afternoon', label: '☀️ Afternoon (2PM - 5PM)' }
+            ].map(f => (
+              <button
+                key={f.id}
+                onClick={() => setSessionFilter(f.id)}
+                style={{
+                  flex: 1,
+                  background: sessionFilter === f.id ? '#002542' : 'transparent',
+                  color: sessionFilter === f.id ? '#ffffff' : '#476179',
+                  border: 'none',
+                  padding: '8px 12px',
+                  borderRadius: '10px',
+                  fontSize: '12px',
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease'
+                }}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+
+          {/* STYLIZED CAR COCKPIT / VAN OUTLINE CONTAINER */}
           <div style={{
-            width: '320px',
+            width: '340px',
             margin: '0 auto 28px auto',
             border: '4px solid #e2e8f0',
-            borderRadius: '40px',
-            padding: '32px 24px',
-            background: '#fafbfc',
+            borderRadius: '44px 44px 28px 28px',
+            padding: '36px 24px 28px 24px',
+            background: 'linear-gradient(180deg, #f8fafc 0%, #ffffff 100%)',
             position: 'relative',
-            boxShadow: 'inset 0 2px 10px rgba(0,0,0,0.02)'
+            boxShadow: 'inset 0 2px 10px rgba(0,0,0,0.03)'
           }}>
-            {/* Simulated Car Wheels/Side Handles */}
-            <div style={{ position: 'absolute', top: '60px', left: '-12px', width: '12px', height: '36px', background: '#cbd5e1', borderRadius: '6px 0 0 6px' }} />
-            <div style={{ position: 'absolute', top: '60px', right: '-12px', width: '12px', height: '36px', background: '#cbd5e1', borderRadius: '0 6px 6px 0' }} />
-            <div style={{ position: 'absolute', bottom: '60px', left: '-12px', width: '12px', height: '36px', background: '#cbd5e1', borderRadius: '6px 0 0 6px' }} />
-            <div style={{ position: 'absolute', bottom: '60px', right: '-12px', width: '12px', height: '36px', background: '#cbd5e1', borderRadius: '0 6px 6px 0' }} />
+            
+            {/* Steering Wheel / Driver Cockpit Header */}
+            <div style={{
+              position: 'absolute',
+              top: '12px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              fontSize: '10px',
+              fontWeight: 800,
+              color: '#94a3b8',
+              letterSpacing: '1px',
+              textTransform: 'uppercase'
+            }}>
+              <span style={{ fontSize: '14px' }}>🚘</span> TEST VEHICLE COCKPIT
+            </div>
+
+            {/* Wheels / Side Mirrors */}
+            <div style={{ position: 'absolute', top: '70px', left: '-12px', width: '12px', height: '40px', background: '#94a3b8', borderRadius: '6px 0 0 6px' }} />
+            <div style={{ position: 'absolute', top: '70px', right: '-12px', width: '12px', height: '40px', background: '#94a3b8', borderRadius: '0 6px 6px 0' }} />
+            <div style={{ position: 'absolute', bottom: '70px', left: '-12px', width: '12px', height: '40px', background: '#cbd5e1', borderRadius: '6px 0 0 6px' }} />
+            <div style={{ position: 'absolute', bottom: '70px', right: '-12px', width: '12px', height: '40px', background: '#cbd5e1', borderRadius: '0 6px 6px 0' }} />
 
             {/* 2x3 Car Seat Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px 24px' }}>
-              {slots.map((s, idx) => {
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '22px 20px', marginTop: '10px' }}>
+              {filteredSlots.map((s, idx) => {
                 const isSelected = selectedSlot === s.time;
                 const isBooked = s.status === 'booked';
                 const isFew = s.status === 'few';
@@ -3224,37 +3544,48 @@ export function DLTestSlotBookingPage() {
                         : isFew
                         ? '2px solid #f59e0b'
                         : '1px solid #cbd5e1',
-                      borderRadius: '16px 16px 12px 12px', // Seat shape curve!
-                      padding: '24px 12px 14px 12px',
+                      borderRadius: '18px 18px 12px 12px',
+                      padding: '24px 10px 14px 10px',
                       textAlign: 'center',
                       cursor: isBooked ? 'not-allowed' : 'pointer',
-                      boxShadow: isSelected ? '0 6px 18px rgba(0, 37, 66, 0.25)' : '0 2px 6px rgba(0,0,0,0.03)',
+                      boxShadow: isSelected ? '0 6px 20px rgba(0, 37, 66, 0.25)' : '0 2px 8px rgba(0,0,0,0.03)',
                       transition: 'all 0.15s ease'
                     }}
                   >
-                    {/* Car Seat Top Headrest Tab */}
+                    {/* Headrest Tab */}
                     <div style={{
                       position: 'absolute',
                       top: '-10px',
                       left: '50%',
                       transform: 'translateX(-50%)',
-                      width: '40px',
+                      width: '42px',
                       height: '10px',
                       borderRadius: '6px 6px 0 0',
-                      background: isSelected ? '#001a30' : isBooked ? '#e2e8f0' : '#e2e8f0'
+                      background: isSelected ? '#001a30' : isBooked ? '#cbd5e1' : '#cbd5e1'
                     }} />
 
-                    {/* FEW Badge */}
-                    {isFew && (
-                      <span style={{ position: 'absolute', top: '-12px', right: '10px', background: '#fef3c7', color: '#b45309', fontSize: '9px', fontWeight: 800, padding: '2px 8px', borderRadius: '10px', border: '1px solid #f59e0b' }}>
-                        FEW
+                    {/* Badge */}
+                    {s.tag && (
+                      <span style={{
+                        position: 'absolute',
+                        top: '-12px',
+                        right: '6px',
+                        background: s.tag.includes('WOMEN') ? '#fce7f3' : '#fef3c7',
+                        color: s.tag.includes('WOMEN') ? '#be185d' : '#b45309',
+                        fontSize: '8px',
+                        fontWeight: 800,
+                        padding: '2px 6px',
+                        borderRadius: '8px',
+                        border: '1px solid currentColor'
+                      }}>
+                        {s.tag}
                       </span>
                     )}
 
-                    {/* Booked Cross Icon */}
+                    {/* Time & Icon */}
                     {isBooked ? (
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
-                        <span style={{ fontSize: '14px', color: '#94a3b8' }}>✕</span>
+                        <span style={{ fontSize: '13px', color: '#94a3b8' }}>✕</span>
                         <span style={{ fontSize: '13px', fontWeight: 700 }}>{s.time}</span>
                       </div>
                     ) : isSelected ? (
@@ -3265,13 +3596,17 @@ export function DLTestSlotBookingPage() {
                     ) : (
                       <span style={{ fontSize: '14px', fontWeight: 800 }}>{s.time}</span>
                     )}
+
+                    <div style={{ fontSize: '9px', fontWeight: 700, opacity: isSelected ? 0.9 : 0.6, marginTop: '4px' }}>
+                      {s.bay.split(' ')[0]} {s.bay.split(' ')[1]}
+                    </div>
                   </div>
                 );
               })}
             </div>
           </div>
 
-          {/* Seat Status Legend */}
+          {/* Legend */}
           <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', fontSize: '12px', fontWeight: 700, color: '#476179' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               <span style={{ width: '12px', height: '12px', borderRadius: '3px', border: '1px solid #cbd5e1', background: '#fff' }} /> Available
@@ -3289,80 +3624,89 @@ export function DLTestSlotBookingPage() {
 
         </div>
 
-        {/* Right Column: Map Snippet & Appointment Summary (1:1 IMAGE 1) */}
+        {/* Right Column: RTO Track Details & Appointment Summary */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           
-          {/* RTO Map Snippet */}
+          {/* Selected RTO Info & Track Features */}
           <div style={{ background: '#ffffff', borderRadius: '20px', overflow: 'hidden', border: '1px solid #e2e8f0', boxShadow: '0 4px 16px rgba(0, 37, 66, 0.03)' }}>
-            <div style={{ height: '120px', background: '#e0e7ff', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <div style={{ background: '#002542', color: '#fff', padding: '6px 14px', borderRadius: '20px', fontSize: '11px', fontWeight: 800 }}>
-                📍 Sarai Kale Khan RTO
+            <div style={{ height: '110px', background: 'linear-gradient(135deg, #173b57 0%, #002542 100%)', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: '10px', fontWeight: 800, color: '#e88a2d', letterSpacing: '1px', textTransform: 'uppercase' }}>SELECTED RTO TRACK</div>
+                <div style={{ fontSize: '15px', fontWeight: 800, marginTop: '2px' }}>{testCenter.name || 'Jamshedpur RTO Test Track'}</div>
               </div>
             </div>
-            <div style={{ padding: '16px 20px' }}>
-              <div style={{ fontSize: '16px', fontWeight: 800, color: '#173b57' }}>Sarai Kale Khan RTO</div>
-              <div style={{ fontSize: '12px', color: '#64748b', margin: '2px 0 8px 0' }}>Driving Test Centre, Sakchi, New Delhi 110013</div>
-              <a href="#map" onClick={(e) => e.preventDefault()} style={{ fontSize: '12px', fontWeight: 800, color: '#002542', textDecoration: 'none' }}>
-                View Location →
-              </a>
+
+            <div style={{ padding: '18px 20px' }}>
+              <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '12px' }}>
+                📍 {testCenter.address || 'Sakchi RTO Complex, Near Jubilee Park, Jamshedpur'}
+              </div>
+
+              <div style={{ background: '#f8fafc', padding: '10px 14px', borderRadius: '12px', fontSize: '11px', color: '#476179', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <div>⚙️ <b>Track Tech:</b> Automated Overhead Cameras & Sensor Grids</div>
+                <div>🎯 <b>Passing Score:</b> 80 / 100 Minimum Criteria</div>
+              </div>
             </div>
           </div>
 
-          {/* Appointment Summary Card */}
+          {/* Appointment Summary Box */}
           <div style={{ background: '#f8fafc', borderRadius: '20px', padding: '24px', border: '1px solid #e2e8f0' }}>
             <div style={{ fontSize: '18px', fontWeight: 800, color: '#173b57', marginBottom: '2px' }}>
               Appointment Summary
             </div>
             <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '20px' }}>
-              Application #IND-4492
+              Application #IND-2026-98124 · Learner Licence Form 3 Verified
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '24px' }}>
+              
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <Calendar size={18} color="#002542" />
                 <div>
-                  <div style={{ fontSize: '10px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase' }}>DATE</div>
-                  <div style={{ fontSize: '14px', fontWeight: 800, color: '#173b57' }}>{selectedDay} August 2026</div>
+                  <div style={{ fontSize: '10px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase' }}>DATE &amp; MONTH</div>
+                  <div style={{ fontSize: '14px', fontWeight: 800, color: '#173b57' }}>{selectedDay} {selectedMonth}</div>
                 </div>
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <Clock size={18} color="#002542" />
                 <div>
-                  <div style={{ fontSize: '10px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase' }}>TIME</div>
-                  <div style={{ fontSize: '14px', fontWeight: 800, color: '#173b57' }}>{selectedSlot}</div>
+                  <div style={{ fontSize: '10px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase' }}>SELECTED TIME SLOT</div>
+                  <div style={{ fontSize: '14px', fontWeight: 800, color: '#173b57' }}>{selectedSlot} ({activeSlotObj.bay})</div>
                 </div>
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <MapPin size={18} color="#002542" />
                 <div>
-                  <div style={{ fontSize: '10px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase' }}>LOCATION</div>
-                  <div style={{ fontSize: '14px', fontWeight: 800, color: '#173b57' }}>Sarai Kale Khan RTO</div>
+                  <div style={{ fontSize: '10px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase' }}>TEST CENTER</div>
+                  <div style={{ fontSize: '14px', fontWeight: 800, color: '#173b57' }}>{testCenter.name}</div>
                 </div>
               </div>
 
               {/* Vehicle Class Box */}
-              <div style={{ background: '#ffffff', borderRadius: '12px', padding: '14px', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ background: '#ffffff', borderRadius: '12px', padding: '12px 14px', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <Car size={20} color="#002542" />
                 <div>
                   <div style={{ fontSize: '10px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase' }}>VEHICLE CLASS</div>
-                  <div style={{ fontSize: '13px', fontWeight: 800, color: '#173b57' }}>LMV — Car</div>
-                  <div style={{ fontSize: '11px', color: '#64748b' }}>Based on your application</div>
+                  <div style={{ fontSize: '13px', fontWeight: 800, color: '#173b57' }}>LMV — Car (Light Motor Vehicle)</div>
                 </div>
               </div>
+
+              {/* Verified Dispatch Address Summary Box */}
+              <div style={{ background: '#ffffff', borderRadius: '12px', padding: '12px 14px', border: '1px dashed #cbd5e1', display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                <Home size={18} color="#e88a2d" style={{ marginTop: '2px', flexShrink: 0 }} />
+                <div>
+                  <div style={{ fontSize: '10px', fontWeight: 800, color: '#e88a2d', textTransform: 'uppercase' }}>SMARTCARD DISPATCH ADDRESS</div>
+                  <div style={{ fontSize: '12px', fontWeight: 700, color: '#173b57', marginTop: '2px' }}>
+                    {addressData.fullAddress || `${addressData.flatNo}, ${addressData.area}, ${addressData.city}, ${addressData.stateName} - ${addressData.pincode}`}
+                  </div>
+                </div>
+              </div>
+
             </div>
 
             <button
-              onClick={() => {
-                centralDataStore.bookAppointment({
-                  date: `${selectedDay} October 2026`,
-                  time: selectedSlot,
-                  slot: selectedSlot,
-                  location: 'Jamshedpur RTO Test Track, Sakchi (JH-05)'
-                });
-                navigate('/dl/appointment-fixed');
-              }}
+              onClick={() => setIsConfirmModalOpen(true)}
               style={{
                 width: '100%',
                 background: '#002542',
@@ -3384,13 +3728,279 @@ export function DLTestSlotBookingPage() {
             </button>
 
             <p style={{ textAlign: 'center', fontSize: '11px', color: '#64748b', margin: '12px 0 0 0' }}>
-              Please arrive 15 minutes before your slot.
+              Reporting time: 15 mins prior to {selectedSlot}.
             </p>
           </div>
 
         </div>
 
       </div>
+
+      {/* ---------------------------------------------------------------------- */}
+      {/* INLINE MODAL 1: EDIT DISPATCH ADDRESS DIRECTLY FROM SLOT BOOKING PAGE  */}
+      {/* ---------------------------------------------------------------------- */}
+      {isEditAddressOpen && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(0, 37, 66, 0.6)',
+          backdropFilter: 'blur(4px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          padding: '20px'
+        }}>
+          <div style={{
+            background: '#ffffff',
+            borderRadius: '24px',
+            padding: '32px',
+            maxWidth: '560px',
+            width: '100%',
+            boxShadow: '0 20px 50px rgba(0,0,0,0.2)',
+            border: '1px solid #e2e8f0',
+            position: 'relative'
+          }}>
+            <button
+              onClick={() => setIsEditAddressOpen(false)}
+              style={{ position: 'absolute', top: '20px', right: '20px', background: '#f1f5f9', border: 'none', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#476179' }}
+            >
+              <X size={18} />
+            </button>
+
+            <div style={{ fontSize: '11px', fontWeight: 800, color: '#e88a2d', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '6px' }}>
+              DISPATCH ADDRESS MANAGEMENT
+            </div>
+
+            <h3 style={{ fontSize: '22px', fontWeight: 800, color: '#173b57', margin: '0 0 6px 0' }}>
+              Update DL Smartcard Dispatch Address
+            </h3>
+
+            <p style={{ fontSize: '13px', color: '#64748b', margin: '0 0 20px 0', lineHeight: 1.4 }}>
+              Your physical Smartcard driving licence will be delivered to this verified address after passing the practical test.
+            </p>
+
+            <form onSubmit={handleSaveModalAddress} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+              
+              <div style={{ gridColumn: 'span 2' }}>
+                <label style={{ fontSize: '11px', fontWeight: 800, color: '#476179', display: 'block', marginBottom: '4px' }}>
+                  RECIPIENT FULL NAME
+                </label>
+                <input
+                  type="text"
+                  value={editForm.recipientName}
+                  onChange={(e) => setEditForm({ ...editForm, recipientName: e.target.value })}
+                  required
+                  style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '14px', color: '#173b57', boxSizing: 'border-box' }}
+                />
+              </div>
+
+              <div style={{ gridColumn: 'span 2' }}>
+                <label style={{ fontSize: '11px', fontWeight: 800, color: '#476179', display: 'block', marginBottom: '4px' }}>
+                  HOUSE / FLAT NO. &amp; BUILDING NAME
+                </label>
+                <input
+                  type="text"
+                  value={editForm.flatNo}
+                  onChange={(e) => setEditForm({ ...editForm, flatNo: e.target.value })}
+                  required
+                  style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '14px', color: '#173b57', boxSizing: 'border-box' }}
+                />
+              </div>
+
+              <div>
+                <label style={{ fontSize: '11px', fontWeight: 800, color: '#476179', display: 'block', marginBottom: '4px' }}>
+                  STREET / AREA / COLONY
+                </label>
+                <input
+                  type="text"
+                  value={editForm.area}
+                  onChange={(e) => setEditForm({ ...editForm, area: e.target.value })}
+                  required
+                  style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '14px', color: '#173b57', boxSizing: 'border-box' }}
+                />
+              </div>
+
+              <div>
+                <label style={{ fontSize: '11px', fontWeight: 800, color: '#476179', display: 'block', marginBottom: '4px' }}>
+                  CITY / DISTRICT
+                </label>
+                <input
+                  type="text"
+                  value={editForm.city}
+                  onChange={(e) => setEditForm({ ...editForm, city: e.target.value })}
+                  required
+                  style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '14px', color: '#173b57', boxSizing: 'border-box' }}
+                />
+              </div>
+
+              <div>
+                <label style={{ fontSize: '11px', fontWeight: 800, color: '#476179', display: 'block', marginBottom: '4px' }}>
+                  STATE
+                </label>
+                <input
+                  type="text"
+                  value={editForm.stateName}
+                  onChange={(e) => setEditForm({ ...editForm, stateName: e.target.value })}
+                  required
+                  style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '14px', color: '#173b57', boxSizing: 'border-box' }}
+                />
+              </div>
+
+              <div>
+                <label style={{ fontSize: '11px', fontWeight: 800, color: '#476179', display: 'block', marginBottom: '4px' }}>
+                  PINCODE
+                </label>
+                <input
+                  type="text"
+                  value={editForm.pincode}
+                  onChange={(e) => setEditForm({ ...editForm, pincode: e.target.value })}
+                  required
+                  style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '14px', color: '#173b57', boxSizing: 'border-box' }}
+                />
+              </div>
+
+              <div style={{ gridColumn: 'span 2', display: 'flex', gap: '12px', marginTop: '12px' }}>
+                <button
+                  type="submit"
+                  style={{
+                    flex: 1,
+                    background: '#002542',
+                    color: '#ffffff',
+                    border: 'none',
+                    padding: '14px',
+                    borderRadius: '12px',
+                    fontWeight: 800,
+                    fontSize: '14px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Save Address &amp; Apply
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setIsEditAddressOpen(false)}
+                  style={{
+                    background: '#ffffff',
+                    color: '#173b57',
+                    border: '1px solid #cbd5e1',
+                    padding: '14px 20px',
+                    borderRadius: '12px',
+                    fontWeight: 700,
+                    fontSize: '14px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ---------------------------------------------------------------------- */}
+      {/* INLINE MODAL 2: CONFIRMATION & REVIEW BEFORE FINAL BOOKING             */}
+      {/* ---------------------------------------------------------------------- */}
+      {isConfirmModalOpen && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(0, 37, 66, 0.65)',
+          backdropFilter: 'blur(4px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          padding: '20px'
+        }}>
+          <div style={{
+            background: '#ffffff',
+            borderRadius: '24px',
+            padding: '36px',
+            maxWidth: '540px',
+            width: '100%',
+            boxShadow: '0 24px 60px rgba(0,0,0,0.25)',
+            border: '1px solid #e2e8f0',
+            position: 'relative'
+          }}>
+            <button
+              onClick={() => setIsConfirmModalOpen(false)}
+              style={{ position: 'absolute', top: '20px', right: '20px', background: '#f1f5f9', border: 'none', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#476179' }}
+            >
+              <X size={18} />
+            </button>
+
+            <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+              <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: '#e0f2fe', color: '#002542', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px auto' }}>
+                <Car size={30} color="#002542" />
+              </div>
+              <h3 style={{ fontSize: '24px', fontWeight: 800, color: '#173b57', margin: 0 }}>
+                Confirm Driving Test Slot
+              </h3>
+              <p style={{ fontSize: '13px', color: '#64748b', margin: '4px 0 0 0' }}>
+                Review your appointment details before issuing your official RTO pass.
+              </p>
+            </div>
+
+            {/* Summary Details Box */}
+            <div style={{ background: '#f8fafc', borderRadius: '16px', border: '1px solid #e2e8f0', padding: '20px', marginBottom: '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: '#476179' }}>
+                <span>Date &amp; Time:</span>
+                <span style={{ fontWeight: 800, color: '#173b57' }}>{selectedDay} {selectedMonth} at {selectedSlot}</span>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: '#476179' }}>
+                <span>Test Center:</span>
+                <span style={{ fontWeight: 800, color: '#173b57' }}>{testCenter.name}</span>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: '#476179' }}>
+                <span>Track Bay:</span>
+                <span style={{ fontWeight: 800, color: '#173b57' }}>{activeSlotObj.bay}</span>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: '#476179' }}>
+                <span>Candidate Name:</span>
+                <span style={{ fontWeight: 800, color: '#173b57' }}>{addressData.recipientName || user.name}</span>
+              </div>
+
+              <div style={{ borderTop: '1px dashed #cbd5e1', paddingTop: '10px', marginTop: '4px' }}>
+                <div style={{ fontSize: '11px', fontWeight: 800, color: '#e88a2d', textTransform: 'uppercase', marginBottom: '2px' }}>
+                  DELIVERY ADDRESS FOR DL SMARTCARD
+                </div>
+                <div style={{ fontSize: '12px', fontWeight: 700, color: '#173b57' }}>
+                  {addressData.fullAddress || `${addressData.flatNo}, ${addressData.area}, ${addressData.city}, ${addressData.stateName} - ${addressData.pincode}`}
+                </div>
+              </div>
+            </div>
+
+            <button
+              onClick={handleConfirmAndProceed}
+              style={{
+                width: '100%',
+                background: '#002542',
+                color: '#ffffff',
+                border: 'none',
+                padding: '16px',
+                borderRadius: '12px',
+                fontWeight: 800,
+                fontSize: '15px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                boxShadow: '0 4px 16px rgba(0, 37, 66, 0.25)'
+              }}
+            >
+              Confirm &amp; Issue Appointment Pass <CheckCircle size={18} color="#e88a2d" />
+            </button>
+          </div>
+        </div>
+      )}
 
     </div>
   );
@@ -3403,13 +4013,26 @@ export function DLAppointmentFixedPage() {
   const navigate = useNavigate();
   const { t } = useLanguage();
 
+  const upcomingApt = centralDataStore.getUpcomingAppointment() || {};
+  const savedCenter = centralDataStore.getDraftForm('dl_test_center') || {};
+  const savedAddress = centralDataStore.getDraftForm('dl_address') || centralDataStore.getUserProfile() || {};
+
+  const testCenterName = upcomingApt.testCenterName || savedCenter.name || upcomingApt.location || 'Sarai Kale Khan Automated RTO Track';
+  const testCenterAddress = upcomingApt.testCenterAddress || savedCenter.address || 'Ring Road, ISBT Sarai Kale Khan, Sakchi, New Delhi - 110013';
+  const appointmentRef = upcomingApt.ref || upcomingApt.id || 'APT-982-1049';
+  const scheduledDate = upcomingApt.date || '28 October 2026';
+  const slotTime = upcomingApt.slot || upcomingApt.time || '10:30 AM';
+  const reportingTime = upcomingApt.reportingTime || '10:15 AM';
+  const dispatchAddress = upcomingApt.dispatchAddress || savedAddress.fullAddress || `${savedAddress.flatNo || savedAddress.streetAddress || 'Flat 402, Green Park Heights'}, ${savedAddress.city || 'Jamshedpur'}`;
+  const recipientName = upcomingApt.recipientName || savedAddress.recipientName || savedAddress.name || 'Yanshi Chauhan';
+
   useEffect(() => {
     localStorage.setItem('last_processed_flow', 'dl_appointment');
     localStorage.setItem('last_processed_title', 'DL Practical Test Slot Fixed');
   }, []);
 
   return (
-    <div className="page page-dl-appointment-fixed" style={{ width: 'min(760px, calc(100% - 48px))', margin: '48px auto', fontFamily: 'Inter, system-ui, sans-serif', textAlign: 'center' }}>
+    <div className="page page-dl-appointment-fixed" style={{ width: 'min(820px, calc(100% - 48px))', margin: '40px auto', fontFamily: 'Inter, system-ui, sans-serif', textAlign: 'center' }}>
       <div style={{ background: '#ffffff', borderRadius: '24px', padding: '44px', border: '1px solid #e2e8f0', boxShadow: '0 6px 24px rgba(0, 37, 66, 0.05)' }}>
         
         {/* Success Icon */}
@@ -3432,7 +4055,7 @@ export function DLAppointmentFixedPage() {
           {t('dlFlow.fixedTitle') || 'Driving Test Appointment Fixed!'} 🚗
         </h1>
 
-        <p style={{ color: '#64748b', fontSize: '15px', margin: '0 auto 32px auto', maxWidth: '520px', lineHeight: 1.5 }}>
+        <p style={{ color: '#64748b', fontSize: '15px', margin: '0 auto 32px auto', maxWidth: '540px', lineHeight: 1.5 }}>
           Your practical driving test appointment has been officially confirmed and registered with the RTO. Your appointment pass has been issued.
         </p>
 
@@ -3450,23 +4073,39 @@ export function DLAppointmentFixedPage() {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px 32px' }}>
             <div>
               <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase' }}>Appointment Ref</div>
-              <div style={{ fontSize: '16px', fontWeight: 800, color: '#173b57', marginTop: '4px' }}>APT-982-1049</div>
-            </div>
-
-            <div>
-              <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase' }}>RTO Test Center</div>
-              <div style={{ fontSize: '15px', fontWeight: 700, color: '#173b57', marginTop: '4px' }}>Sarai Kale Khan RTO</div>
+              <div style={{ fontSize: '16px', fontWeight: 800, color: '#173b57', marginTop: '4px' }}>{appointmentRef}</div>
             </div>
 
             <div>
               <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase' }}>Scheduled Date</div>
-              <div style={{ fontSize: '15px', fontWeight: 700, color: '#173b57', marginTop: '4px' }}>28 August 2026</div>
+              <div style={{ fontSize: '15px', fontWeight: 700, color: '#173b57', marginTop: '4px' }}>{scheduledDate}</div>
+            </div>
+
+            <div style={{ gridColumn: 'span 2' }}>
+              <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase' }}>RTO Test Center &amp; Track Location</div>
+              <div style={{ fontSize: '15px', fontWeight: 800, color: '#173b57', marginTop: '4px' }}>{testCenterName}</div>
+              <div style={{ fontSize: '13px', color: '#64748b', marginTop: '2px' }}>📍 {testCenterAddress}</div>
             </div>
 
             <div>
-              <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase' }}>Reporting Time</div>
-              <div style={{ fontSize: '15px', fontWeight: 700, color: '#e88a2d', marginTop: '4px' }}>10:30 AM (Slot 2)</div>
+              <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase' }}>Selected Slot &amp; Reporting Time</div>
+              <div style={{ fontSize: '15px', fontWeight: 700, color: '#e88a2d', marginTop: '4px' }}>{slotTime} (Report: {reportingTime})</div>
             </div>
+
+            <div>
+              <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase' }}>Candidate Name</div>
+              <div style={{ fontSize: '15px', fontWeight: 700, color: '#173b57', marginTop: '4px' }}>{recipientName}</div>
+            </div>
+
+            <div style={{ gridColumn: 'span 2', background: '#ffffff', padding: '14px 18px', borderRadius: '14px', border: '1px dashed #cbd5e1' }}>
+              <div style={{ fontSize: '10px', fontWeight: 800, color: '#e88a2d', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                🏠 SMARTCARD DISPATCH ADDRESS
+              </div>
+              <div style={{ fontSize: '13px', fontWeight: 700, color: '#173b57', marginTop: '4px' }}>
+                {dispatchAddress}
+              </div>
+            </div>
+
           </div>
         </div>
 

@@ -396,21 +396,26 @@ class CentralDataStore {
     const title = slotData.title || (slotData.stage === 'll' ? 'Learner Licence Test' : 'Automated Driving Licence Skill Test');
 
     const newApt = {
-      id: `APT-${Math.floor(10000 + Math.random() * 90000)}`,
-      ref: appNumber,
-      title,
-      date: slotData.date || '28 Oct 2026',
-      dateRaw: slotData.dateRaw || '2026-10-28',
-      time: slotData.time || slotData.slot || '10:00 AM',
-      location: testCenterName,
-      testCenterName: testCenterName,
-      testCentreId: slotData.testCentreId || 'rto-001',
-      slot: slotData.slot || slotData.time || '10:00 AM',
+      id: slotData.id || `APT-${Math.floor(10000 + Math.random() * 90000)}`,
+      ref: slotData.ref || `IND-DL-SLOT-${Math.floor(100 + Math.random() * 900)}`,
+      title: slotData.title || 'Automated Driving Licence Skill Test',
+      date: slotData.date || '24 Oct 2026',
+      dateRaw: slotData.dateRaw || '2026-10-24',
+      time: slotData.time || '10:00 AM - 11:00 AM',
+      location: slotData.location || slotData.testCenterName || 'Jamshedpur RTO Test Track, Sakchi, Jamshedpur (JH-05)',
+      testCenterName: slotData.testCenterName || 'Jamshedpur RTO Test Track',
+      testCenterAddress: slotData.testCenterAddress || 'Sakchi RTO Complex, Near Jubilee Park, Jamshedpur',
+      testCenterCode: slotData.testCenterCode || 'JH-05',
+      testCentreId: slotData.testCentreId || 'rto001',
+      slot: slotData.slot || '10:00 AM',
       type: 'upcoming',
       status: 'Scheduled',
-      vehicleClass,
-      trackBay: slotData.trackBay || 'Bay 2',
-      reportingTime: slotData.reportingTime || '09:45 AM'
+      vehicleClass: slotData.vehicleClass || 'LMV (Light Motor Vehicle)',
+      trackBay: slotData.trackBay || 'Bay 1',
+      reportingTime: slotData.reportingTime || '09:45 AM',
+      dispatchAddress: slotData.dispatchAddress || '',
+      recipientName: slotData.recipientName || '',
+      recipientMobile: slotData.recipientMobile || ''
     };
 
     this.state.appointments.unshift(newApt);
