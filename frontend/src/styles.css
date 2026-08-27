@@ -1804,6 +1804,36 @@ select:focus {
   background: var(--ok);
 }
 
+/* Live Road Flow Animation */
+@keyframes roadDashFlow {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: -32;
+  }
+}
+
+.live-road-dashes {
+  animation: roadDashFlow 1.8s linear infinite;
+}
+
+@keyframes carPulseGlow {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.35);
+    opacity: 0.3;
+  }
+}
+
+.car-pulse-ring {
+  animation: carPulseGlow 2s ease-in-out infinite;
+  transform-origin: center;
+}
+
 /* Dashboard Destination Cards Hover Animation */
 .journey-destination-card {
   position: relative;

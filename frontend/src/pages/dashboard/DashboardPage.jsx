@@ -8,7 +8,8 @@ import {
   Shield,
   Bell,
   CheckCircle2,
-  X
+  X,
+  Navigation
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { api } from '../../services/api';
@@ -124,7 +125,7 @@ export function DashboardPage() {
       }}
     >
       {/* ─────────────────────────────────────────────────────────────
-          1. SUBTLE MINIMAL ROAD BACKGROUND DESIGN (NON-INTRUSIVE)
+          1. SUBTLE MINIMAL ROAD BACKGROUND DESIGN
       ───────────────────────────────────────────────────────────── */}
       <div
         aria-hidden="true"
@@ -136,7 +137,6 @@ export function DashboardPage() {
           overflow: 'hidden'
         }}
       >
-        {/* Subtle Minimal Road SVG Line Art */}
         <svg
           width="100%"
           height="100%"
@@ -146,14 +146,13 @@ export function DashboardPage() {
           preserveAspectRatio="none"
           style={{ opacity: 0.45 }}
         >
-          {/* Gentle Gray Sweeping Road */}
+          {/* Gentle Sweeping Road Track */}
           <path
             d="M -80 260 C 320 260, 480 90, 840 90 C 1180 90, 1320 400, 1560 400"
             stroke="#e2e8f0"
             strokeWidth="32"
             strokeLinecap="round"
           />
-          {/* Subtle Dashed Centerline */}
           <path
             d="M -80 260 C 320 260, 480 90, 840 90 C 1180 90, 1320 400, 1560 400"
             stroke="#cbd5e1"
@@ -162,7 +161,7 @@ export function DashboardPage() {
             strokeLinecap="round"
           />
 
-          {/* Lower Gentle Connecting Road */}
+          {/* Lower Connecting Road */}
           <path
             d="M 60 840 C 360 840, 560 560, 980 560 C 1240 560, 1380 720, 1560 720"
             stroke="#edf2f7"
@@ -343,20 +342,20 @@ export function DashboardPage() {
         </AnimatePresence>
 
         {/* ─────────────────────────────────────────────────────────────
-            3. CLEAN HERO SECTION WITH RESTRAINED S-CURVE ROADMAP
+            3. HERO SECTION WITH LIVE WORKING ROAD DIAGRAM
         ───────────────────────────────────────────────────────────── */}
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'minmax(0, 1.2fr) minmax(360px, 460px)',
+            gridTemplateColumns: 'minmax(0, 1.15fr) minmax(380px, 500px)',
             gap: '36px',
             alignItems: 'center',
-            padding: '12px 0 24px 0'
+            padding: '8px 0 20px 0'
           }}
         >
           {/* Left Text */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {/* Minimal Tricolor Top Accent Line */}
+            {/* Minimal Tricolor Top Accent */}
             <div style={{ display: 'flex', width: '36px', height: '3px', borderRadius: '2px', overflow: 'hidden', marginBottom: '4px' }}>
               <div style={{ flex: 1, background: '#e88a2d' }} />
               <div style={{ flex: 1, background: '#cbd5e1' }} />
@@ -384,76 +383,154 @@ export function DashboardPage() {
             </div>
           </div>
 
-          {/* Right S-Curve Roadmap Graphic (Clean, Restrained) */}
+          {/* ═══════════════════════════════════════════════════════════
+              RIGHT: LIVE WORKING ROAD DIAGRAM (MINIMAL & PREMIUM)
+          ═══════════════════════════════════════════════════════════ */}
           <div
             style={{
               position: 'relative',
               background: '#ffffff',
               border: '1px solid #e2e8f0',
-              borderRadius: '16px',
-              padding: '16px 20px',
+              borderRadius: '20px',
+              padding: '20px 22px 18px 22px',
               display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 1px 3px rgba(0, 37, 66, 0.03)'
+              flexDirection: 'column',
+              gap: '12px',
+              boxShadow: '0 2px 10px rgba(0, 37, 66, 0.03)'
             }}
           >
-            <svg
-              width="410"
-              height="130"
-              viewBox="0 0 410 130"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <defs>
-                <linearGradient id="restrainedRoadGradient" x1="0%" y1="100%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#e88a2d" />
-                  <stop offset="50%" stopColor="#002542" />
-                  <stop offset="100%" stopColor="#16805a" />
-                </linearGradient>
-              </defs>
+            {/* Top Live Progress Status Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#16805a', display: 'inline-block' }} />
+                <span style={{ fontSize: '11px', fontWeight: 800, color: '#002542', letterSpacing: '0.8px', textTransform: 'uppercase' }}>
+                  LIVE JOURNEY TRACK
+                </span>
+              </div>
+              <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 600 }}>
+                Stage: <strong>DL Form 4 Approved</strong>
+              </span>
+            </div>
 
-              {/* Road Track */}
-              <path
-                d="M 25 105 C 110 105, 125 25, 195 25 C 255 25, 280 65, 365 65"
-                stroke="#f1f5f9"
-                strokeWidth="12"
-                strokeLinecap="round"
-              />
-              <path
-                d="M 25 105 C 110 105, 125 25, 195 25 C 255 25, 280 65, 365 65"
-                stroke="url(#restrainedRoadGradient)"
-                strokeWidth="3.5"
-                strokeLinecap="round"
-              />
+            {/* SVG Live Road Canvas */}
+            <div style={{ position: 'relative', width: '100%', height: '140px' }}>
+              <svg
+                width="100%"
+                height="100%"
+                viewBox="0 0 440 140"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <defs>
+                  {/* Subtle Road Gradient */}
+                  <linearGradient id="roadAsphalt" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="#1e293b" />
+                    <stop offset="50%" stopColor="#0f172a" />
+                    <stop offset="100%" stopColor="#1e293b" />
+                  </linearGradient>
 
-              {/* Node 1: START (Minimal Saffron) */}
-              <g transform="translate(25, 105)">
-                <circle r="7" fill="#ffffff" stroke="#e88a2d" strokeWidth="2.5" />
-                <circle r="3" fill="#e88a2d" />
-                <text x="0" y="20" textAnchor="middle" fill="#e88a2d" fontSize="10" fontWeight="700" letterSpacing="0.4">START</text>
-              </g>
+                  {/* Completed Progress Path Glow */}
+                  <linearGradient id="completedPathGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="#e88a2d" />
+                    <stop offset="60%" stopColor="#0284c7" />
+                    <stop offset="100%" stopColor="#16805a" />
+                  </linearGradient>
 
-              {/* Node 2: LL (35%) (Road Navy) */}
-              <g transform="translate(195, 25)">
-                <circle r="6" fill="#ffffff" stroke="#002542" strokeWidth="2" />
-                <circle r="2.5" fill="#002542" />
-                <text x="0" y="-10" textAnchor="middle" fill="#476179" fontSize="10" fontWeight="600">LL (35%)</text>
-              </g>
+                  {/* Beacon Radial Blur */}
+                  <filter id="beaconGlow" x="-50%" y="-50%" width="200%" height="200%">
+                    <feGaussianBlur stdDeviation="3" result="blur" />
+                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                  </filter>
+                </defs>
 
-              {/* Node 3: TEST (65%) */}
-              <g transform="translate(285, 42)">
-                <circle r="5" fill="#94a3b8" />
-                <text x="0" y="-10" textAnchor="middle" fill="#94a3b8" fontSize="10" fontWeight="600">TEST (65%)</text>
-              </g>
+                {/* 1. Road Outer Shoulder / Curb */}
+                <path
+                  d="M 30 108 C 115 108, 130 28, 205 28 C 265 28, 290 68, 385 68"
+                  stroke="#e2e8f0"
+                  strokeWidth="24"
+                  strokeLinecap="round"
+                />
 
-              {/* Node 4: DL ISSUED (Minimal Green) */}
-              <g transform="translate(365, 65)">
-                <circle r="7" fill="#ffffff" stroke="#16805a" strokeWidth="2.5" />
-                <circle r="3" fill="#16805a" />
-                <text x="0" y="20" textAnchor="middle" fill="#16805a" fontSize="10" fontWeight="700">DL ISSUED</text>
-              </g>
-            </svg>
+                {/* 2. Asphalt Road Body */}
+                <path
+                  d="M 30 108 C 115 108, 130 28, 205 28 C 265 28, 290 68, 385 68"
+                  stroke="url(#roadAsphalt)"
+                  strokeWidth="18"
+                  strokeLinecap="round"
+                />
+
+                {/* 3. Live Animated White Dashed Centerline */}
+                <path
+                  className="live-road-dashes"
+                  d="M 30 108 C 115 108, 130 28, 205 28 C 265 28, 290 68, 385 68"
+                  stroke="#ffffff"
+                  strokeWidth="2"
+                  strokeDasharray="6 8"
+                  strokeLinecap="round"
+                  opacity="0.9"
+                />
+
+                {/* ──────────────────────────────────────────────────
+                    WAYPOINTS / MILESTONES
+                ────────────────────────────────────────────────── */}
+
+                {/* WAYPOINT 01: START */}
+                <g transform="translate(30, 108)">
+                  <circle r="10" fill="#ffffff" stroke="#e88a2d" strokeWidth="3" />
+                  <circle r="4" fill="#e88a2d" />
+                  <text x="0" y="24" textAnchor="middle" fill="#c2410c" fontSize="10" fontWeight="800" letterSpacing="0.4">START</text>
+                </g>
+
+                {/* WAYPOINT 02: LL ISSUED (COMPLETED ✓) */}
+                <g transform="translate(205, 28)">
+                  <circle r="9" fill="#002542" stroke="#ffffff" strokeWidth="2" />
+                  <path d="M -2.5 0 L -0.5 2 L 3 -1.5" stroke="#ffffff" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                  <text x="0" y="-14" textAnchor="middle" fill="#002542" fontSize="10" fontWeight="800">LL (35%)</text>
+                </g>
+
+                {/* LIVE NAVIGATING CAR POSITION (Active between LL & Test at ~52%) */}
+                <g transform="translate(250, 42)">
+                  {/* Pulsing Beacon Ring */}
+                  <circle className="car-pulse-ring" r="14" fill="#0284c7" fillOpacity="0.3" filter="url(#beaconGlow)" />
+                  <circle r="10" fill="#0284c7" stroke="#ffffff" strokeWidth="2" />
+                  
+                  {/* Mini Car Icon on Road */}
+                  <g transform="translate(-5, -5) scale(0.65)">
+                    <path
+                      d="M2 7l1-3h10l1 3M1 10h14a1 1 0 001-1V7a2 2 0 00-2-2H2a2 2 0 00-2 2v2a1 1 0 001 1z"
+                      fill="#ffffff"
+                    />
+                    <circle cx="4" cy="10" r="1.5" fill="#002542" />
+                    <circle cx="12" cy="10" r="1.5" fill="#002542" />
+                  </g>
+                </g>
+
+                {/* WAYPOINT 03: TEST (65%) */}
+                <g transform="translate(305, 52)">
+                  <circle r="7" fill="#ffffff" stroke="#002542" strokeWidth="2.5" />
+                  <circle r="2.5" fill="#002542" />
+                  <text x="0" y="-12" textAnchor="middle" fill="#476179" fontSize="10" fontWeight="700">TEST (65%)</text>
+                </g>
+
+                {/* WAYPOINT 04: DL ISSUED (DESTINATION 100%) */}
+                <g transform="translate(385, 68)">
+                  <circle r="10" fill="#ffffff" stroke="#16805a" strokeWidth="3" />
+                  <circle r="4" fill="#16805a" />
+                  <text x="0" y="24" textAnchor="middle" fill="#16805a" fontSize="10" fontWeight="800">DL ISSUED</text>
+                </g>
+              </svg>
+            </div>
+
+            {/* Bottom Live Micro-Legend */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '4px', borderTop: '1px solid #f1f5f9', fontSize: '11px', color: '#64748b' }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#0284c7' }} />
+                Current: <strong>Test Scheduled at Burari Track (18 Sep)</strong>
+              </span>
+              <span style={{ fontWeight: 600, color: '#002542' }}>
+                Progress: <strong>55%</strong>
+              </span>
+            </div>
           </div>
         </div>
 
@@ -461,7 +538,7 @@ export function DashboardPage() {
         <div style={{ height: '1px', background: '#e2e8f0', width: '100%' }} />
 
         {/* ─────────────────────────────────────────────────────────────
-            4. CLEAN, BALANCED 3 DESTINATION CARDS (LESS HIGHLIGHTED)
+            4. CLEAN, BALANCED 3 DESTINATION CARDS
         ───────────────────────────────────────────────────────────── */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           <div>
@@ -490,7 +567,7 @@ export function DashboardPage() {
             </h2>
           </div>
 
-          {/* 3 Balanced, Clean Destination Cards */}
+          {/* 3 Balanced Destination Cards */}
           <div
             style={{
               display: 'grid',
