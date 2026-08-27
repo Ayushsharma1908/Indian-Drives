@@ -242,7 +242,7 @@ export function HelpCenterPage() {
             onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--color-pale-indigo)')}
             onMouseLeave={(e) => (e.currentTarget.style.background = '#ffffff')}
           >
-            Ask Indian Drives <ArrowRight size={15} />
+            Ask DriveSEVA <ArrowRight size={15} />
           </button>
         </div>
 
