@@ -4,6 +4,7 @@ import express from "express";
 import mongoose from "mongoose";
 import { knowledge } from "./rag/knowledge.js";
 import { streamChatCompletion } from "./ai/provider.js";
+import { NotificationService } from "./services/notificationService.js";
 
 dotenv.config();
 
@@ -20,7 +21,7 @@ const db = {
   user: {
     id: "user-demo",
     name: "Yanshi Chauhan",
-    email: "yanshi.chauhan@example.com",
+    email: process.env.SMTP_USER || "ynsh.ai.codes@gmail.com",
     mobile: "+91 98765 43210",
     userType: "ll-holder",
     language: "en",
@@ -209,7 +210,7 @@ app.patch("/api/applications/:id", (req, res) => {
   Object.assign(application, req.body);
   res.json(ok(application));
 });
-app.post("/api/applications/:id/approve", (req, res) => {
+app.post("/api/applications/:id/approve", async (req, res) => {
   const application = db.applications.find((item) => item.id === req.params.id);
   if (!application) fail("Application not found", 404);
   application.status = "approved";
@@ -217,6 +218,13 @@ app.post("/api/applications/:id/approve", (req, res) => {
   db.licences.dl = issuedLicence();
   setJourney("licence");
   addNotification("Driving licence issued", "Your digital driving licence is ready.");
+
+  // Fire Real-Time SMS & Email
+  NotificationService.notifyDrivingLicenceIssued({
+    user: db.user,
+    licence: db.licences.dl
+  }).catch((err) => console.error("Notification dispatch error:", err.message));
+
   res.json(ok({ application, licence: db.licences.dl }));
 });
 
@@ -237,7 +245,7 @@ app.patch("/api/documents/:id", (req, res) => {
 
 app.get("/api/payments", (_req, res) => res.json(ok(db.payments)));
 app.get("/api/payments/:id", (req, res) => res.json(ok(db.payments.find((item) => item.id === req.params.id))));
-app.post("/api/payments", (req, res) => {
+app.post("/api/payments", async (req, res) => {
   const payment = {
     id: `pay-${String(ids.pay++).padStart(3, "0")}`,
     purpose: req.body.purpose || "DL Application Fee",
@@ -249,6 +257,13 @@ app.post("/api/payments", (req, res) => {
   db.payments.unshift(payment);
   setJourney("test-booking");
   addNotification("Payment successful", `Payment ${payment.transactionId} is complete.`);
+
+  // Fire Real-Time SMS & Email
+  NotificationService.notifyPaymentSuccess({
+    user: db.user,
+    payment
+  }).catch((err) => console.error("Notification dispatch error:", err.message));
+
   res.status(201).json(ok(payment));
 });
 
@@ -297,7 +312,7 @@ app.get("/api/test-centres/:id/slots", (req, res) => {
 
 app.get("/api/appointments", (_req, res) => res.json(ok(db.appointments)));
 app.get("/api/appointments/:id", (req, res) => res.json(ok(db.appointments.find((item) => item.id === req.params.id))));
-app.post("/api/appointments", (req, res) => {
+app.post("/api/appointments", async (req, res) => {
   const { testCentreId, date, slot, vehicleClass } = req.body;
   if (!testCentreId || !date || !slot || !vehicleClass) fail("Test centre, date, slot, and vehicle class are required");
   const conflict = db.appointments.some((item) => item.testCentreId === testCentreId && item.date === date && item.slot === slot);
@@ -315,6 +330,15 @@ app.post("/api/appointments", (req, res) => {
   db.appointments.unshift(appointment);
   setJourney("processing");
   addNotification("Driving test booked", `Your ${vehicleClass} test is booked for ${date} at ${slot}.`);
+
+  // Fire Real-Time SMS & Email
+  const centre = db.centres.find((c) => c.id === testCentreId) || { name: "ARTO Kashipur Driving Test Track", address: "Kashipur, Uttarakhand" };
+  NotificationService.notifySlotBooking({
+    user: db.user,
+    appointment,
+    centre
+  }).catch((err) => console.error("Notification dispatch error:", err.message));
+
   res.status(201).json(ok(appointment));
 });
 app.delete("/api/appointments/:id", (req, res) => {
@@ -322,7 +346,7 @@ app.delete("/api/appointments/:id", (req, res) => {
   res.json(ok({ deleted: true }));
 });
 
-app.post("/api/tests/:appointmentId/result", (req, res) => {
+app.post("/api/tests/:appointmentId/result", async (req, res) => {
   const appointment = db.appointments.find((item) => item.id === req.params.appointmentId);
   if (!appointment) fail("Appointment not found", 404);
   const result = req.body.result || "passed";
@@ -334,6 +358,12 @@ app.post("/api/tests/:appointmentId/result", (req, res) => {
     db.licences.dl = issuedLicence();
     setJourney("licence");
     addNotification("Driving test passed", "Your application moved to processing and your digital DL is ready for demo.");
+
+    // Fire Real-Time SMS & Email
+    NotificationService.notifyDrivingLicenceIssued({
+      user: db.user,
+      licence: db.licences.dl
+    }).catch((err) => console.error("Notification dispatch error:", err.message));
   } else {
     application.status = "retest-required";
     application.currentStage = "test-booking";
@@ -341,6 +371,35 @@ app.post("/api/tests/:appointmentId/result", (req, res) => {
     addNotification("Retest required", "Book another driving test slot when ready.");
   }
   res.json(ok({ appointment, application, licence: db.licences.dl }));
+});
+
+// Real-Time Test Send Route
+app.post("/api/notifications/test-send", async (req, res) => {
+  const { email, mobile, type = "all" } = req.body;
+  const targetEmail = email || db.user.email;
+  const targetMobile = mobile || db.user.mobile;
+
+  const result = {};
+  if (type === "email" || type === "all") {
+    result.email = await NotificationService.sendEmail({
+      to: targetEmail,
+      subject: "Test Notification from Indian Drives Portal",
+      html: `<div style="font-family: sans-serif; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
+        <h2 style="color: #002542;">Indian Drives Test Alert</h2>
+        <p>This is a live test notification from your Indian Drives Portal server.</p>
+        <p>Real-time email gateway is operating successfully.</p>
+      </div>`,
+      text: "This is a live test notification from Indian Drives Portal."
+    });
+  }
+  if (type === "sms" || type === "all") {
+    result.sms = await NotificationService.sendSMS({
+      to: targetMobile,
+      message: "Indian Drives Test Alert: Real-time SMS notifications are active on your portal."
+    });
+  }
+
+  res.json(ok({ sent: true, targetEmail, targetMobile, details: result }));
 });
 
 app.get("/api/notifications", (_req, res) => res.json(ok(db.notifications)));

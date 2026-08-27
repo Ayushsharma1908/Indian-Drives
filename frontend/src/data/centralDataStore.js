@@ -333,7 +333,7 @@ class CentralDataStore {
       id: `TXN-${Math.floor(100000 + Math.random() * 900000)}`,
       appId: paymentData.appId || this.state.applications[0]?.id || 'IND-2026-98124',
       title: paymentData.title || 'Driving Licence Fee',
-      purpose: paymentData.purpose || 'DL Application Fee',
+      purpose: paymentData.purpose || paymentData.title || 'DL Application Fee',
       amount: Number(paymentData.amount || 450),
       formattedAmount: `₹${Number(paymentData.amount || 450).toFixed(2)}`,
       date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
@@ -351,6 +351,24 @@ class CentralDataStore {
       route: '/payments'
     });
     this.saveToStorage();
+
+    // Trigger Real-Time Backend Notification (Email + SMS)
+    try {
+      const baseUrl = import.meta.env?.VITE_API_BASE_URL || "http://localhost:5001";
+      fetch(`${baseUrl}/api/payments`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          purpose: txn.title || txn.purpose,
+          amount: txn.amount,
+          transactionId: txn.id,
+          method: txn.method
+        })
+      }).catch((err) => console.warn("Backend payment notification trigger skipped:", err.message));
+    } catch (e) {
+      console.warn("Could not dispatch backend payment notification:", e.message);
+    }
+
     return txn;
   }
 
@@ -391,11 +409,29 @@ class CentralDataStore {
     this.state.appointments.unshift(newApt);
     this.addNotification({
       category: 'appointments',
-      title: 'Driving Test Booked',
-      body: `Your slot is confirmed for ${newApt.date} at ${newApt.time} at ${newApt.location}.`,
+      title: 'Appointment Scheduled',
+      body: `Test appointment booked for ${newApt.date} at ${newApt.time} (${newApt.location}).`,
       route: '/appointments'
     });
     this.saveToStorage();
+
+    // Trigger Real-Time Backend Notification (Email + SMS)
+    try {
+      const baseUrl = import.meta.env?.VITE_API_BASE_URL || "http://localhost:5001";
+      fetch(`${baseUrl}/api/appointments`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          testCentreId: newApt.testCentreId,
+          date: newApt.date,
+          slot: newApt.slot || newApt.time,
+          vehicleClass: newApt.vehicleClass
+        })
+      }).catch((err) => console.warn("Backend appointment notification trigger skipped:", err.message));
+    } catch (e) {
+      console.warn("Could not dispatch backend appointment notification:", e.message);
+    }
+
     return newApt;
   }
 

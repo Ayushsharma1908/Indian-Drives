@@ -114,7 +114,7 @@ export function DashboardPage() {
       }}
     >
       {/* ─────────────────────────────────────────────────────────────
-          1. SUBTLE AMBIENT BACKGROUND ROAD ART (WATERMARK STYLE)
+          1. MINIMAL AMBIENT BACKGROUND HIGHWAY ARTWORK (SINGLE ROAD)
       ───────────────────────────────────────────────────────────── */}
       <div
         aria-hidden="true"
@@ -132,20 +132,90 @@ export function DashboardPage() {
           viewBox="0 0 1440 900"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-          preserveAspectRatio="none"
-          style={{ opacity: 0.35 }}
+          preserveAspectRatio="xMidYMid slice"
+          style={{ opacity: 0.65 }}
         >
+          <defs>
+            {/* Clean minimal highway asphalt gradient */}
+            <linearGradient id="singleRoadAsphalt" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#e2e8f0" stopOpacity="0.8" />
+              <stop offset="50%" stopColor="#cbd5e1" stopOpacity="0.55" />
+              <stop offset="100%" stopColor="#e2e8f0" stopOpacity="0.75" />
+            </linearGradient>
+
+            {/* Subtle neutral centerline */}
+            <linearGradient id="singleRoadCenterline" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#94a3b8" stopOpacity="0.4" />
+              <stop offset="50%" stopColor="#64748b" stopOpacity="0.5" />
+              <stop offset="100%" stopColor="#94a3b8" stopOpacity="0.4" />
+            </linearGradient>
+
+            {/* Topographic elevation line gradient */}
+            <linearGradient id="bgTopoGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#002542" stopOpacity="0.02" />
+              <stop offset="50%" stopColor="#002542" stopOpacity="0.06" />
+              <stop offset="100%" stopColor="#002542" stopOpacity="0.02" />
+            </linearGradient>
+          </defs>
+
+          {/* Topographic Contour Curves */}
           <path
-            d="M -100 320 C 350 320, 520 120, 920 120 C 1260 120, 1380 440, 1600 440"
-            stroke="#e2e8f0"
-            strokeWidth="36"
-            strokeLinecap="round"
+            d="M -150 180 C 200 160, 500 70, 850 80 C 1150 90, 1350 220, 1600 200"
+            stroke="url(#bgTopoGrad)"
+            strokeWidth="1.5"
+            strokeDasharray="4 6"
           />
           <path
-            d="M -100 320 C 350 320, 520 120, 920 120 C 1260 120, 1380 440, 1600 440"
+            d="M -150 240 C 220 220, 520 120, 870 130 C 1170 140, 1370 280, 1600 260"
+            stroke="url(#bgTopoGrad)"
+            strokeWidth="1"
+          />
+          <path
+            d="M -100 460 C 300 440, 600 580, 950 560 C 1250 540, 1450 400, 1650 380"
+            stroke="url(#bgTopoGrad)"
+            strokeWidth="1.2"
+          />
+          <path
+            d="M -100 520 C 320 500, 620 640, 970 620 C 1270 600, 1470 460, 1650 440"
+            stroke="url(#bgTopoGrad)"
+            strokeWidth="1"
+            strokeDasharray="5 7"
+          />
+
+          {/* SINGLE HIGHWAY: Outer Soft Glow Ribbon */}
+          <path
+            d="M -80 320 C 320 320, 500 140, 880 140 C 1220 140, 1360 450, 1550 450"
+            stroke="#f1f5f9"
+            strokeWidth="52"
+            strokeLinecap="round"
+          />
+
+          {/* Expressway Asphalt Bed */}
+          <path
+            d="M -80 320 C 320 320, 500 140, 880 140 C 1220 140, 1360 450, 1550 450"
+            stroke="url(#singleRoadAsphalt)"
+            strokeWidth="28"
+            strokeLinecap="round"
+          />
+
+          {/* Outer Guardrails / Shoulder Lines */}
+          <path
+            d="M -80 306 C 320 306, 500 126, 880 126 C 1220 126, 1360 436, 1550 436"
             stroke="#cbd5e1"
+            strokeWidth="1.2"
+          />
+          <path
+            d="M -80 334 C 320 334, 500 154, 880 154 C 1220 154, 1360 464, 1550 464"
+            stroke="#cbd5e1"
+            strokeWidth="1.2"
+          />
+
+          {/* Static Clean Dashed Centerline */}
+          <path
+            d="M -80 320 C 320 320, 500 140, 880 140 C 1220 140, 1360 450, 1550 450"
+            stroke="url(#singleRoadCenterline)"
             strokeWidth="2"
-            strokeDasharray="12 14"
+            strokeDasharray="8 10"
             strokeLinecap="round"
           />
         </svg>
@@ -250,6 +320,91 @@ export function DashboardPage() {
             </motion.div>
           )}
 
+          {importantNotice && !showProcessedNotification && (
+            <motion.div
+              key="important-notice"
+              initial={{ opacity: 0, y: -16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              style={{ display: 'flex', justifyContent: 'center' }}
+            >
+              <div
+                style={{
+                  background: '#ffffff',
+                  border: '1px solid #fed7aa',
+                  borderRadius: '14px',
+                  padding: '16px 24px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '20px',
+                  width: '100%',
+                  boxShadow: '0 2px 8px rgba(0, 37, 66, 0.04)'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                  <div
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: '10px',
+                      background: '#fff7ed',
+                      color: '#ea580c',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0
+                    }}
+                  >
+                    <Bell size={22} />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#ea580c', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
+                      IMPORTANT NOTIFICATION
+                    </div>
+                    <div style={{ fontSize: '14px', fontWeight: 600, color: '#173b57' }}>
+                      {importantNotice.title}: {importantNotice.desc}
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <button
+                    onClick={() => {
+                      centralDataStore.markNotificationRead(importantNotice.id);
+                      setImportantNotice(null);
+                      if (importantNotice.link) navigate(importantNotice.link);
+                    }}
+                    style={{
+                      background: '#002542',
+                      color: '#ffffff',
+                      fontSize: '13px',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '8px 14px',
+                      borderRadius: '8px',
+                      border: 'none'
+                    }}
+                  >
+                    View Details <ArrowRight size={14} />
+                  </button>
+                  <button
+                    onClick={() => {
+                      centralDataStore.markNotificationRead(importantNotice.id);
+                      setImportantNotice(null);
+                    }}
+                    style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#94a3b8', padding: '4px' }}
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
           {upcomingVisit && !showProcessedNotification && (
             <div style={{ display: 'flex', justifyContent: 'center' }}>
               <div
@@ -315,187 +470,46 @@ export function DashboardPage() {
         </AnimatePresence>
 
         {/* ─────────────────────────────────────────────────────────────
-            3. HERO SECTION (GREETING ON LEFT + S-CURVE ROAD ON RIGHT)
+            3. CLEAN & SPACIOUS HERO SECTION
         ───────────────────────────────────────────────────────────── */}
         <div
-          className="hero-section-grid"
           style={{
-            display: 'grid',
-            gridTemplateColumns: 'minmax(0, 1.15fr) minmax(360px, 480px)',
-            gap: '36px',
-            alignItems: 'center',
-            padding: '12px 0 20px 0'
+            padding: '12px 0 16px 0',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '12px'
           }}
         >
-          {/* Left Text */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {/* Minimal Tricolor Top Accent */}
-            <div style={{ display: 'flex', width: '36px', height: '3px', borderRadius: '2px', overflow: 'hidden' }}>
-              <div style={{ flex: 1, background: 'var(--color-saffron)' }} />
-              <div style={{ flex: 1, background: 'var(--color-border)' }} />
-              <div style={{ flex: 1, background: 'var(--color-sage)' }} />
-            </div>
-
-            <h1
-              style={{
-                fontSize: '44px',
-                fontWeight: 700,
-                color: 'var(--color-deep-navy)',
-                margin: 0,
-                lineHeight: 1.15,
-                letterSpacing: '-1.2px'
-              }}
-            >
-              {t('dashboard.title')}, {profile.firstName || 'Yanshi'} 🙏
-            </h1>
-
-            <div style={{ fontSize: '18px', color: 'var(--color-primary-navy)', fontWeight: 600, lineHeight: 1.4 }}>
-              Welcome to Indian Drives.
-              <div style={{ color: 'var(--color-text-secondary)', fontWeight: 400, fontSize: '15px', marginTop: '4px' }}>
-                {t('dashboard.subtitle')}
-              </div>
-            </div>
+          {/* Minimal Tricolor Top Accent */}
+          <div style={{ display: 'flex', width: '36px', height: '3px', borderRadius: '2px', overflow: 'hidden' }}>
+            <div style={{ flex: 1, background: 'var(--color-saffron)' }} />
+            <div style={{ flex: 1, background: 'var(--color-border)' }} />
+            <div style={{ flex: 1, background: 'var(--color-sage)' }} />
           </div>
 
-          {/* ═══════════════════════════════════════════════════════════
-              RIGHT: SEAMLESS S-CURVE ROAD DIAGRAM (STITCH SPEC)
-          ═══════════════════════════════════════════════════════════ */}
-          <div
+          <h1
             style={{
-              position: 'relative',
-              width: '100%',
-              height: '160px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
+              fontSize: '46px',
+              fontWeight: 700,
+              color: 'var(--color-deep-navy)',
+              margin: 0,
+              lineHeight: 1.15,
+              letterSpacing: '-1.2px'
             }}
           >
-            <svg
-              width="100%"
-              height="100%"
-              viewBox="0 0 450 160"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              preserveAspectRatio="xMidYMid meet"
-            >
-              <defs>
-                {/* Centerline Multi-Color Transition Gradient */}
-                <linearGradient id="roadStitchGrad" x1="0%" y1="100%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#E8892D" />
-                  <stop offset="35%" stopColor="#102D43" />
-                  <stop offset="65%" stopColor="#425B78" />
-                  <stop offset="100%" stopColor="#5D9278" />
-                </linearGradient>
-              </defs>
+            {t('dashboard.title')}, {profile.firstName || 'Yanshi'} 🙏
+          </h1>
 
-              {/* 1. Road Outer Shoulder / Curb Outline */}
-              <path
-                d="M 35 110 C 110 110, 140 28, 210 28 C 270 28, 290 62, 340 62 C 370 62, 385 45, 410 38"
-                stroke="#DCE4EA"
-                strokeWidth="18"
-                strokeLinecap="round"
-              />
-
-              {/* 2. Road Asphalt Surface Body */}
-              <path
-                d="M 35 110 C 110 110, 140 28, 210 28 C 270 28, 290 62, 340 62 C 370 62, 385 45, 410 38"
-                stroke="#F7F9FB"
-                strokeWidth="14"
-                strokeLinecap="round"
-              />
-
-              {/* 3. Live Animated Multi-Color Dashed Center Road Line */}
-              <path
-                className="live-road-dashes"
-                d="M 35 110 C 110 110, 140 28, 210 28 C 270 28, 290 62, 340 62 C 370 62, 385 45, 410 38"
-                stroke="url(#roadStitchGrad)"
-                strokeWidth="2.2"
-                strokeDasharray="5 7"
-                strokeLinecap="round"
-              />
-
-              {/* ──────────────────────────────────────────────────
-                  4 MILESTONE NODES (START, LL, TEST, DL)
-              ────────────────────────────────────────────────── */}
-
-              {/* NODE 1: START (Bottom Left) */}
-              <g transform="translate(35, 110)">
-                <circle r="14" fill="#FFF3E3" fillOpacity="0.8" />
-                <circle r="5.5" fill="#E8892D" />
-                <text
-                  x="0"
-                  y="24"
-                  textAnchor="middle"
-                  fill="#E8892D"
-                  fontSize="11"
-                  fontWeight="800"
-                  letterSpacing="0.8"
-                >
-                  START
-                </text>
-              </g>
-
-              {/* NODE 2: LL (Top Peak Crest) */}
-              <g transform="translate(210, 28)">
-                <circle r="6" fill="#102D43" />
-                <circle r="2" fill="#FFFFFF" />
-                <text
-                  x="0"
-                  y="-12"
-                  textAnchor="middle"
-                  fill="#102D43"
-                  fontSize="11"
-                  fontWeight="800"
-                  letterSpacing="0.4"
-                >
-                  LL
-                </text>
-              </g>
-
-              {/* NODE 3: TEST (Descent Valley) */}
-              <g transform="translate(320, 62)">
-                <circle r="4.5" fill="#8693A2" />
-                <text
-                  x="0"
-                  y="-11"
-                  textAnchor="middle"
-                  fill="#8693A2"
-                  fontSize="10.5"
-                  fontWeight="700"
-                  letterSpacing="0.4"
-                >
-                  TEST
-                </text>
-              </g>
-
-              {/* NODE 4: DL (End Target) */}
-              <g transform="translate(410, 38)">
-                <circle
-                  r="12"
-                  fill="none"
-                  stroke="#5D9278"
-                  strokeWidth="1.8"
-                  strokeDasharray="3 3"
-                />
-                <circle r="5.5" fill="#5D9278" />
-                <text
-                  x="0"
-                  y="24"
-                  textAnchor="middle"
-                  fill="#102D43"
-                  fontSize="11"
-                  fontWeight="800"
-                  letterSpacing="0.4"
-                >
-                  DL
-                </text>
-              </g>
-            </svg>
+          <div style={{ fontSize: '18px', color: 'var(--color-primary-navy)', fontWeight: 600, lineHeight: 1.4 }}>
+            Welcome to Indian Drives.
+            <div style={{ color: 'var(--color-text-secondary)', fontWeight: 400, fontSize: '15.5px', marginTop: '4px' }}>
+              {t('dashboard.subtitle')}
+            </div>
           </div>
         </div>
 
         {/* SECTION DIVIDER */}
-        <div style={{ height: '1px', background: 'var(--color-border)', width: '100%' }} />
+        <div style={{ height: '1px', background: '#e2e8f0', width: '100%' }} />
 
         {/* ─────────────────────────────────────────────────────────────
             4. CLEAN, BALANCED 3 DESTINATION CARDS
@@ -544,16 +558,6 @@ export function DashboardPage() {
               desc="I don't have a Learner Licence yet. Start your online Form 2 application with Aadhaar."
               cta="Start with LL process"
               icon={Car}
-              theme={{
-                baseBg: '#ffffff',
-                border: '#e2e8f0',
-                hoverBorder: '#818cf8',
-                hoverGlow: '0 10px 25px rgba(99, 102, 241, 0.12)',
-                iconBg: '#eef2ff',
-                iconBorder: '#e0e7ff',
-                iconColor: '#4f46e5',
-                accentColor: '#4f46e5'
-              }}
               onClick={() => navigate('/journey?stage=ll')}
             />
 
@@ -565,16 +569,6 @@ export function DashboardPage() {
               desc="Continue towards your Driving Licence and schedule your practical driving test."
               cta="Start with DL process"
               icon={FileText}
-              theme={{
-                baseBg: '#ffffff',
-                border: '#e2e8f0',
-                hoverBorder: '#fb923c',
-                hoverGlow: '0 10px 25px rgba(234, 88, 12, 0.12)',
-                iconBg: '#fff7ed',
-                iconBorder: '#ffedd5',
-                iconColor: '#ea580c',
-                accentColor: '#ea580c'
-              }}
               onClick={() => navigate('/journey?stage=dl')}
             />
 
@@ -586,16 +580,6 @@ export function DashboardPage() {
               desc="Manage renewals, duplicate Smart Cards, address updates and citizen services."
               cta="Manage Licence Services"
               icon={Shield}
-              theme={{
-                baseBg: '#ffffff',
-                border: '#e2e8f0',
-                hoverBorder: '#34d399',
-                hoverGlow: '0 10px 25px rgba(16, 185, 129, 0.12)',
-                iconBg: '#ecfdf5',
-                iconBorder: '#d1fae5',
-                iconColor: '#059669',
-                accentColor: '#059669'
-              }}
               onClick={() => navigate('/licence-services')}
             />
 
@@ -607,7 +591,7 @@ export function DashboardPage() {
   );
 }
 
-function DestinationCard({ step, tag, title, desc, cta, icon: Icon, theme, onClick }) {
+function DestinationCard({ step, tag, title, desc, cta, icon: Icon, onClick }) {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -616,47 +600,32 @@ function DestinationCard({ step, tag, title, desc, cta, icon: Icon, theme, onCli
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       style={{
-        background: theme.baseBg,
+        background: '#ffffff',
         borderRadius: '20px',
-        border: `1px solid ${isHovered ? theme.hoverBorder : theme.border}`,
-        padding: '30px 26px',
+        border: isHovered ? '1px solid #002542' : '1px solid #e2e8f0',
+        padding: '32px 28px',
         display: 'flex',
         flexDirection: 'column',
         cursor: 'pointer',
-        boxShadow: isHovered ? theme.hoverGlow : '0 2px 10px rgba(0, 37, 66, 0.03)',
-        transform: isHovered ? 'translateY(-5px)' : 'translateY(0)',
-        transition: 'all 0.22s cubic-bezier(0.16, 1, 0.3, 1)',
-        position: 'relative',
-        overflow: 'hidden'
+        boxShadow: isHovered ? '0 10px 24px rgba(0, 37, 66, 0.06)' : '0 2px 8px rgba(0, 37, 66, 0.02)',
+        transform: isHovered ? 'translateY(-3px)' : 'translateY(0)',
+        transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+        position: 'relative'
       }}
     >
-      {/* Top subtle highlight line when hovered */}
-      <div
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: '3px',
-          background: isHovered ? theme.hoverBorder : 'transparent',
-          transition: 'all 0.22s ease'
-        }}
-      />
-
       <div
         style={{
           width: '46px',
           height: '46px',
-          borderRadius: '14px',
-          background: isHovered ? theme.iconBg : 'var(--color-bg)',
-          border: `1px solid ${isHovered ? theme.iconBorder : 'var(--color-border)'}`,
-          color: isHovered ? theme.iconColor : 'var(--color-deep-navy)',
+          borderRadius: '12px',
+          background: isHovered ? '#002542' : '#f8fafc',
+          border: isHovered ? '1px solid #002542' : '1px solid #e2e8f0',
+          color: isHovered ? '#ffffff' : '#002542',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          marginBottom: '18px',
-          transition: 'all 0.22s ease',
-          transform: isHovered ? 'scale(1.06)' : 'scale(1)'
+          marginBottom: '20px',
+          transition: 'all 0.2s ease'
         }}
       >
         <Icon size={22} />
@@ -666,9 +635,9 @@ function DestinationCard({ step, tag, title, desc, cta, icon: Icon, theme, onCli
         style={{
           fontSize: '11px',
           fontWeight: 800,
-          letterSpacing: '1px',
+          letterSpacing: '0.8px',
           textTransform: 'uppercase',
-          color: isHovered ? theme.accentColor : 'var(--color-text-secondary)',
+          color: isHovered ? '#002542' : '#64748b',
           marginBottom: '8px',
           transition: 'color 0.2s ease'
         }}
@@ -680,7 +649,7 @@ function DestinationCard({ step, tag, title, desc, cta, icon: Icon, theme, onCli
         style={{
           fontSize: '20px',
           fontWeight: 700,
-          color: 'var(--color-deep-navy)',
+          color: '#102D43',
           margin: '0 0 10px 0',
           lineHeight: 1.3
         }}
@@ -691,7 +660,7 @@ function DestinationCard({ step, tag, title, desc, cta, icon: Icon, theme, onCli
       <p
         style={{
           fontSize: '14px',
-          color: 'var(--color-text-secondary)',
+          color: '#64748b',
           lineHeight: 1.6,
           margin: '0 0 24px 0',
           flexGrow: 1
@@ -705,20 +674,19 @@ function DestinationCard({ step, tag, title, desc, cta, icon: Icon, theme, onCli
           display: 'inline-flex',
           alignItems: 'center',
           gap: '8px',
-          color: isHovered ? theme.accentColor : 'var(--color-deep-navy)',
-          fontSize: '14.5px',
+          color: '#002542',
+          fontSize: '14px',
           fontWeight: 700,
-          marginTop: 'auto',
-          transition: 'all 0.2s ease'
+          marginTop: 'auto'
         }}
       >
         <span>{cta}</span>
         <span
           style={{
             display: 'inline-flex',
-            transform: isHovered ? 'translateX(6px)' : 'translateX(0)',
-            transition: 'transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1)',
-            color: isHovered ? theme.accentColor : 'var(--color-deep-navy)'
+            transform: isHovered ? 'translateX(5px)' : 'translateX(0)',
+            transition: 'transform 0.2s ease',
+            color: '#002542'
           }}
         >
           <ArrowRight size={16} />

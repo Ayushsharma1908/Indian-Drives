@@ -2070,9 +2070,9 @@ select:focus {
 
 .journey-destination-card:hover {
   background: #ffffff;
-  border-color: #e2e8f0;
-  box-shadow: 0 10px 25px -5px rgba(0, 37, 66, 0.08), 0 8px 10px -6px rgba(0, 37, 66, 0.04);
-  transform: translateY(-4px);
+  border-color: #002542;
+  box-shadow: 0 10px 24px rgba(0, 37, 66, 0.06);
+  transform: translateY(-3px);
 }
 
 .dest-icon-circle {
