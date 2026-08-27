@@ -2,85 +2,54 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Bell, Check, FileText, Calendar, CreditCard, Award, Laptop, CheckCircle2,
-  AlertTriangle, ArrowRight, Download, RefreshCw
+  AlertTriangle, ArrowRight, Download, RefreshCw, Inbox
 } from 'lucide-react';
+import { centralDataStore } from '../../data/centralDataStore';
 import { useLanguage } from '../../main';
 
 export function NotificationsPage() {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const [activeFilter, setActiveFilter] = useState('all');
+  const [notificationList, setNotificationList] = useState(() => centralDataStore.getNotifications());
 
-  const [notificationList, setNotificationList] = useState([
-    {
-      id: 1,
-      category: 'applications',
-      dateGroup: 'Today',
-      title: 'DL Application Submitted',
-      timeAgo: '2 Hours Ago',
-      body: 'Your application for a new Driving Licence has been successfully submitted and is pending verification by RTO officials.',
-      appNo: 'APP NO: 4899201',
-      statusTag: '✓ Successful',
-      unread: true,
-      icon: FileText,
-      iconBg: '#e0f2fe',
-      iconColor: '#0369a1',
-      stripeColor: '#f97316'
-    },
-    {
-      id: 2,
-      category: 'appointments',
-      dateGroup: 'Today',
-      title: 'Driving Test Booked',
-      timeAgo: '5 Hours Ago',
-      body: 'Your driving test has been scheduled for Oct 24, 2024 at 10:00 AM. Please ensure you arrive 15 minutes early with original documents.',
-      eventBox: {
-        month: 'OCT',
-        day: '24',
-        location: 'Andheri West RTO',
-        actionPath: '/dl/appointment-fixed'
-      },
-      unread: true,
-      icon: Calendar,
-      iconBg: '#ffedd5',
-      iconColor: '#c2410c',
-      stripeColor: '#f97316'
-    },
-    {
-      id: 3,
-      category: 'payments',
-      dateGroup: 'Yesterday',
-      title: 'Payment Successful',
-      timeAgo: 'Yesterday, 2:30 PM',
-      body: 'Your payment of ₹1,200 for the Driving Licence renewal has been processed successfully.',
-      refNo: 'Ref: TXN-998273',
-      hasReceipt: true,
-      unread: false,
-      icon: CreditCard,
-      iconBg: '#f1f5f9',
-      iconColor: '#476179',
-      stripeColor: null
-    },
-    {
-      id: 4,
-      category: 'applications',
-      dateGroup: 'Yesterday',
-      title: 'Document Re-upload Required',
-      timeAgo: 'Yesterday, 10:15 AM',
-      body: 'The address proof document you uploaded for LL Application (App No: 4899105) is unclear. Please re-upload a clearer copy.',
-      reuploadAction: true,
-      unread: false,
-      icon: AlertTriangle,
-      iconBg: '#fee2e2',
-      iconColor: '#dc2626',
-      stripeColor: null
-    }
-  ]);
+  useEffect(() => {
+    const handleUpdate = () => {
+      setNotificationList([...centralDataStore.getNotifications()]);
+    };
+    window.addEventListener('notifications-updated', handleUpdate);
+    window.addEventListener('indian-drives-state-change', handleUpdate);
+    return () => {
+      window.removeEventListener('notifications-updated', handleUpdate);
+      window.removeEventListener('indian-drives-state-change', handleUpdate);
+    };
+  }, []);
 
   const markAllRead = () => {
-    setNotificationList(prev => prev.map(n => ({ ...n, unread: false })));
-    localStorage.setItem('indian-drives-unread-notifications', 'false');
-    window.dispatchEvent(new Event('notifications-read'));
+    centralDataStore.markAllNotificationsAsRead();
+    setNotificationList([...centralDataStore.getNotifications()]);
+  };
+
+  const handleNotificationClick = (item) => {
+    centralDataStore.markNotificationAsRead(item.id);
+    setNotificationList([...centralDataStore.getNotifications()]);
+    if (item.route) {
+      navigate(item.route);
+    }
+  };
+
+  const getIconForCategory = (cat) => {
+    switch (cat) {
+      case 'appointments':
+        return { icon: Calendar, iconBg: 'var(--color-pale-amber)', iconColor: 'var(--color-warm-amber)' };
+      case 'payments':
+        return { icon: CreditCard, iconBg: 'var(--color-pale-teal)', iconColor: 'var(--color-teal)' };
+      case 'licences':
+        return { icon: Award, iconBg: 'var(--color-pale-indigo)', iconColor: 'var(--color-indigo)' };
+      case 'applications':
+      default:
+        return { icon: FileText, iconBg: 'var(--color-pale-indigo)', iconColor: 'var(--color-primary-navy)' };
+    }
   };
 
   const filteredNotifications = notificationList.filter(n => {
@@ -88,71 +57,65 @@ export function NotificationsPage() {
     return n.category === activeFilter;
   });
 
-  const todayItems = filteredNotifications.filter(n => n.dateGroup === 'Today');
+  const todayItems = filteredNotifications.filter(n => n.dateGroup === 'Today' || !n.dateGroup);
   const yesterdayItems = filteredNotifications.filter(n => n.dateGroup === 'Yesterday');
+  const olderItems = filteredNotifications.filter(n => n.dateGroup && n.dateGroup !== 'Today' && n.dateGroup !== 'Yesterday');
+
+  const upcomingApt = centralDataStore.getUpcomingAppointment();
 
   return (
-    <div className="page page-notifications" style={{ width: 'min(1184px, calc(100% - 48px))', margin: '40px auto', fontFamily: 'Inter, system-ui, sans-serif' }}>
+    <div className="page page-notifications" style={{ width: 'min(1184px, calc(100% - 48px))', margin: '40px auto', fontFamily: "'Hanken Grotesk', system-ui, sans-serif" }}>
       
-      {/* Top Header Row with | Notifications Title */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '36px' }}>
+      {/* Top Header Row with Notifications Title */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '32px', flexWrap: 'wrap', gap: '16px' }}>
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{ width: '4px', height: '38px', background: '#0f2942', borderRadius: '2px' }} />
-            <h1 style={{ fontSize: '38px', fontWeight: 800, color: '#173b57', margin: 0, letterSpacing: '-0.8px' }}>
-              {t('userFlow.notificationsTitle')}
-            </h1>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: 'var(--color-indigo)', fontSize: '11px', fontWeight: 800, letterSpacing: '1.2px', textTransform: 'uppercase', marginBottom: '6px' }}>
+            <span style={{ display: 'inline-block', width: '16px', height: '2px', background: 'var(--color-indigo)' }} />
+            SYSTEM ALERTS & ACTIVITY
           </div>
-          <p style={{ color: '#64748b', fontSize: '15px', margin: '6px 0 0 16px' }}>
-            Stay updated about your applications, appointments, and licences.
+          <h1 style={{ fontSize: '36px', fontWeight: 700, color: 'var(--color-deep-navy)', margin: 0, letterSpacing: '-0.8px' }}>
+            {t('userFlow.notificationsTitle')}
+          </h1>
+          <p style={{ color: 'var(--color-text-secondary)', fontSize: '15px', margin: '6px 0 0 0' }}>
+            Real-time updates regarding your applications, payments, appointments, and driving licences.
           </p>
         </div>
 
-        <button
-          onClick={markAllRead}
-          style={{
-            background: '#ffffff',
-            color: '#173b57',
-            border: '1px solid #cbd5e1',
-            padding: '10px 20px',
-            borderRadius: '20px',
-            fontWeight: 700,
-            fontSize: '14px',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            boxShadow: '0 2px 6px rgba(0, 37, 66, 0.03)',
-            transition: 'all 0.15s ease'
-          }}
-        >
-          <Check size={16} strokeWidth={2.5} /> Mark all as read
-        </button>
+        {notificationList.some(n => n.unread) && (
+          <button
+            onClick={markAllRead}
+            className="secondary-button"
+            style={{
+              padding: '10px 18px',
+              fontSize: '13px',
+              fontWeight: 700,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}
+          >
+            <Check size={16} /> Mark all as read
+          </button>
+        )}
       </div>
 
       {/* Main 2-Column Grid (Left Filter Sidebar + Right Feed) */}
-      <div className="grid-2col" style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: '32px', alignItems: 'start' }}>
+      <div className="grid-2col" style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: '28px', alignItems: 'start' }}>
         
         {/* Left Filter Sidebar */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          <div style={{
-            background: '#ffffff',
-            borderRadius: '20px',
-            padding: '24px',
-            border: '1px solid #e2e8f0',
-            boxShadow: '0 4px 16px rgba(0, 37, 66, 0.03)'
-          }}>
-            <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', letterSpacing: '0.8px', textTransform: 'uppercase', marginBottom: '16px' }}>
+          <div className="card-standard" style={{ padding: '20px' }}>
+            <div style={{ fontSize: '11px', fontWeight: 800, color: 'var(--color-text-secondary)', letterSpacing: '0.8px', textTransform: 'uppercase', marginBottom: '14px' }}>
               FILTER BY
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
               {[
-                { id: 'all', label: 'All Notifications', count: 12, icon: Laptop },
-                { id: 'applications', label: 'Applications', count: 4, icon: FileText },
-                { id: 'appointments', label: 'Appointments', count: 2, icon: Calendar },
-                { id: 'payments', label: 'Payments', count: 5, icon: CreditCard },
-                { id: 'licences', label: 'Licences', count: 1, icon: Award }
+                { id: 'all', label: 'All Notifications', count: notificationList.length, icon: Laptop },
+                { id: 'applications', label: 'Applications', count: notificationList.filter(n => n.category === 'applications').length, icon: FileText },
+                { id: 'appointments', label: 'Appointments', count: notificationList.filter(n => n.category === 'appointments').length, icon: Calendar },
+                { id: 'payments', label: 'Payments', count: notificationList.filter(n => n.category === 'payments').length, icon: CreditCard },
+                { id: 'licences', label: 'Licences', count: notificationList.filter(n => n.category === 'licences').length, icon: Award }
               ].map(item => {
                 const Icon = item.icon;
                 const isActive = activeFilter === item.id;
@@ -162,27 +125,27 @@ export function NotificationsPage() {
                     key={item.id}
                     onClick={() => setActiveFilter(item.id)}
                     style={{
-                      background: isActive ? '#0a2540' : 'transparent',
-                      color: isActive ? '#ffffff' : '#173b57',
-                      borderRadius: '12px',
-                      padding: '12px 14px',
+                      background: isActive ? 'var(--color-deep-navy)' : 'transparent',
+                      color: isActive ? '#ffffff' : 'var(--color-deep-navy)',
+                      borderRadius: '10px',
+                      padding: '10px 12px',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
                       cursor: 'pointer',
-                      fontWeight: isActive ? 800 : 600,
-                      fontSize: '14px',
+                      fontWeight: isActive ? 700 : 600,
+                      fontSize: '13.5px',
                       transition: 'all 0.15s ease'
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <Icon size={16} color={isActive ? '#ffffff' : '#64748b'} />
+                      <Icon size={16} color={isActive ? '#ffffff' : 'var(--color-text-secondary)'} />
                       <span>{item.label}</span>
                     </div>
 
                     <span style={{
-                      background: isActive ? 'rgba(255, 255, 255, 0.15)' : '#e0f2fe',
-                      color: isActive ? '#ffffff' : '#0369a1',
+                      background: isActive ? 'rgba(255, 255, 255, 0.15)' : 'var(--color-pale-indigo)',
+                      color: isActive ? '#ffffff' : 'var(--color-primary-navy)',
                       fontSize: '11px',
                       fontWeight: 800,
                       padding: '2px 8px',
@@ -198,281 +161,212 @@ export function NotificationsPage() {
             </div>
           </div>
 
-          {/* Upcoming Event Promo Widget */}
-          <div style={{
-            background: '#eef6ff',
-            border: '1px solid #bae6fd',
-            borderRadius: '16px',
-            padding: '16px 20px',
-            position: 'relative',
-            overflow: 'hidden'
-          }}>
-            <div style={{ fontSize: '11px', fontWeight: 800, color: '#0369a1', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-              Upcoming Event
+          {/* Upcoming Event Widget if booked */}
+          {upcomingApt && (
+            <div
+              className="card-current"
+              style={{
+                padding: '18px 20px',
+                cursor: 'pointer'
+              }}
+              onClick={() => navigate('/appointments')}
+            >
+              <div style={{ fontSize: '11px', fontWeight: 800, color: 'var(--color-deep-navy)', textTransform: 'uppercase', letterSpacing: '0.6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{ color: 'var(--color-saffron)' }}>●</span> UPCOMING EVENT
+              </div>
+              <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-deep-navy)', marginTop: '6px' }}>
+                {upcomingApt.title}
+              </div>
+              <div style={{ fontSize: '13px', fontWeight: 800, color: 'var(--color-deep-navy)', marginTop: '2px' }}>
+                {upcomingApt.date} · {upcomingApt.slot}
+              </div>
+              <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginTop: '4px' }}>
+                {upcomingApt.location}
+              </div>
             </div>
-            <div style={{ fontSize: '14px', fontWeight: 700, color: '#173b57', marginTop: '4px' }}>
-              Driving Test
-            </div>
-            <div style={{ fontSize: '13px', fontWeight: 800, color: '#e88a2d', marginTop: '2px' }}>
-              Oct 24, 10:00 AM
-            </div>
-
-            <Calendar size={48} color="#93c5fd" style={{ position: 'absolute', right: '12px', bottom: '8px', opacity: 0.4 }} />
-          </div>
+          )}
         </div>
 
-        {/* Right Stream Notifications Feed */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+        {/* Right Notifications Feed */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           
-          {/* Today Group */}
-          {todayItems.length > 0 && (
-            <div>
-              <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#173b57', margin: '0 0 16px 0' }}>
-                Today
-              </h2>
+          {filteredNotifications.length === 0 ? (
+            /* TRUE EMPTY STATE */
+            <div className="card-standard" style={{ padding: '48px 32px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '14px' }}>
+              <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: 'var(--color-pale-indigo)', color: 'var(--color-indigo)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Inbox size={26} />
+              </div>
+              <h3 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--color-deep-navy)', margin: 0 }}>
+                No notifications in this category
+              </h3>
+              <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', margin: 0, maxWidth: '420px', lineHeight: 1.5 }}>
+                You're all caught up! New notifications will automatically appear here when events occur on your applications.
+              </p>
+              {activeFilter !== 'all' && (
+                <button
+                  onClick={() => setActiveFilter('all')}
+                  className="secondary-button"
+                  style={{ marginTop: '8px', padding: '8px 16px', fontSize: '13px' }}
+                >
+                  View All Notifications
+                </button>
+              )}
+            </div>
+          ) : (
+            <>
+              {/* Today Group */}
+              {todayItems.length > 0 && (
+                <div>
+                  <div style={{ fontSize: '12px', fontWeight: 800, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '12px' }}>
+                    Today
+                  </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                {todayItems.map(item => {
-                  const Icon = item.icon;
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {todayItems.map(item => {
+                      const { icon: Icon, iconBg, iconColor } = getIconForCategory(item.category);
 
-                  return (
-                    <div
-                      key={item.id}
-                      style={{
-                        background: '#ffffff',
-                        borderRadius: '16px',
-                        border: '1px solid #e2e8f0',
-                        borderLeft: item.unread ? '4px solid #f97316' : '1px solid #e2e8f0',
-                        padding: '24px',
-                        boxShadow: '0 2px 10px rgba(0, 37, 66, 0.03)',
-                        position: 'relative'
-                      }}
-                    >
-                      <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
-                        
-                        {/* Icon Badge */}
-                        <div style={{
-                          width: '44px',
-                          height: '44px',
-                          borderRadius: '50%',
-                          background: item.iconBg,
-                          color: item.iconColor,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          flexShrink: 0
-                        }}>
-                          <Icon size={22} />
-                        </div>
-
-                        {/* Content Block */}
-                        <div style={{ flex: 1 }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '6px' }}>
-                            <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#173b57', margin: 0 }}>
-                              {item.title}
-                            </h3>
-                            <span style={{ fontSize: '12px', fontWeight: 700, color: '#94a3b8' }}>
-                              {item.timeAgo}
-                            </span>
-                          </div>
-
-                          <p style={{ color: '#64748b', fontSize: '14px', margin: '0 0 14px 0', lineHeight: 1.5 }}>
-                            {item.body}
-                          </p>
-
-                          {/* App No & Successful Status Badges */}
-                          {item.appNo && (
-                            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                              <span style={{ background: '#e0f2fe', color: '#0369a1', fontSize: '11px', fontWeight: 800, padding: '4px 10px', borderRadius: '6px' }}>
-                                {item.appNo}
-                              </span>
-                              <span style={{ background: '#dcfce7', color: '#16a34a', fontSize: '11px', fontWeight: 800, padding: '4px 10px', borderRadius: '6px' }}>
-                                {item.statusTag}
-                              </span>
-                            </div>
-                          )}
-
-                          {/* Embedded Driving Test Booked Box */}
-                          {item.eventBox && (
+                      return (
+                        <div
+                          key={item.id}
+                          onClick={() => handleNotificationClick(item)}
+                          className="card-standard"
+                          style={{
+                            padding: '20px 24px',
+                            borderLeft: item.unread ? '4px solid var(--color-saffron)' : '1px solid var(--color-border)',
+                            cursor: item.route ? 'pointer' : 'default',
+                            transition: 'all 0.15s ease'
+                          }}
+                          onMouseEnter={(e) => {
+                            if (item.route) {
+                              e.currentTarget.style.borderColor = 'var(--color-slate-blue)';
+                              e.currentTarget.style.transform = 'translateY(-1px)';
+                            }
+                          }}
+                          onMouseLeave={(e) => {
+                            if (item.route) {
+                              e.currentTarget.style.borderColor = 'var(--color-border)';
+                              e.currentTarget.style.transform = 'translateY(0)';
+                            }
+                          }}
+                        >
+                          <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
                             <div style={{
-                              background: '#f0f4ff',
-                              border: '1px solid #dbeafe',
-                              borderRadius: '14px',
-                              padding: '12px 18px',
+                              width: '42px',
+                              height: '42px',
+                              borderRadius: '10px',
+                              background: iconBg,
+                              color: iconColor,
                               display: 'flex',
                               alignItems: 'center',
-                              justifyContent: 'space-between',
-                              marginTop: '8px'
+                              justifyContent: 'center',
+                              flexShrink: 0
                             }}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                                <div style={{
-                                  background: '#ffffff',
-                                  border: '1px solid #cbd5e1',
-                                  borderRadius: '10px',
-                                  width: '42px',
-                                  height: '42px',
-                                  display: 'flex',
-                                  flexDirection: 'column',
-                                  alignItems: 'center',
-                                  justifyContent: 'center'
-                                }}>
-                                  <span style={{ fontSize: '9px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase' }}>{item.eventBox.month}</span>
-                                  <span style={{ fontSize: '15px', fontWeight: 800, color: '#173b57' }}>{item.eventBox.day}</span>
-                                </div>
+                              <Icon size={20} />
+                            </div>
 
-                                <div>
-                                  <div style={{ fontSize: '10px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase' }}>LOCATION</div>
-                                  <div style={{ fontSize: '13px', fontWeight: 800, color: '#173b57' }}>{item.eventBox.location}</div>
+                            <div style={{ flex: 1 }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '4px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                  <h3 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-deep-navy)', margin: 0 }}>
+                                    {item.title}
+                                  </h3>
+                                  {item.unread && (
+                                    <span style={{ fontSize: '10px', fontWeight: 800, background: 'var(--color-pale-amber)', color: 'var(--color-deep-navy)', padding: '2px 6px', borderRadius: '4px', textTransform: 'uppercase' }}>
+                                      NEW
+                                    </span>
+                                  )}
                                 </div>
+                                <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-text-muted)' }}>
+                                  {item.timeAgo}
+                                </span>
                               </div>
 
-                              <button
-                                onClick={() => navigate(item.eventBox.actionPath)}
-                                style={{
-                                  background: 'transparent',
-                                  border: 'none',
-                                  color: '#0369a1',
-                                  fontSize: '13px',
-                                  fontWeight: 800,
-                                  cursor: 'pointer',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  gap: '4px'
-                                }}
-                              >
-                                View Details <ArrowRight size={14} />
-                              </button>
+                              <p style={{ color: 'var(--color-text-secondary)', fontSize: '13.5px', margin: '0 0 8px 0', lineHeight: 1.5 }}>
+                                {item.body}
+                              </p>
+
+                              {item.route && (
+                                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '12.5px', fontWeight: 700, color: 'var(--color-primary-navy)', marginTop: '4px' }}>
+                                  <span>View details</span>
+                                  <ArrowRight size={13} />
+                                </div>
+                              )}
                             </div>
-                          )}
-
-                        </div>
-
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          {/* Yesterday Group */}
-          {yesterdayItems.length > 0 && (
-            <div>
-              <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#173b57', margin: '0 0 16px 0' }}>
-                Yesterday
-              </h2>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                {yesterdayItems.map(item => {
-                  const Icon = item.icon;
-
-                  return (
-                    <div
-                      key={item.id}
-                      style={{
-                        background: '#ffffff',
-                        borderRadius: '16px',
-                        border: '1px solid #e2e8f0',
-                        padding: '24px',
-                        boxShadow: '0 2px 10px rgba(0, 37, 66, 0.03)'
-                      }}
-                    >
-                      <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
-                        
-                        {/* Icon Badge */}
-                        <div style={{
-                          width: '44px',
-                          height: '44px',
-                          borderRadius: '50%',
-                          background: item.iconBg,
-                          color: item.iconColor,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          flexShrink: 0
-                        }}>
-                          <Icon size={22} />
-                        </div>
-
-                        {/* Content Block */}
-                        <div style={{ flex: 1 }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '6px' }}>
-                            <h3 style={{ fontSize: '16px', fontWeight: 800, color: item.iconColor === '#dc2626' ? '#dc2626' : '#173b57', margin: 0 }}>
-                              {item.title}
-                            </h3>
-                            <span style={{ fontSize: '12px', fontWeight: 700, color: '#94a3b8' }}>
-                              {item.timeAgo}
-                            </span>
                           </div>
-
-                          <p style={{ color: '#64748b', fontSize: '14px', margin: '0 0 14px 0', lineHeight: 1.5 }}>
-                            {item.body}
-                          </p>
-
-                          {/* Payment Receipt button & Ref Tag */}
-                          {item.hasReceipt && (
-                            <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                              <span style={{ background: '#f1f5f9', color: '#64748b', fontSize: '11px', fontWeight: 800, padding: '4px 10px', borderRadius: '6px' }}>
-                                {item.refNo}
-                              </span>
-                              <button
-                                onClick={() => alert("Downloading official payment receipt (PDF)...")}
-                                style={{ background: '#ffffff', border: '1px solid #cbd5e1', padding: '4px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', color: '#173b57', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
-                              >
-                                <Download size={14} /> Receipt
-                              </button>
-                            </div>
-                          )}
-
-                          {/* Re-upload Document Action Button */}
-                          {item.reuploadAction && (
-                            <button
-                              onClick={() => navigate('/ll/documents')}
-                              style={{
-                                background: '#ffffff',
-                                color: '#dc2626',
-                                border: '1px solid #fca5a5',
-                                padding: '8px 16px',
-                                borderRadius: '10px',
-                                fontSize: '13px',
-                                fontWeight: 700,
-                                cursor: 'pointer',
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: '8px',
-                                marginTop: '4px'
-                              }}
-                            >
-                              <FileText size={16} /> Re-upload Document
-                            </button>
-                          )}
-
                         </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
 
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
+              {/* Yesterday Group */}
+              {yesterdayItems.length > 0 && (
+                <div>
+                  <div style={{ fontSize: '12px', fontWeight: 800, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '12px', marginTop: '12px' }}>
+                    Yesterday
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {yesterdayItems.map(item => {
+                      const { icon: Icon, iconBg, iconColor } = getIconForCategory(item.category);
+
+                      return (
+                        <div
+                          key={item.id}
+                          onClick={() => handleNotificationClick(item)}
+                          className="card-standard"
+                          style={{
+                            padding: '20px 24px',
+                            cursor: item.route ? 'pointer' : 'default',
+                            transition: 'all 0.15s ease'
+                          }}
+                        >
+                          <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+                            <div style={{
+                              width: '42px',
+                              height: '42px',
+                              borderRadius: '10px',
+                              background: iconBg,
+                              color: iconColor,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              flexShrink: 0
+                            }}>
+                              <Icon size={20} />
+                            </div>
+
+                            <div style={{ flex: 1 }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '4px' }}>
+                                <h3 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-deep-navy)', margin: 0 }}>
+                                  {item.title}
+                                </h3>
+                                <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-text-muted)' }}>
+                                  {item.timeAgo}
+                                </span>
+                              </div>
+
+                              <p style={{ color: 'var(--color-text-secondary)', fontSize: '13.5px', margin: '0 0 8px 0', lineHeight: 1.5 }}>
+                                {item.body}
+                              </p>
+
+                              {item.route && (
+                                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '12.5px', fontWeight: 700, color: 'var(--color-primary-navy)', marginTop: '4px' }}>
+                                  <span>View details</span>
+                                  <ArrowRight size={13} />
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </>
           )}
-
-          {/* Bottom Pagination Button */}
-          <div style={{ textAlign: 'center', marginTop: '12px' }}>
-            <button style={{
-              background: '#ffffff',
-              color: '#173b57',
-              border: '1px solid #cbd5e1',
-              padding: '12px 28px',
-              borderRadius: '20px',
-              fontWeight: 700,
-              fontSize: '14px',
-              cursor: 'pointer',
-              boxShadow: '0 2px 8px rgba(0, 37, 66, 0.03)'
-            }}>
-              Load Older Notifications ˅
-            </button>
-          </div>
 
         </div>
 

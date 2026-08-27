@@ -22,6 +22,9 @@ export function HelpCenterPage() {
       title: 'Learner Licence',
       desc: 'Application process, eligibility criteria, and mandatory LL test guidelines.',
       icon: BookOpen,
+      iconColor: 'var(--color-indigo)',
+      iconBg: 'var(--color-pale-indigo)',
+      borderColor: '#D5DCF2',
       articles: [
         { title: 'LL Eligibility Criteria', content: 'Applicants must be at least 18 years old for Light Motor Vehicles (LMV) or 16 years for non-geared 50cc two-wheelers. Parental consent is required for 16-18 age group.' },
         { title: 'Online LL Assessment Rules', content: 'The test consists of 15 multiple-choice questions covering traffic signs, road rules, and driving safety. Passing score is 9 out of 15 (60%). Remote proctoring checks camera identity.' },
@@ -34,6 +37,9 @@ export function HelpCenterPage() {
       title: 'Driving Licence',
       desc: 'Permanent licence, renewals, address change, and international driving permits.',
       icon: CreditCard,
+      iconColor: 'var(--color-teal)',
+      iconBg: 'var(--color-pale-teal)',
+      borderColor: '#B8E4DD',
       articles: [
         { title: 'Permanent DL Application', content: 'Apply online 30 days after LL issuance. Upload your valid LL number, select RTO testing track, and book your practical driving test slot.' },
         { title: 'DL Renewal Guidelines', content: 'You can apply for DL renewal 1 year prior to expiry and up to 1 year post-expiry without a retest. Late fee applies after 30 days post-expiry.' },
@@ -46,6 +52,9 @@ export function HelpCenterPage() {
       title: 'Documents',
       desc: 'Required identity, address, and medical proofs for various applications.',
       icon: FolderCheck,
+      iconColor: '#0284c7',
+      iconBg: '#EAF4F8',
+      borderColor: '#BAE6FD',
       articles: [
         { title: 'Accepted Identity Proofs', content: 'Aadhaar Card (with eKYC), Passport, Voter ID Card, PAN Card, or Official Government ID.' },
         { title: 'Accepted Address Proofs', content: 'Aadhaar Card, Recent Utility Bill (Electricity/Water within 3 months), Passport, or Registered Rent Agreement.' },
@@ -58,6 +67,9 @@ export function HelpCenterPage() {
       title: 'Payments',
       desc: 'Fee structures, payment methods, transaction failures, and refund policies.',
       icon: CreditCard,
+      iconColor: 'var(--color-warm-amber)',
+      iconBg: 'var(--color-pale-amber)',
+      borderColor: '#F6D8B0',
       articles: [
         { title: 'RTO Fee Structure', content: 'Learner Licence (LL): ₹200 | Permanent Driving Licence (DL): ₹700 (includes Form 7 fee, test track fee & smartcard printing) | Renewal: ₹400.' },
         { title: 'Accepted Payment Methods', content: 'Secure online payment via UPI (GPay, PhonePe, Paytm), Net Banking, Credit Cards, or Debit Cards.' },
@@ -70,6 +82,9 @@ export function HelpCenterPage() {
       title: 'Appointments',
       desc: 'Booking slots, rescheduling, cancellations, and RTO visit procedures.',
       icon: Calendar,
+      iconColor: 'var(--color-indigo)',
+      iconBg: 'var(--color-pale-indigo)',
+      borderColor: '#D5DCF2',
       articles: [
         { title: 'Booking Driving Test Slots', content: 'Choose your local automated RTO test track, pick an available date on the interactive calendar, and select morning or afternoon session.' },
         { title: 'Rescheduling Appointments', content: 'You can reschedule your driving test appointment for free up to 48 hours prior to your scheduled slot directly from your dashboard.' },
@@ -82,6 +97,9 @@ export function HelpCenterPage() {
       title: 'Driving Test',
       desc: 'Track layouts, vehicle requirements, evaluation criteria, and retake rules.',
       icon: Car,
+      iconColor: 'var(--color-sage)',
+      iconBg: 'var(--color-pale-teal)',
+      borderColor: '#B8E4DD',
       articles: [
         { title: 'Automated Track Layouts', content: 'LMV (Car): Parallel Parking, Figure-8 Track, S-Curve Steering & Hill Gradient Stop/Start. MCWG: Figure-8 Balance & Emergency Braking.' },
         { title: 'Vehicle Requirements', content: 'Vehicle must be roadworthy with valid RC, active Insurance & PUC certificate. Must display red "L" plates on both front and rear bumpers.' },
@@ -144,53 +162,61 @@ export function HelpCenterPage() {
   const displayedFaqs = showAllFaqs ? filteredFaqs : filteredFaqs.slice(0, 4);
 
   return (
-    <div style={{ background: '#f8fafc', minHeight: 'calc(100vh - 78px)', padding: '48px 0 80px 0', fontFamily: "'Hanken Grotesk', system-ui, sans-serif", color: '#173b57' }}>
-      <div style={{ maxWidth: '1184px', margin: '0 auto', padding: '0 24px', display: 'flex', flexDirection: 'column', gap: '48px' }}>
+    <div style={{ background: 'var(--color-bg)', minHeight: 'calc(100vh - 78px)', padding: '40px 0 80px 0', fontFamily: "'Hanken Grotesk', system-ui, sans-serif", color: 'var(--color-text-primary)' }}>
+      <div style={{ maxWidth: '1184px', margin: '0 auto', padding: '0 24px', display: 'flex', flexDirection: 'column', gap: '40px' }}>
 
         {/* 1. HERO SEARCH SECTION */}
         <div style={{ textAlign: 'center', maxWidth: '780px', margin: '0 auto' }}>
-          <h1 className="page-main-heading" style={{ fontSize: '48px', fontWeight: 700, color: '#173b57', margin: '0 0 12px 0', letterSpacing: '-0.8px' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: 'var(--color-indigo)', fontSize: '11px', fontWeight: 800, letterSpacing: '1.2px', textTransform: 'uppercase', marginBottom: '8px' }}>
+            HELP CENTER & FAQS
+          </div>
+          <h1 className="page-main-heading" style={{ fontSize: '44px', fontWeight: 700, color: 'var(--color-deep-navy)', margin: '0 0 12px 0', letterSpacing: '-0.8px' }}>
             {t('userFlow.helpTitle')}
           </h1>
-          <p style={{ fontSize: '16px', color: '#476179', margin: '0 0 32px 0', lineHeight: 1.5 }}>
+          <p style={{ fontSize: '16px', color: 'var(--color-text-secondary)', margin: '0 0 28px 0', lineHeight: 1.5 }}>
             Find clear, official answers about Indian Drives services, licensing, and procedures.
           </p>
         </div>
 
         {/* 2. DARK NAVY CALLOUT BANNER ("Can't find what you're looking for?") */}
         <div className="card" style={{
-          background: '#00253e',
+          background: 'var(--color-deep-navy)',
           borderRadius: '12px',
-          padding: '28px 36px',
+          padding: '24px 32px',
           color: '#ffffff',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
           flexWrap: 'wrap',
-          gap: '24px',
-          boxShadow: '0 12px 32px rgba(0, 37, 62, 0.15)'
+          gap: '20px',
+          boxShadow: '0 8px 24px rgba(16, 45, 67, 0.12)'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
             {/* Bot Icon Badge */}
             <div style={{
-              width: '52px',
-              height: '52px',
+              width: '48px',
+              height: '48px',
               borderRadius: '12px',
-              background: 'rgba(255, 255, 255, 0.1)',
-              border: '1px solid rgba(255, 255, 255, 0.15)',
+              background: 'rgba(232, 137, 45, 0.15)',
+              border: '1px solid rgba(232, 137, 45, 0.3)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               flexShrink: 0
             }}>
-              <Bot size={26} color="#ffffff" />
+              <Bot size={24} color="var(--color-saffron)" />
             </div>
 
             <div>
-              <h2 className="card-header" style={{ fontSize: '24px', fontWeight: 600, color: '#ffffff', margin: '0 0 4px 0' }}>
-                Can't find what you're looking for?
-              </h2>
-              <p style={{ fontSize: '14px', color: '#94a3b8', margin: 0, maxWidth: '620px', lineHeight: 1.5 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
+                <h2 className="card-header" style={{ fontSize: '20px', fontWeight: 700, color: '#ffffff', margin: 0 }}>
+                  Can't find what you're looking for?
+                </h2>
+                <span style={{ fontSize: '10px', fontWeight: 800, background: 'rgba(232, 137, 45, 0.25)', color: '#FFD699', padding: '2px 8px', borderRadius: '9999px', letterSpacing: '0.6px', textTransform: 'uppercase' }}>
+                  AI ASSISTANT
+                </span>
+              </div>
+              <p style={{ fontSize: '13px', color: '#D5DCF2', margin: 0, maxWidth: '600px', lineHeight: 1.45 }}>
                 Our AI assistant is trained on official Indian Drives regulations to provide instant, specific guidance for your unique situation.
               </p>
             </div>
@@ -200,86 +226,83 @@ export function HelpCenterPage() {
             onClick={() => navigate('/ask')}
             style={{
               background: '#ffffff',
-              color: '#00253e',
+              color: 'var(--color-deep-navy)',
               border: 'none',
               borderRadius: '8px',
-              padding: '12px 24px',
-              fontSize: '16px',
-              fontWeight: 600,
+              padding: '10px 20px',
+              fontSize: '14px',
+              fontWeight: 700,
               cursor: 'pointer',
               display: 'inline-flex',
               alignItems: 'center',
               gap: '8px',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
               transition: 'all 0.15s ease'
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = '#f8fafc')}
+            onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--color-pale-indigo)')}
             onMouseLeave={(e) => (e.currentTarget.style.background = '#ffffff')}
           >
-            Ask Indian Drives <ArrowRight size={16} />
+            Ask Indian Drives <ArrowRight size={15} />
           </button>
         </div>
 
         {/* 3. BROWSE BY CATEGORY SECTION */}
         <div>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: '#476179', fontSize: '12px', fontWeight: 800, letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '20px' }}>
-            <span style={{ display: 'inline-block', width: '18px', height: '2px', background: '#476179' }} />
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: 'var(--color-indigo)', fontSize: '11px', fontWeight: 800, letterSpacing: '1.2px', textTransform: 'uppercase', marginBottom: '16px' }}>
+            <span style={{ display: 'inline-block', width: '16px', height: '2px', background: 'var(--color-indigo)' }} />
             Browse by Category
           </div>
 
           {/* 6 Category Cards Grid (2 rows x 3 columns) */}
-          <div className="help-categories-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
+          <div className="help-categories-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
             {categories.map((cat) => {
               const IconComp = cat.icon;
               return (
                 <div
                   key={cat.id}
-                  className="card"
+                  className="card-standard"
                   onClick={() => setSelectedCategory(cat)}
                   style={{
-                    background: '#ffffff',
-                    borderRadius: '12px',
-                    padding: '28px',
-                    border: '1px solid #e2e8f0',
-                    boxShadow: '0 2px 10px rgba(23, 59, 87, 0.02)',
+                    padding: '24px',
                     cursor: 'pointer',
                     transition: 'all 0.2s ease',
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'space-between',
-                    minHeight: '190px'
+                    minHeight: '170px'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = '#cbd5e1';
-                    e.currentTarget.style.boxShadow = '0 8px 24px rgba(23, 59, 87, 0.08)';
+                    e.currentTarget.style.borderColor = cat.iconColor;
+                    e.currentTarget.style.boxShadow = 'var(--shadow-hover)';
                     e.currentTarget.style.transform = 'translateY(-2px)';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = '#e2e8f0';
-                    e.currentTarget.style.boxShadow = '0 2px 10px rgba(23, 59, 87, 0.02)';
+                    e.currentTarget.style.borderColor = 'var(--color-border)';
+                    e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
                     e.currentTarget.style.transform = 'translateY(0)';
                   }}
                 >
                   <div>
-                    {/* Icon Badge */}
+                    {/* Icon Badge with Subtle Semantic Background */}
                     <div style={{
                       width: '42px',
                       height: '42px',
                       borderRadius: '10px',
-                      background: '#eef6ff',
-                      border: '1px solid #bae6fd',
+                      background: cat.iconBg,
+                      border: `1px solid ${cat.borderColor}`,
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      marginBottom: '16px'
+                      marginBottom: '14px',
+                      color: cat.iconColor
                     }}>
-                      <IconComp size={20} color="#0369a1" />
+                      <IconComp size={20} />
                     </div>
 
-                    <h3 className="card-header" style={{ fontSize: '24px', fontWeight: 600, color: '#173b57', margin: '0 0 8px 0' }}>
+                    <h3 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--color-deep-navy)', margin: '0 0 6px 0' }}>
                       {cat.title}
                     </h3>
-                    <p style={{ fontSize: '14px', color: '#476179', margin: 0, lineHeight: 1.5 }}>
+                    <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', margin: 0, lineHeight: 1.5 }}>
                       {cat.desc}
                     </p>
                   </div>

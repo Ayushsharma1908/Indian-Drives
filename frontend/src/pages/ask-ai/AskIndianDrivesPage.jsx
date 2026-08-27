@@ -63,26 +63,13 @@ export function AskIndianDrivesPage() {
     {
       id: 'welcome',
       sender: 'assistant',
-      text: `Eligibility: Ensure your LL has been valid for at least 30 days but not more than 6 months.
-
-Apply Online: Proceed to the DL application and enter your LL number.
-
-Documents: Keep your Learner Licence and Address Proof handy for verification.
-
-Fee Payment: Pay the required fee for the driving test and licence issuance.
-
-Book a Test: Schedule a slot for your practical driving test at your RTO.`,
-      timestamp: '10:46 AM',
-      actionCard: {
-        title: 'Ready to start?',
-        subtitle: 'Launch the guided DL application',
-        buttonText: 'Continue to DL Journey',
-        actionId: 'START_DL_APPLICATION'
-      },
+      text: `Hello, Yanshi! 👋 I'm your Indian Drives Assistant. I can help you with your application steps, document checklists, fee payments, and driving test bookings. How can I help you today?`,
+      timestamp: 'Just now',
       followUps: [
-        "What is my next step?",
-        "What documents do I need for DL?",
-        "How to pay driving licence fee?"
+        "What do I do next?",
+        "What documents do I need?",
+        "Show my appointment",
+        "Check my payment status"
       ]
     }
   ]);
@@ -227,26 +214,13 @@ Book a Test: Schedule a slot for your practical driving test at your RTO.`,
       {
         id: `welcome-${Date.now()}`,
         sender: 'assistant',
-        text: `Eligibility: Ensure your LL has been valid for at least 30 days but not more than 6 months.
-
-Apply Online: Proceed to the DL application and enter your LL number.
-
-Documents: Keep your Learner Licence and Address Proof handy for verification.
-
-Fee Payment: Pay the required fee for the driving test and licence issuance.
-
-Book a Test: Schedule a slot for your practical driving test at your RTO.`,
+        text: `Hello, Yanshi! 👋 A fresh conversation has been started. How can I help you today?`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        actionCard: {
-          title: 'Ready to start?',
-          subtitle: 'Launch the guided DL application',
-          buttonText: 'Continue to DL Journey',
-          actionId: 'START_DL_APPLICATION'
-        },
         followUps: [
-          "What is my next step?",
-          "What documents do I need for DL?",
-          "How to pay driving licence fee?"
+          "What do I do next?",
+          "What documents do I need?",
+          "Show my appointment",
+          "Check my payment status"
         ]
       }
     ]);

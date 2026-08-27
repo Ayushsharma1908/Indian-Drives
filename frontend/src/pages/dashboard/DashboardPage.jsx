@@ -12,15 +12,16 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { api } from '../../services/api';
+import { centralDataStore } from '../../data/centralDataStore';
 import { getStoredUserProfile } from '../../data/userProfileData';
 import { useLanguage } from '../../main';
 
 export function DashboardPage() {
   const navigate = useNavigate();
   const { t } = useLanguage();
-  const profile = getStoredUserProfile();
+  const profile = centralDataStore.getUserProfile() || getStoredUserProfile();
   const [searchParams] = useSearchParams();
-  const [upcomingVisit, setUpcomingVisit] = useState(null);
+  const [upcomingVisit, setUpcomingVisit] = useState(() => centralDataStore.getUpcomingAppointment());
   const [importantNotice, setImportantNotice] = useState(null);
   const [showProcessedNotification, setShowProcessedNotification] = useState(false);
   const [activeFlow, setActiveFlow] = useState(null);
@@ -78,37 +79,26 @@ export function DashboardPage() {
   }, [searchParams, navigate]);
 
   useEffect(() => {
-    // Check for active booked appointments
-    api.appointments()
-      .then((res) => {
-        if (Array.isArray(res) && res.length > 0) {
-          const booked = res.find((a) => a.status === 'booked' || a.status === 'scheduled');
-          if (booked) {
-            setUpcomingVisit(booked);
-            return;
-          }
-        }
-      })
-      .catch(() => {});
+    const handleStateChange = () => {
+      setUpcomingVisit(centralDataStore.getUpcomingAppointment());
+    };
+    window.addEventListener('indian-drives-state-change', handleStateChange);
 
-    // Check for urgent unread notifications
-    api.notifications()
-      .then((res) => {
-        if (Array.isArray(res)) {
-          const urgent = res.find(
-            (n) => !n.read && (
-              n.title.toLowerCase().includes('verified') ||
-              n.title.toLowerCase().includes('ready') ||
-              n.title.toLowerCase().includes('retest') ||
-              n.title.toLowerCase().includes('important')
-            )
-          );
-          if (urgent) {
-            setImportantNotice(urgent);
-          }
-        }
-      })
-      .catch(() => {});
+    // Also check for urgent unread notifications
+    const notes = centralDataStore.getNotifications();
+    const urgent = notes.find(
+      (n) => n.unread && (
+        n.title.toLowerCase().includes('verified') ||
+        n.title.toLowerCase().includes('ready') ||
+        n.title.toLowerCase().includes('retest') ||
+        n.title.toLowerCase().includes('important')
+      )
+    );
+    if (urgent) {
+      setImportantNotice(urgent);
+    }
+
+    return () => window.removeEventListener('indian-drives-state-change', handleStateChange);
   }, []);
 
   return (

@@ -6,6 +6,7 @@ import {
   Car, Shield, Award, Flag, User, CreditCard, Lock, AlertCircle, FileCheck, X
 } from 'lucide-react';
 import { getStoredUserProfile } from '../../data/userProfileData';
+import { centralDataStore } from '../../data/centralDataStore';
 import { useLanguage } from '../../main';
 
 // ----------------------------------------------------------------------
@@ -1514,17 +1515,24 @@ export function MyJourneyTimelinePage({ initialStage }) {
   const [searchParams] = useSearchParams();
   const queryStage = searchParams.get('stage');
 
-  // Stage can be 'll' (0%), 'dl' (62%), or 'completed' (100%)
-  const stage = queryStage || initialStage || 'dl';
+  // Listen to state changes
+  const [journeyState, setJourneyState] = useState(() => centralDataStore.getJourney());
 
-  const percentage = stage === 'll' ? 0 : stage === 'dl' ? 62 : 100;
-  const labelText = stage === 'll' ? 'LL APPLICATION' : stage === 'dl' ? 'DL APPLICATION' : 'DL ISSUED';
+  useEffect(() => {
+    const handleState = () => setJourneyState(centralDataStore.getJourney());
+    window.addEventListener('indian-drives-state-change', handleState);
+    return () => window.removeEventListener('indian-drives-state-change', handleState);
+  }, []);
+
+  // Stage can be 'll' (0%), 'dl' (dynamically calculated), or 'completed' (100%)
+  const stage = queryStage || initialStage || journeyState.activeStageId || 'dl';
+
+  const dynamicCalc = centralDataStore.getJourneyProgress();
+  const percentage = stage === 'll' ? 0 : stage === 'completed' ? 100 : (dynamicCalc > 0 ? dynamicCalc : 67);
+  const labelText = stage === 'll' ? 'LL APPLICATION' : stage === 'completed' ? 'DL ISSUED' : 'DL APPLICATION · IN PROGRESS';
   
   // Speedometer Needle Math:
   // Arc angle spans 270° from -135° (left rest pos at 0%) to +135° (right max pos at 100%)
-  // At P = 0%, needleAngle = -135° (Rests at 0% mark on the bottom left)
-  // At P = 62%, needleAngle = -135 + 0.62 * 270 = +32.4°
-  // At P = 100%, needleAngle = +135°
   const needleAngle = -135 + (percentage / 100) * 270;
 
   // Arc math for gauge
@@ -1571,9 +1579,9 @@ export function MyJourneyTimelinePage({ initialStage }) {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '32px', alignItems: 'start' }}>
         
         {/* Left Column: Automotive Car Speedometer Card */}
-        <div style={{ background: '#ffffff', borderRadius: '24px', padding: '36px 28px', border: '1px solid #e2e8f0', boxShadow: '0 4px 20px rgba(0,37,66,0.06)', display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative' }}>
+        <div className="card-standard" style={{ padding: '36px 28px', display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative' }}>
           
-          <div style={{ fontSize: '11px', fontWeight: 800, color: '#e88a2d', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '8px' }}>
+          <div style={{ fontSize: '11px', fontWeight: 800, color: 'var(--color-indigo)', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '8px' }}>
             AUTOMOTIVE DASHBOARD GAUGE
           </div>
 
@@ -1581,24 +1589,18 @@ export function MyJourneyTimelinePage({ initialStage }) {
           <div style={{ position: 'relative', width: '340px', height: '310px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <svg width="340" height="310" viewBox="0 0 340 310">
               <defs>
-                {/* Metallic Chrome Dial Outer Gradient */}
-                <linearGradient id="dialRimGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#173b57" />
-                  <stop offset="100%" stopColor="#0f172a" />
-                </linearGradient>
-
-                {/* Saffron Gauge Arc Gradient */}
+                {/* Saffron to Navy to Teal Gauge Arc Gradient */}
                 <linearGradient id="gaugeArcGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#e88a2d" />
-                  <stop offset="50%" stopColor="#3b82f6" />
-                  <stop offset="100%" stopColor="#16a34a" />
+                  <stop offset="0%" stopColor="var(--color-saffron)" />
+                  <stop offset="50%" stopColor="var(--color-indigo)" />
+                  <stop offset="100%" stopColor="var(--color-teal)" />
                 </linearGradient>
 
                 {/* Center Hub Metallic Cap */}
                 <radialGradient id="needleCapGradient" cx="50%" cy="50%" r="50%">
-                  <stop offset="0%" stopColor="#475569" />
-                  <stop offset="70%" stopColor="#0f172a" />
-                  <stop offset="100%" stopColor="#020617" />
+                  <stop offset="0%" stopColor="#425B78" />
+                  <stop offset="70%" stopColor="#102D43" />
+                  <stop offset="100%" stopColor="#0a1a28" />
                 </radialGradient>
               </defs>
 
@@ -1606,8 +1608,8 @@ export function MyJourneyTimelinePage({ initialStage }) {
               <path
                 d="M 85.1 264.9 A 120 120 0 1 1 254.9 264.9"
                 fill="none"
-                stroke="#f1f5f9"
-                strokeWidth="20"
+                stroke="var(--color-border)"
+                strokeWidth="18"
                 strokeLinecap="round"
               />
 
@@ -1616,7 +1618,7 @@ export function MyJourneyTimelinePage({ initialStage }) {
                 d="M 85.1 264.9 A 120 120 0 1 1 254.9 264.9"
                 fill="none"
                 stroke="url(#gaugeArcGradient)"
-                strokeWidth="20"
+                strokeWidth="18"
                 strokeLinecap="round"
                 strokeDasharray="565.48"
                 strokeDashoffset={565.48 - (percentage / 100) * 565.48}
@@ -1631,17 +1633,17 @@ export function MyJourneyTimelinePage({ initialStage }) {
                     y1={t.y1}
                     x2={t.x2}
                     y2={t.y2}
-                    stroke={t.isMajor ? '#173b57' : '#94a3b8'}
-                    strokeWidth={t.isMajor ? 3 : 1.5}
+                    stroke={t.isMajor ? 'var(--color-deep-navy)' : 'var(--color-text-muted)'}
+                    strokeWidth={t.isMajor ? 2.5 : 1.2}
                     strokeLinecap="round"
                   />
                   {t.isMajor && (
                     <text
                       x={t.tx}
                       y={t.ty}
-                      fill="#476179"
+                      fill="var(--color-slate-blue)"
                       fontSize="11"
-                      fontWeight="800"
+                      fontWeight="700"
                       textAnchor="middle"
                       dominantBaseline="middle"
                     >
@@ -1653,23 +1655,23 @@ export function MyJourneyTimelinePage({ initialStage }) {
 
               {/* 4 Major Milestone Node Labels around Dial: 0 at Start, 100 at DL Issued */}
               <g transform="translate(85, 265)">
-                <circle r="6" fill={stage === 'll' ? '#e88a2d' : '#16a34a'} />
-                <text x="0" y="18" fill="#e88a2d" fontSize="11" fontWeight="800" textAnchor="middle">0 (START)</text>
+                <circle r="6" fill={stage === 'll' ? 'var(--color-saffron)' : 'var(--color-teal)'} />
+                <text x="0" y="18" fill="var(--color-saffron)" fontSize="10.5" fontWeight="800" textAnchor="middle">0 (START)</text>
               </g>
 
               <g transform="translate(68, 80)">
-                <circle r="6" fill={stage !== 'll' ? '#16a34a' : '#cbd5e1'} />
-                <text x="-10" y="-12" fill="#173b57" fontSize="11" fontWeight="800" textAnchor="end">LL ISSUED</text>
+                <circle r="6" fill={stage !== 'll' ? 'var(--color-teal)' : 'var(--color-border)'} />
+                <text x="-10" y="-12" fill="var(--color-deep-navy)" fontSize="10.5" fontWeight="800" textAnchor="end">LL ISSUED</text>
               </g>
 
               <g transform="translate(272, 80)">
-                <circle r="6" fill={stage === 'dl' ? '#e88a2d' : stage === 'completed' ? '#16a34a' : '#cbd5e1'} />
-                <text x="10" y="-12" fill="#173b57" fontSize="11" fontWeight="800" textAnchor="start">DL TEST</text>
+                <circle r="6" fill={stage === 'dl' ? 'var(--color-saffron)' : stage === 'completed' ? 'var(--color-teal)' : 'var(--color-border)'} />
+                <text x="10" y="-12" fill="var(--color-deep-navy)" fontSize="10.5" fontWeight="800" textAnchor="start">DL TEST</text>
               </g>
 
               <g transform="translate(255, 265)">
-                <circle r="6" fill={stage === 'completed' ? '#16a34a' : '#cbd5e1'} />
-                <text x="0" y="18" fill="#16a34a" fontSize="11" fontWeight="800" textAnchor="middle">100 (DL ISSUED)</text>
+                <circle r="6" fill={stage === 'completed' ? 'var(--color-teal)' : 'var(--color-border)'} />
+                <text x="0" y="18" fill="var(--color-teal)" fontSize="10.5" fontWeight="800" textAnchor="middle">100 (DL ISSUED)</text>
               </g>
 
               {/* ROTATING SPEEDOMETER NEEDLE / ARROW */}
@@ -1680,13 +1682,13 @@ export function MyJourneyTimelinePage({ initialStage }) {
                 {/* Shadow */}
                 <polygon
                   points="170,88 175,182 165,182"
-                  fill="rgba(0,0,0,0.2)"
+                  fill="rgba(16,45,67,0.15)"
                   transform="rotate(4, 170, 180)"
                 />
                 {/* Needle Blade */}
                 <polygon
                   points="170,72 176,180 164,180"
-                  fill="#e88a2d"
+                  fill="var(--color-saffron)"
                 />
                 {/* Needle Tip Accent */}
                 <polygon
@@ -1696,27 +1698,27 @@ export function MyJourneyTimelinePage({ initialStage }) {
               </g>
 
               {/* Speedometer Pivot Center Cap */}
-              <circle cx={cx} cy={cy} r="16" fill="url(#needleCapGradient)" stroke="#ffffff" strokeWidth="2.5" boxShadow="0 4px 10px rgba(0,0,0,0.3)" />
-              <circle cx={cx} cy={cy} r="5" fill="#e88a2d" />
+              <circle cx={cx} cy={cy} r="16" fill="url(#needleCapGradient)" stroke="#ffffff" strokeWidth="2.5" />
+              <circle cx={cx} cy={cy} r="5" fill="var(--color-saffron)" />
 
               {/* LCD Odometer Digital Reading Box at Dial Base */}
-              <rect x="120" y="222" width="100" height="38" rx="8" fill="#0f172a" stroke="#334155" strokeWidth="1.5" />
-              <text x="170" y="246" fill="#e88a2d" fontSize="20" fontWeight="900" textAnchor="middle" fontFamily="monospace" letterSpacing="1px">
+              <rect x="120" y="222" width="100" height="38" rx="8" fill="var(--color-deep-navy)" stroke="var(--color-slate-blue)" strokeWidth="1.5" />
+              <text x="170" y="246" fill="var(--color-saffron)" fontSize="20" fontWeight="900" textAnchor="middle" fontFamily="monospace" letterSpacing="1px">
                 {percentage}%
               </text>
             </svg>
           </div>
 
           {/* Speedometer Status Banner below dial */}
-          <div style={{ width: '100%', marginTop: '16px', paddingTop: '16px', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ width: '100%', marginTop: '16px', paddingTop: '16px', borderTop: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: percentage === 0 ? '#e88a2d' : '#16a34a', animation: 'pulse 1.5s infinite' }} />
-              <span style={{ fontSize: '13px', fontWeight: 800, color: '#173b57' }}>
+              <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: percentage === 0 ? 'var(--color-saffron)' : 'var(--color-teal)' }} />
+              <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-deep-navy)' }}>
                 {percentage === 0 ? 'SPEEDOMETER REST POSITION (0%)' : `SPEEDOMETER GAUGING (${percentage}%)`}
               </span>
             </div>
 
-            <span style={{ fontSize: '11px', background: '#f1f5f9', color: '#476179', padding: '4px 10px', borderRadius: '6px', fontWeight: 800 }}>
+            <span style={{ fontSize: '11px', background: 'var(--color-pale-indigo)', color: 'var(--color-primary-navy)', padding: '3px 10px', borderRadius: '6px', fontWeight: 700 }}>
               {labelText}
             </span>
           </div>
@@ -1727,34 +1729,29 @@ export function MyJourneyTimelinePage({ initialStage }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           
           {/* Card 1: YOUR NEXT STEP */}
-          <div style={{ background: '#ffffff', borderRadius: '20px', padding: '28px', border: '1px solid #e2e8f0', boxShadow: '0 4px 16px rgba(0, 37, 66, 0.04)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '15px', fontWeight: 800, color: '#173b57' }}>
-              <span style={{ color: '#e88a2d', fontSize: '18px' }}>✪</span> YOUR NEXT STEP
+          <div className="card-current" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', fontWeight: 800, color: 'var(--color-deep-navy)', letterSpacing: '0.6px', textTransform: 'uppercase' }}>
+              <span style={{ color: 'var(--color-saffron)', fontSize: '16px' }}>●</span> YOUR NEXT STEP
             </div>
-            <p style={{ fontSize: '14px', color: '#476179', margin: 0, lineHeight: 1.5 }}>
+            <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', margin: 0, lineHeight: 1.55 }}>
               {stage === 'll'
                 ? 'Begin your Learner Licence application. Upload your Aadhaar identity proof and complete the online traffic rules test.'
                 : 'Complete your DL application. Your Learner Licence has been issued. You can now continue with your Driving Licence application.'}
             </p>
             <button
               onClick={() => navigate(stage === 'll' ? '/ll/intro' : '/dl/intro')}
+              className="primary-button"
               style={{
                 width: '100%',
-                background: '#173b57',
-                color: '#ffffff',
-                border: 'none',
                 padding: '12px',
-                borderRadius: '10px',
-                fontWeight: 700,
-                fontSize: '14px',
-                cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '8px'
               }}
             >
-              {stage === 'll' ? 'Start LL application' : 'Continue application'} <ArrowRight size={16} />
+              <span>{stage === 'll' ? 'Start LL Application' : 'Continue DL Application'}</span>
+              <ArrowRight size={16} />
             </button>
           </div>
 

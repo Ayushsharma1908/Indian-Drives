@@ -741,24 +741,37 @@ select:focus {
   display: grid;
   gap: 24px;
   padding: 24px;
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-sm);
 }
 
-.services-panel,
+.services-panel {
+  grid-column: span 4;
+  padding: 24px;
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-sm);
+}
+
 .assistant-panel {
   grid-column: span 4;
   padding: 24px;
-}
-
-.assistant-panel {
   display: grid;
   gap: 16px;
   align-content: start;
-  background: var(--primary);
+  background: var(--color-deep-navy);
   color: #fff;
+  border-radius: var(--radius-card);
+  box-shadow: 0 8px 24px rgba(16, 45, 67, 0.12);
 }
 
 .assistant-panel p {
-  color: var(--primary-soft);
+  color: #D5DCF2;
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 .panel-heading {
@@ -770,14 +783,15 @@ select:focus {
 
 .panel h2,
 .panel h3,
-.assistant-panel h3,
 .profile-card h2 {
   margin: 0;
-  color: var(--primary);
+  color: var(--color-deep-navy);
 }
 
 .assistant-panel h3 {
+  margin: 0;
   color: #fff;
+  font-size: 20px;
 }
 
 .next-step-panel {
@@ -785,10 +799,11 @@ select:focus {
   align-items: center;
   justify-content: space-between;
   gap: 18px;
-  padding: 16px;
-  border: 1px solid var(--surface-high);
+  padding: 16px 20px;
+  border: 1px solid #F6D8B0;
+  border-left: 4px solid var(--color-saffron);
   border-radius: 12px;
-  background: var(--surface-low);
+  background: var(--color-pale-amber);
 }
 
 .journey-road {
@@ -798,9 +813,9 @@ select:focus {
   align-items: center;
   justify-content: space-around;
   overflow: hidden;
-  border: 1px solid var(--surface-high);
+  border: 1px solid var(--color-border);
   border-radius: 12px;
-  background: var(--surface-low);
+  background: var(--color-bg);
 }
 
 .journey-road::before {
@@ -811,25 +826,25 @@ select:focus {
   top: 50%;
   height: 8px;
   border-radius: 999px;
-  background: var(--surface-variant);
+  background: var(--color-border);
 }
 
 .road-node {
   z-index: 1;
   width: 24px;
   height: 24px;
-  border: 4px solid var(--surface-variant);
+  border: 4px solid var(--color-border);
   border-radius: 50%;
   background: #fff;
 }
 
 .road-node.done {
-  border-color: var(--primary-container);
+  border-color: var(--color-teal);
 }
 
 .road-node.active {
-  border-color: var(--saffron);
-  box-shadow: 0 0 0 5px rgba(233, 139, 46, 0.2);
+  border-color: var(--color-saffron);
+  box-shadow: 0 0 0 5px rgba(232, 137, 45, 0.2);
 }
 
 .road-car {
@@ -837,7 +852,7 @@ select:focus {
   top: 62px;
   left: 43%;
   z-index: 2;
-  color: var(--primary);
+  color: var(--color-deep-navy);
 }
 
 .quick-actions {
@@ -848,26 +863,34 @@ select:focus {
 }
 
 .quick-action {
-  min-height: 132px;
+  min-height: 124px;
   display: grid;
   place-items: center;
   align-content: center;
-  gap: 12px;
+  gap: 10px;
   padding: 16px;
-  border: 1px solid var(--surface-high);
+  border: 1px solid var(--color-border);
   border-radius: 12px;
   background: #fff;
-  color: var(--primary);
+  color: var(--color-deep-navy);
   text-align: center;
+  transition: all 0.2s ease;
+}
+
+.quick-action:hover {
+  border-color: var(--color-slate-blue);
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-2px);
 }
 
 .quick-action span {
   display: grid;
   place-items: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: var(--primary-soft);
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: var(--color-pale-indigo);
+  color: var(--color-primary-navy);
 }
 
 .service-list {
@@ -877,21 +900,22 @@ select:focus {
 }
 
 .service-list a {
-  min-height: 52px;
+  min-height: 48px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 10px 12px;
+  padding: 10px 14px;
   border: 1px solid transparent;
   border-radius: 10px;
-  color: var(--primary);
-  font-weight: 700;
+  color: var(--color-deep-navy);
+  font-weight: 600;
+  transition: all 0.15s ease;
 }
 
 .service-list a:hover {
-  border-color: var(--surface-high);
-  background: var(--surface-low);
+  border-color: var(--color-border);
+  background: var(--color-pale-indigo);
 }
 
 .cockpit-layout {
@@ -922,9 +946,9 @@ select:focus {
   position: relative;
   width: 100%;
   height: 100%;
-  border: 9px solid var(--surface-variant);
-  border-top-color: var(--primary-container);
-  border-right-color: var(--primary-container);
+  border: 10px solid var(--color-border);
+  border-top-color: var(--color-deep-navy);
+  border-right-color: var(--color-deep-navy);
   border-radius: 50%;
   transform: rotate(-45deg);
 }
@@ -932,7 +956,7 @@ select:focus {
 .arc-progress {
   position: absolute;
   inset: 18px;
-  border-top: 5px solid var(--saffron);
+  border-top: 5px solid var(--color-saffron);
   transform-origin: 50% 50%;
   transition: transform 0.5s ease;
 }
@@ -949,19 +973,20 @@ select:focus {
 }
 
 .arc-content small {
-  color: var(--muted);
-  font-size: 13px;
+  color: var(--color-indigo);
+  font-size: 12px;
   font-weight: 800;
   text-transform: uppercase;
+  letter-spacing: 0.6px;
 }
 
 .arc-content strong {
-  color: var(--primary);
+  color: var(--color-deep-navy);
   font-size: 24px;
 }
 
 .arc-content em {
-  color: rgba(64, 97, 127, 0.22);
+  color: rgba(23, 59, 87, 0.18);
   font-size: 54px;
   font-style: normal;
   font-weight: 800;
@@ -979,20 +1004,20 @@ select:focus {
 .node.done {
   top: 86%;
   left: 14%;
-  border: 4px solid var(--primary-container);
+  border: 4px solid var(--color-teal);
 }
 
 .node.current {
   top: 14%;
   left: 50%;
-  border: 4px solid var(--saffron);
-  box-shadow: 0 0 0 5px rgba(233, 139, 46, 0.2);
+  border: 4px solid var(--color-saffron);
+  box-shadow: 0 0 0 5px rgba(232, 137, 45, 0.2);
 }
 
 .node.future {
   top: 86%;
   left: 86%;
-  border: 4px solid var(--surface-variant);
+  border: 4px solid var(--color-border);
 }
 
 .step-card,
@@ -1015,11 +1040,12 @@ select:focus {
 .timeline-step {
   display: grid;
   gap: 8px;
-  min-height: 118px;
+  min-height: 114px;
   padding: 14px;
-  border: 1px solid var(--surface-high);
+  border: 1px solid var(--color-border);
   border-radius: 12px;
-  background: #fff;
+  background: #ffffff;
+  transition: all 0.2s ease;
 }
 
 .timeline-step span {
@@ -1028,26 +1054,28 @@ select:focus {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: var(--surface-low);
-  color: var(--primary);
-  font-weight: 800;
+  background: var(--color-pale-indigo);
+  color: var(--color-primary-navy);
+  font-weight: 700;
 }
 
 .timeline-step.completed span {
-  background: var(--primary);
-  color: #fff;
+  background: var(--color-teal);
+  color: #ffffff;
 }
 
 .timeline-step.current {
-  border-color: var(--saffron);
+  border-color: var(--color-saffron);
+  background: var(--color-pale-amber);
 }
 
 .timeline-step.current span {
-  background: var(--saffron-soft);
+  background: var(--color-saffron);
+  color: #ffffff;
 }
 
 .timeline-step small {
-  color: var(--muted);
+  color: var(--color-text-secondary);
   text-transform: capitalize;
 }
 
