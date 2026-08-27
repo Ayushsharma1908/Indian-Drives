@@ -81,7 +81,8 @@ const db = {
     { id: "rto001", name: "Jamshedpur RTO Test Centre", address: "Sakchi, Jamshedpur, Jharkhand", latitude: 22.8046, longitude: 86.2029, distance: "4.2 km" },
     { id: "rto002", name: "Adityapur Transport Office", address: "Adityapur, Seraikela Kharsawan", latitude: 22.7835, longitude: 86.1571, distance: "8.8 km" },
     { id: "rto003", name: "Mango Driving Test Track", address: "Mango, Jamshedpur, Jharkhand", latitude: 22.8451, longitude: 86.2064, distance: "10.5 km" }
-  ]
+  ],
+  chatHistory: []
 };
 
 const schemas = {
@@ -91,7 +92,22 @@ const schemas = {
   document: new mongoose.Schema({ name: String, type: String, status: String }),
   payment: new mongoose.Schema({ purpose: String, amount: Number, status: String, transactionId: String }),
   appointment: new mongoose.Schema({ testCentreId: String, date: String, time: String, vehicleClass: String, slot: String, status: String }),
-  notification: new mongoose.Schema({ title: String, body: String, read: Boolean })
+  notification: new mongoose.Schema({ title: String, body: String, read: Boolean }),
+  chatHistory: new mongoose.Schema({
+    userId: { type: String, default: "user-demo", index: true },
+    messages: [
+      {
+        id: String,
+        sender: String,
+        text: String,
+        action: mongoose.Schema.Types.Mixed,
+        followUps: [String],
+        timestamp: String,
+        statusBadge: mongoose.Schema.Types.Mixed
+      }
+    ],
+    updatedAt: { type: Date, default: Date.now }
+  })
 };
 
 Object.entries(schemas).forEach(([name, schema]) => {
@@ -361,6 +377,53 @@ app.post("/api/chat/stream", async (req, res) => {
     context,
     res
   });
+});
+
+// Chat History Endpoints (MongoDB backed with memory fallback)
+app.get("/api/chat/history", async (_req, res) => {
+  try {
+    if (mongoose.connection.readyState === 1) {
+      const ChatHistory = mongoose.model("chatHistory");
+      const record = await ChatHistory.findOne({ userId: "user-demo" });
+      if (record && Array.isArray(record.messages)) {
+        return res.json(ok(record.messages));
+      }
+    }
+    res.json(ok(db.chatHistory || []));
+  } catch (error) {
+    res.json(ok(db.chatHistory || []));
+  }
+});
+
+app.post("/api/chat/history", async (req, res) => {
+  const { messages = [] } = req.body;
+  db.chatHistory = messages;
+  try {
+    if (mongoose.connection.readyState === 1) {
+      const ChatHistory = mongoose.model("chatHistory");
+      await ChatHistory.findOneAndUpdate(
+        { userId: "user-demo" },
+        { messages, updatedAt: new Date() },
+        { upsert: true, new: true }
+      );
+    }
+    res.json(ok({ saved: true, count: messages.length }));
+  } catch (error) {
+    res.json(ok({ saved: true, fallback: true }));
+  }
+});
+
+app.delete("/api/chat/history", async (_req, res) => {
+  db.chatHistory = [];
+  try {
+    if (mongoose.connection.readyState === 1) {
+      const ChatHistory = mongoose.model("chatHistory");
+      await ChatHistory.deleteOne({ userId: "user-demo" });
+    }
+    res.json(ok({ cleared: true }));
+  } catch (error) {
+    res.json(ok({ cleared: true }));
+  }
 });
 
 // Legacy / Fallback endpoint

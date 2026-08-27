@@ -131,3 +131,50 @@ export function parseActionAndSuggestionTags(rawText = '', context = {}) {
 
   return { cleanText, action, followUps };
 }
+
+/**
+ * Fetch chat history from backend MongoDB / store
+ */
+export async function fetchChatHistory() {
+  try {
+    const res = await fetch(`${baseUrl}/api/chat/history`);
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.success && Array.isArray(data.data) ? data.data : [];
+  } catch (err) {
+    console.error('Failed to fetch chat history:', err);
+    return [];
+  }
+}
+
+/**
+ * Persist chat history to backend MongoDB / store
+ */
+export async function saveChatHistory(messages) {
+  try {
+    const res = await fetch(`${baseUrl}/api/chat/history`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages })
+    });
+    return res.ok;
+  } catch (err) {
+    console.error('Failed to save chat history:', err);
+    return false;
+  }
+}
+
+/**
+ * Clear chat history from backend MongoDB / store
+ */
+export async function clearChatHistory() {
+  try {
+    const res = await fetch(`${baseUrl}/api/chat/history`, {
+      method: 'DELETE'
+    });
+    return res.ok;
+  } catch (err) {
+    console.error('Failed to clear chat history:', err);
+    return false;
+  }
+}
