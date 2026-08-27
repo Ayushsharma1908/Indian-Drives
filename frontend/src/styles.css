@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,300..900;1,300..900&display=swap');
+
 :root {
   --background: #f7f9fb;
   --surface: #ffffff;
@@ -26,13 +28,56 @@
   box-sizing: border-box;
 }
 
+body, html, button, input, select, textarea {
+  font-family: 'Hanken Grotesk', "Noto Sans Devanagari", system-ui, -apple-system, sans-serif !important;
+}
+
 body {
   margin: 0;
   min-width: 320px;
   background: var(--background);
   color: var(--text);
-  font-family: Inter, "Noto Sans Devanagari", system-ui, sans-serif;
   letter-spacing: 0;
+}
+
+/* Global Heading Defaults: Main page heading = 48px bold */
+h1, .page-title, .hero-title, .main-heading {
+  font-size: 48px !important;
+  font-weight: 700 !important;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif !important;
+  letter-spacing: -0.8px;
+}
+
+/* Card Header Defaults: 24px semibold */
+h2, h3, .card-header, .card-title, .panel-title, .section-heading {
+  font-size: 24px !important;
+  font-weight: 600 !important;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif !important;
+}
+
+/* Global Button Defaults: radius corner of 8px, text semibold of 16px */
+button, .button, .btn, input[type="submit"] {
+  border-radius: 8px !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif !important;
+}
+
+/* Card Border Radius: 12px */
+.card, .panel, .bento-grid > div, .ask-card, .chat-container, .document-card, .status-card, .cockpit-panel, .info-card, .hero-card, div[style*="borderRadius: '20px'"], div[style*="borderRadius: '16px'"], div[style*="borderRadius: '24px'"] {
+  border-radius: 12px !important;
+}
+
+/* Status of verified and ready: 9999px radius */
+.status-badge, .status-pill, .badge, .chip, .tag-pill, .status-tag, [class*="status-"], [class*="-verified"], [class*="-ready"] {
+  border-radius: 9999px !important;
+}
+
+/* Dates: Medium of 16px */
+.date, .timestamp, .date-text, time, .time-stamp, .date-badge, .date-display {
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif !important;
 }
 
 a {
@@ -97,9 +142,9 @@ select {
 
 .brand img,
 .brand-logo-img {
-  height: 58px;
+  height: 42px;
   width: auto;
-  max-width: 72px;
+  max-width: 56px;
   object-fit: contain;
   display: block;
 }

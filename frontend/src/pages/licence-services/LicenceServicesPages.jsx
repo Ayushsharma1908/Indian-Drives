@@ -1525,10 +1525,10 @@ export function MyJourneyTimelinePage({ initialStage }) {
   const cx = 170;
   const cy = 180;
 
-  // Render 11 speedometer dial ticks (0% to 100%)
+  // Render 11 speedometer dial ticks (0 to 100)
   const dialTicks = Array.from({ length: 11 }, (_, i) => {
     const val = i * 10;
-    const tickAngle = -135 + (val / 100) * 270;
+    const tickAngle = 135 + (val / 100) * 270;
     const rad = (tickAngle * Math.PI) / 180;
     
     // Outer and inner radii for tick lines
@@ -1644,25 +1644,25 @@ export function MyJourneyTimelinePage({ initialStage }) {
                 </g>
               ))}
 
-              {/* 4 Major Milestone Node Labels around Dial */}
-              <g transform="translate(68, 276)">
+              {/* 4 Major Milestone Node Labels around Dial: 0 at Start, 100 at DL Issued */}
+              <g transform="translate(85, 265)">
                 <circle r="6" fill={stage === 'll' ? '#e88a2d' : '#16a34a'} />
-                <text x="0" y="16" fill="#173b57" fontSize="10" fontWeight="800" textAnchor="middle">START (0%)</text>
+                <text x="0" y="18" fill="#e88a2d" fontSize="11" fontWeight="800" textAnchor="middle">0 (START)</text>
               </g>
 
               <g transform="translate(68, 80)">
                 <circle r="6" fill={stage !== 'll' ? '#16a34a' : '#cbd5e1'} />
-                <text x="-10" y="-12" fill="#173b57" fontSize="10" fontWeight="800" textAnchor="end">LL ISSUED</text>
+                <text x="-10" y="-12" fill="#173b57" fontSize="11" fontWeight="800" textAnchor="end">LL ISSUED</text>
               </g>
 
               <g transform="translate(272, 80)">
                 <circle r="6" fill={stage === 'dl' ? '#e88a2d' : stage === 'completed' ? '#16a34a' : '#cbd5e1'} />
-                <text x="10" y="-12" fill="#173b57" fontSize="10" fontWeight="800" textAnchor="start">DL TEST</text>
+                <text x="10" y="-12" fill="#173b57" fontSize="11" fontWeight="800" textAnchor="start">DL TEST</text>
               </g>
 
-              <g transform="translate(272, 276)">
+              <g transform="translate(255, 265)">
                 <circle r="6" fill={stage === 'completed' ? '#16a34a' : '#cbd5e1'} />
-                <text x="0" y="16" fill="#94a3b8" fontSize="10" fontWeight="800" textAnchor="middle">DL ISSUED (100%)</text>
+                <text x="0" y="18" fill="#16a34a" fontSize="11" fontWeight="800" textAnchor="middle">100 (DL ISSUED)</text>
               </g>
 
               {/* ROTATING SPEEDOMETER NEEDLE / ARROW */}

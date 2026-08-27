@@ -513,31 +513,31 @@ export function DashboardPage() {
                 strokeLinecap="round"
               />
 
-              {/* Node 1: START */}
+              {/* Node 1: 0 (START) */}
               <g transform="translate(30, 130)">
                 <circle r="12" fill="#e88a2d" fillOpacity="0.15" filter="url(#premium-glow)" />
                 <circle r="10" fill="#f7f9fb" stroke="#e88a2d" strokeWidth="4" />
                 <circle r="4" fill="#e88a2d" />
-                <text x="0" y="26" textAnchor="middle" fill="#e88a2d" fontSize="11" fontWeight="800" letterSpacing="1">START</text>
+                <text x="0" y="26" textAnchor="middle" fill="#e88a2d" fontSize="11" fontWeight="800" letterSpacing="0.5">0 (START)</text>
               </g>
 
               {/* Node 2: LL */}
               <g transform="translate(210, 35)">
                 <circle r="6" fill="#173b57" />
-                <text x="0" y="-14" textAnchor="middle" fill="#476179" fontSize="11" fontWeight="700">LL</text>
+                <text x="0" y="-14" textAnchor="middle" fill="#476179" fontSize="11" fontWeight="700">LL (35%)</text>
               </g>
 
               {/* Node 3: TEST */}
               <g transform="translate(305, 48)">
                 <circle r="6" fill="#173b57" opacity="0.6" />
-                <text x="0" y="-14" textAnchor="middle" fill="#476179" fontSize="11" fontWeight="700">TEST</text>
+                <text x="0" y="-14" textAnchor="middle" fill="#476179" fontSize="11" fontWeight="700">TEST (65%)</text>
               </g>
 
-              {/* Node 4: DL */}
+              {/* Node 4: 100 (DL ISSUED) */}
               <g transform="translate(390, 85)">
                 <circle r="12" fill="none" stroke="#16805a" strokeWidth="2" strokeDasharray="3 3" />
                 <circle r="5" fill="#16805a" />
-                <text x="0" y="26" textAnchor="middle" fill="#16805a" fontSize="11" fontWeight="800">DL</text>
+                <text x="0" y="26" textAnchor="middle" fill="#16805a" fontSize="11" fontWeight="800">100 (DL ISSUED)</text>
               </g>
             </svg>
           </div>

@@ -39,9 +39,7 @@ const FILTER_PILLS = [
   'LL',
   'DL',
   'Documents',
-  'Payments',
   'Driving Test',
-  'Appointments'
 ];
 
 export function AskIndianDrivesPage() {
@@ -251,23 +249,55 @@ Book a Test: Schedule a slot for your practical driving test at your RTO.`,
     ]);
   };
 
+  const parseInlineMarkdown = (str) => {
+    if (!str) return null;
+    const parts = str.split(/(\*\*[^*]+\*\*)/g);
+    return parts.map((part, i) => {
+      if (part.startsWith('**') && part.endsWith('**')) {
+        const cleanContent = part.slice(2, -2);
+        return (
+          <strong key={i} style={{ color: '#173b57', fontWeight: 700 }}>
+            {cleanContent}
+          </strong>
+        );
+      }
+      return part;
+    });
+  };
+
   const renderFormattedText = (text) => {
     if (!text) return null;
     const lines = text.split('\n');
     return lines.map((line, idx) => {
+      const trimmed = line.trim();
+      if (!trimmed) {
+        return <div key={idx} style={{ height: '6px' }} />;
+      }
+
+      if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
+        const content = trimmed.slice(2);
+        return (
+          <div key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', marginBottom: '6px', lineHeight: '1.6' }}>
+            <span style={{ color: '#e88a2d', fontWeight: 800, fontSize: '14px', lineHeight: '1.6' }}>•</span>
+            <div style={{ flex: 1 }}>{parseInlineMarkdown(content)}</div>
+          </div>
+        );
+      }
+
       const colonIndex = line.indexOf(':');
-      if (colonIndex > 0 && colonIndex < 25 && !line.startsWith('http')) {
+      if (colonIndex > 0 && colonIndex < 35 && !line.startsWith('http') && !line.includes('**')) {
         const label = line.slice(0, colonIndex + 1);
         const rest = line.slice(colonIndex + 1);
         return (
           <div key={idx} style={{ marginBottom: '8px', lineHeight: '1.6' }}>
-            <strong style={{ color: '#173b57', fontWeight: 700 }}>{label}</strong>{rest}
+            <strong style={{ color: '#173b57', fontWeight: 700 }}>{label}</strong>{parseInlineMarkdown(rest)}
           </div>
         );
       }
+
       return (
-        <div key={idx} style={{ marginBottom: line.trim() ? '6px' : '0', lineHeight: '1.6' }}>
-          {line}
+        <div key={idx} style={{ marginBottom: '6px', lineHeight: '1.6' }}>
+          {parseInlineMarkdown(line)}
         </div>
       );
     });
@@ -284,7 +314,7 @@ Book a Test: Schedule a slot for your practical driving test at your RTO.`,
               <span style={{ display: 'inline-block', width: '18px', height: '2px', background: '#e88a2d' }} />
               ASK INDIAN DRIVES
             </div>
-            <h1 style={{ fontSize: '36px', fontWeight: 800, color: '#173b57', margin: '0 0 6px 0', letterSpacing: '-0.8px' }}>
+            <h1 className="page-main-heading" style={{ fontSize: '48px', fontWeight: 700, color: '#173b57', margin: '0 0 6px 0', letterSpacing: '-0.8px', fontFamily: "'Hanken Grotesk', system-ui, sans-serif" }}>
               Hello! How can we help?
             </h1>
             <p style={{ fontSize: '14px', color: '#476179', margin: 0, maxWidth: '640px' }}>
@@ -298,8 +328,8 @@ Book a Test: Schedule a slot for your practical driving test at your RTO.`,
               background: '#ffffff',
               border: '1px solid #e2e8f0',
               borderRadius: '8px',
-              padding: '8px 16px',
-              fontSize: '13px',
+              padding: '8px 18px',
+              fontSize: '16px',
               fontWeight: 600,
               color: '#476179',
               display: 'inline-flex',
@@ -329,11 +359,11 @@ Book a Test: Schedule a slot for your practical driving test at your RTO.`,
 
           {/* LEFT SIDEBAR */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            
+
             {/* ASSISTANT CARD */}
-            <div style={{
+            <div className="card" style={{
               background: '#ffffff',
-              borderRadius: '16px',
+              borderRadius: '12px',
               border: '1px solid #e2e8f0',
               padding: '18px 20px',
               boxShadow: '0 2px 10px rgba(23, 59, 87, 0.03)',
@@ -354,22 +384,22 @@ Book a Test: Schedule a slot for your practical driving test at your RTO.`,
                 flexShrink: 0
               }}>
                 <Sparkles size={20} color="#e88a2d" />
-                <span style={{
+                <span className="status-pill" style={{
                   position: 'absolute',
                   bottom: '-2px',
                   right: '-2px',
                   width: '12px',
                   height: '12px',
-                  borderRadius: '50%',
+                  borderRadius: '9999px',
                   background: '#22c55e',
                   border: '2px solid #ffffff'
                 }} />
               </div>
               <div>
-                <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#173b57', margin: '0 0 3px 0' }}>
+                <h3 className="card-header" style={{ fontSize: '24px', fontWeight: 600, color: '#173b57', margin: '0 0 3px 0' }}>
                   Indian Drives Assistant
                 </h3>
-                <p style={{ fontSize: '12px', color: '#476179', margin: 0, fontWeight: 500 }}>
+                <p className="status-pill" style={{ fontSize: '13px', color: '#476179', margin: 0, fontWeight: 500, borderRadius: '9999px' }}>
                   Online • Ready to help
                 </p>
               </div>
@@ -377,7 +407,7 @@ Book a Test: Schedule a slot for your practical driving test at your RTO.`,
 
             {/* SUGGESTED QUESTIONS */}
             <div>
-              <div style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.8px', color: '#476179', textTransform: 'uppercase', marginBottom: '12px', paddingLeft: '4px' }}>
+              <div className="section-heading" style={{ fontSize: '24px', fontWeight: 600, letterSpacing: '0.5px', color: '#173b57', marginBottom: '12px', paddingLeft: '4px' }}>
                 SUGGESTED QUESTIONS
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -390,7 +420,7 @@ Book a Test: Schedule a slot for your practical driving test at your RTO.`,
                       style={{
                         background: '#ffffff',
                         border: '1px solid #e2e8f0',
-                        borderRadius: '12px',
+                        borderRadius: '8px',
                         padding: '14px 16px',
                         textAlign: 'left',
                         display: 'flex',
@@ -399,7 +429,9 @@ Book a Test: Schedule a slot for your practical driving test at your RTO.`,
                         cursor: 'pointer',
                         boxShadow: '0 1px 3px rgba(23, 59, 87, 0.02)',
                         transition: 'all 0.2s ease',
-                        width: '100%'
+                        width: '100%',
+                        fontSize: '16px',
+                        fontWeight: 600
                       }}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.borderColor = '#cbd5e1';
@@ -427,9 +459,9 @@ Book a Test: Schedule a slot for your practical driving test at your RTO.`,
           </div>
 
           {/* RIGHT CHAT WINDOW */}
-          <div style={{
+          <div className="card chat-container" style={{
             background: '#ffffff',
-            borderRadius: '16px',
+            borderRadius: '12px',
             border: '1px solid #e2e8f0',
             boxShadow: '0 4px 20px rgba(23, 59, 87, 0.04)',
             display: 'flex',
@@ -487,7 +519,7 @@ Book a Test: Schedule a slot for your practical driving test at your RTO.`,
 
                     {/* Action Callout Box */}
                     {(m.actionCard || m.action) && (
-                      <div style={{
+                      <div className="card" style={{
                         background: '#f8fafc',
                         borderRadius: '12px',
                         padding: '16px 20px',
@@ -500,10 +532,10 @@ Book a Test: Schedule a slot for your practical driving test at your RTO.`,
                         border: '1px solid #e2e8f0'
                       }}>
                         <div>
-                          <div style={{ fontSize: '14px', fontWeight: 700, color: '#173b57', marginBottom: '2px' }}>
+                          <div className="card-header" style={{ fontSize: '24px', fontWeight: 600, color: '#173b57', marginBottom: '2px' }}>
                             {m.actionCard?.title || m.action?.confirmTitle || 'Ready to start?'}
                           </div>
-                          <div style={{ fontSize: '12px', color: '#476179' }}>
+                          <div style={{ fontSize: '14px', color: '#476179' }}>
                             {m.actionCard?.subtitle || m.action?.confirmMessage || 'Launch the guided DL application'}
                           </div>
                         </div>
@@ -516,7 +548,7 @@ Book a Test: Schedule a slot for your practical driving test at your RTO.`,
                             border: 'none',
                             borderRadius: '8px',
                             padding: '10px 18px',
-                            fontSize: '13px',
+                            fontSize: '16px',
                             fontWeight: 600,
                             display: 'inline-flex',
                             alignItems: 'center',
@@ -536,7 +568,7 @@ Book a Test: Schedule a slot for your practical driving test at your RTO.`,
 
                   {/* Message Timestamp */}
                   {m.timestamp && (
-                    <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '6px', textAlign: m.sender === 'user' ? 'right' : 'left' }}>
+                    <div className="timestamp date" style={{ fontSize: '16px', fontWeight: 500, color: '#94a3b8', marginTop: '6px', textAlign: m.sender === 'user' ? 'right' : 'left' }}>
                       {m.timestamp}
                     </div>
                   )}
@@ -553,6 +585,7 @@ Book a Test: Schedule a slot for your practical driving test at your RTO.`,
                 return (
                   <button
                     key={tag}
+                    className="status-pill chip"
                     onClick={() => {
                       setSelectedTag(isActive ? null : tag);
                       handleSendMessage(`Tell me details regarding ${tag}`);
@@ -562,9 +595,9 @@ Book a Test: Schedule a slot for your practical driving test at your RTO.`,
                       color: isActive ? '#ffffff' : '#476179',
                       border: '1px solid',
                       borderColor: isActive ? '#00253e' : '#e2e8f0',
-                      borderRadius: '20px',
-                      padding: '5px 14px',
-                      fontSize: '12px',
+                      borderRadius: '9999px',
+                      padding: '6px 16px',
+                      fontSize: '16px',
                       fontWeight: 600,
                       cursor: 'pointer',
                       transition: 'all 0.15s ease'
@@ -631,9 +664,11 @@ Book a Test: Schedule a slot for your practical driving test at your RTO.`,
                     background: '#f1f5f9',
                     color: '#476179',
                     border: '1px solid #cbd5e1',
-                    borderRadius: '12px',
+                    borderRadius: '8px',
                     width: '46px',
                     height: '46px',
+                    fontSize: '16px',
+                    fontWeight: 600,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -651,9 +686,11 @@ Book a Test: Schedule a slot for your practical driving test at your RTO.`,
                     background: input.trim() ? '#e98b2e' : '#f1f5f9',
                     color: input.trim() ? '#ffffff' : '#cbd5e1',
                     border: 'none',
-                    borderRadius: '12px',
+                    borderRadius: '8px',
                     width: '46px',
                     height: '46px',
+                    fontSize: '16px',
+                    fontWeight: 600,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',

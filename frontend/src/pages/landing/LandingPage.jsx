@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Car, ShieldCheck, CheckCircle2, ArrowRight, Sparkles, Laptop, Calendar,
   CreditCard, Truck, Award, HelpCircle, Lock, User, FileText, Search, Phone,
   Check, X, Zap, ChevronRight, MapPin, Eye, Info
 } from 'lucide-react';
+import { AuthContext } from '../../main';
 
 export function LandingPage() {
   const navigate = useNavigate();
+  const auth = useContext(AuthContext);
 
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [loginMethod, setLoginMethod] = useState('phone'); // 'phone' or 'aadhaar'
@@ -16,18 +18,28 @@ export function LandingPage() {
   const [otpSent, setOtpSent] = useState(false);
   const [otpCode, setOtpCode] = useState('');
 
+  const handleStartJourney = () => {
+    const isAuth = localStorage.getItem('indian-drives-authenticated') === 'true' || localStorage.getItem('indian-drives-token');
+    if (isAuth) {
+      navigate('/dashboard');
+    } else {
+      setShowLoginModal(true);
+    }
+  };
+
   const handleLoginSubmit = (e) => {
-    e.preventDefault();
-    // Save login state & navigate to dashboard
+    if (e) e.preventDefault();
     localStorage.setItem('indian-drives-authenticated', 'true');
+    localStorage.setItem('indian-drives-token', 'demo-token-' + Date.now());
+    if (auth && auth.login) {
+      auth.login({ email: 'rahul.sharma@example.in' }).catch(() => {});
+    }
     setShowLoginModal(false);
     navigate('/dashboard');
   };
 
   const handleDemoLogin = () => {
-    localStorage.setItem('indian-drives-authenticated', 'true');
-    setShowLoginModal(false);
-    navigate('/dashboard');
+    handleLoginSubmit();
   };
 
   return (
@@ -48,27 +60,7 @@ export function LandingPage() {
       }}>
         {/* Brand Logo */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }} onClick={() => navigate('/')}>
-          <div style={{
-            width: '40px',
-            height: '40px',
-            borderRadius: '10px',
-            background: '#0a2540',
-            color: '#ffffff',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontWeight: 900
-          }}>
-            <Car size={24} color="#f97316" />
-          </div>
-          <div>
-            <div style={{ fontSize: '20px', fontWeight: 900, color: '#0a2540', letterSpacing: '-0.5px', lineHeight: 1 }}>
-              Indian Drives
-            </div>
-            <div style={{ fontSize: '10px', fontWeight: 800, color: '#e88a2d', letterSpacing: '1px', textTransform: 'uppercase', marginTop: '2px' }}>
-              DRIVESEVA CITIZEN PORTAL
-            </div>
-          </div>
+          <img src="/indian-drives-logo.png" alt="Indian Drives Logo" className="brand-logo-img" style={{ height: '42px', width: 'auto' }} />
         </div>
 
         {/* Center Nav Links */}
@@ -84,26 +76,7 @@ export function LandingPage() {
         {/* Right CTA Actions */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           <button
-            onClick={() => setShowLoginModal(true)}
-            style={{
-              background: '#ffffff',
-              color: '#0a2540',
-              border: '1px solid #cbd5e1',
-              padding: '10px 20px',
-              borderRadius: '10px',
-              fontWeight: 800,
-              fontSize: '14px',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px'
-            }}
-          >
-            <Lock size={15} /> Login
-          </button>
-
-          <button
-            onClick={handleDemoLogin}
+            onClick={handleStartJourney}
             style={{
               background: '#0a2540',
               color: '#ffffff',
@@ -119,7 +92,7 @@ export function LandingPage() {
               boxShadow: '0 4px 12px rgba(10, 37, 64, 0.15)'
             }}
           >
-            Get Started <ArrowRight size={16} />
+            Start Your Journey <ArrowRight size={16} />
           </button>
         </div>
       </header>
@@ -176,7 +149,7 @@ export function LandingPage() {
           {/* Action Buttons */}
           <div style={{ display: 'flex', gap: '16px', marginBottom: '40px', flexWrap: 'wrap' }}>
             <button
-              onClick={handleDemoLogin}
+              onClick={handleStartJourney}
               style={{
                 background: '#0a2540',
                 color: '#ffffff',
@@ -193,25 +166,6 @@ export function LandingPage() {
               }}
             >
               Start Your Journey <ArrowRight size={18} />
-            </button>
-
-            <button
-              onClick={() => setShowLoginModal(true)}
-              style={{
-                background: '#ffffff',
-                color: '#0a2540',
-                border: '1px solid #cbd5e1',
-                padding: '16px 28px',
-                borderRadius: '12px',
-                fontWeight: 800,
-                fontSize: '16px',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}
-            >
-              <Lock size={16} /> Citizen Login
             </button>
           </div>
 
@@ -646,7 +600,7 @@ export function LandingPage() {
 
           <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
             <button
-              onClick={handleDemoLogin}
+              onClick={handleStartJourney}
               style={{
                 background: '#f97316',
                 color: '#ffffff',
@@ -662,26 +616,7 @@ export function LandingPage() {
                 boxShadow: '0 4px 16px rgba(249, 115, 22, 0.3)'
               }}
             >
-              Get Started Now <ArrowRight size={18} />
-            </button>
-
-            <button
-              onClick={() => setShowLoginModal(true)}
-              style={{
-                background: 'transparent',
-                color: '#ffffff',
-                border: '1px solid #475569',
-                padding: '16px 28px',
-                borderRadius: '12px',
-                fontWeight: 800,
-                fontSize: '16px',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}
-            >
-              <Lock size={16} /> Login to Portal
+              Start Your Journey <ArrowRight size={18} />
             </button>
           </div>
         </div>
@@ -696,8 +631,7 @@ export function LandingPage() {
 
           <div style={{ display: 'flex', gap: '24px' }}>
             <span style={{ cursor: 'pointer' }} onClick={() => navigate('/help')}>Help & Support</span>
-            <span style={{ cursor: 'pointer' }} onClick={() => navigate('/ask')}>Ask DriveSeva AI</span>
-            <span style={{ cursor: 'pointer' }} onClick={() => setShowLoginModal(true)}>Citizen Login</span>
+            <span style={{ cursor: 'pointer' }} onClick={handleStartJourney}>Start Your Journey</span>
           </div>
         </div>
       </footer>

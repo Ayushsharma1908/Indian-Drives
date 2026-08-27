@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   User, Phone, Mail, FileText, Award, FolderCheck, Edit3, X, Check,
-  ArrowRight, ShieldCheck, Calendar, MapPin
+  ArrowRight, ShieldCheck, Calendar, MapPin, LogOut
 } from 'lucide-react';
+import { AuthContext } from '../../main';
 
 export function ProfilePage() {
   const navigate = useNavigate();
+  const auth = useContext(AuthContext);
 
   // Load initial profile details from localStorage or defaults
   const [profile, setProfile] = useState(() => {
@@ -40,6 +42,16 @@ export function ProfilePage() {
     setProfile(editForm);
     localStorage.setItem('indian-drives-user-profile', JSON.stringify(editForm));
     setIsEditing(false);
+  };
+
+  const handleLogout = async () => {
+    if (auth && auth.logout) {
+      await auth.logout();
+    }
+    localStorage.removeItem('indian-drives-authenticated');
+    localStorage.removeItem('indian-drives-token');
+    localStorage.removeItem('indian-drives-user-profile');
+    navigate('/', { replace: true });
   };
 
   return (
@@ -94,27 +106,57 @@ export function ProfilePage() {
           </div>
         </div>
 
-        {/* Edit Profile Button */}
-        <button
-          onClick={handleOpenEdit}
-          style={{
-            background: '#0a2540',
-            color: '#ffffff',
-            border: 'none',
-            padding: '12px 24px',
-            borderRadius: '10px',
-            fontWeight: 800,
-            fontSize: '14px',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            boxShadow: '0 4px 12px rgba(10, 37, 64, 0.15)',
-            transition: 'all 0.15s ease'
-          }}
-        >
-          <Edit3 size={16} /> Edit Profile
-        </button>
+        {/* Profile Action Buttons */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+          <button
+            onClick={handleOpenEdit}
+            style={{
+              background: '#0a2540',
+              color: '#ffffff',
+              border: 'none',
+              padding: '12px 20px',
+              borderRadius: '10px',
+              fontWeight: 800,
+              fontSize: '14px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              boxShadow: '0 4px 12px rgba(10, 37, 64, 0.15)',
+              transition: 'all 0.15s ease'
+            }}
+          >
+            <Edit3 size={16} /> Edit Profile
+          </button>
+
+          <button
+            onClick={handleLogout}
+            style={{
+              background: '#fff1f2',
+              color: '#e11d48',
+              border: '1px solid #fecdd3',
+              padding: '12px 20px',
+              borderRadius: '10px',
+              fontWeight: 800,
+              fontSize: '14px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              transition: 'all 0.15s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = '#ffe4e6';
+              e.currentTarget.style.borderColor = '#fda4af';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = '#fff1f2';
+              e.currentTarget.style.borderColor = '#fecdd3';
+            }}
+          >
+            <LogOut size={16} /> Logout
+          </button>
+        </div>
 
       </div>
 
@@ -188,6 +230,40 @@ export function ProfilePage() {
                 {profile.address}
               </div>
             </div>
+
+            <div style={{ borderTop: '1px solid #f1f5f9', margin: '4px 0' }} />
+
+            {/* LOGOUT ACTION BUTTON */}
+            <button
+              onClick={handleLogout}
+              style={{
+                width: '100%',
+                background: '#fff1f2',
+                color: '#e11d48',
+                border: '1px solid #fecdd3',
+                padding: '12px',
+                borderRadius: '10px',
+                fontWeight: 800,
+                fontSize: '13px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                marginTop: '4px',
+                transition: 'all 0.15s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = '#ffe4e6';
+                e.currentTarget.style.borderColor = '#fda4af';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = '#fff1f2';
+                e.currentTarget.style.borderColor = '#fecdd3';
+              }}
+            >
+              <LogOut size={15} /> Logout Account
+            </button>
 
           </div>
         </div>

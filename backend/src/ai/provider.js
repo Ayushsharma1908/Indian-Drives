@@ -1,7 +1,52 @@
 import { buildSystemPrompt } from './systemPrompt.js';
 
+function isRelevantQuery(userMessage = '') {
+  const query = (userMessage || '').toLowerCase().trim();
+  if (!query) return true;
+
+  // 1. Explicitly unrelated markers (Checked FIRST)
+  const unrelatedMarkers = [
+    'facebook', 'meta', 'google', 'apple', 'microsoft', 'amazon', 'twitter', 'instagram',
+    'founder of', 'ceo of', 'who is', 'capital of', 'weather in', 'recipe', 'python', 'java',
+    'code', 'coding', 'programming', 'cricket', 'football', 'movie', 'actor', 'actress',
+    'president', 'prime minister', 'math', 'equation', 'solve', 'physics', 'chemistry',
+    'joke', 'song', 'sing', 'dance', 'who won', 'what is the capital', 'how to cook',
+    'how to make', 'meaning of life'
+  ];
+
+  if (unrelatedMarkers.some(m => query.includes(m))) {
+    return false;
+  }
+
+  // 2. Casual greetings & domain starters
+  const greetings = ['hi', 'hello', 'hey', 'namaste', 'good morning', 'good afternoon', 'thanks', 'thank you', 'who are you', 'what can you do', 'help'];
+  if (greetings.some(g => query === g || query.startsWith(g + ' ') || query.endsWith(' ' + g))) {
+    return true;
+  }
+
+  // 3. Driving & RTO Domain Keywords with Strict Word Boundaries (\b)
+  const domainPattern = /\b(licence|license|dl|ll|learner|driving|rto|parivahan|sarathi|test|slot|track|document|documents|aadhaar|proof|fee|fees|payment|renew|renewal|duplicate|address|vehicle|car|bike|lmv|mcwg|traffic|signal|exam|quiz|smartcard|speedpost|rc|puc|form|ekyc|appointment|status|challan|chalan)\b/i;
+
+  return domainPattern.test(query);
+}
+
 function getSmartKnowledgeResponse(userMessage = '') {
   const query = (userMessage || '').toLowerCase();
+
+  // Check if the query is unrelated / invalid for Driving Licence & RTO domain
+  if (!isRelevantQuery(userMessage)) {
+    return `I am **DriveSeva AI**, an assistant specialized specifically for **Indian Drives - Driving Licence & RTO Citizen Services**.
+
+Your question seems unrelated to driving licences or RTO procedures. I can assist you with:
+
+- 📄 **Learner Licence (LL)**: Eligibility, application steps & online test prep
+- 🚗 **Driving Licence (DL)**: Practical test booking, track exercises & DL issuance
+- 📂 **Documents & Verification**: Aadhaar eKYC & Form 1A medical requirements
+- 💳 **Fees & Smartcard**: Fee structure, payment receipts & Speed Post tracking
+
+Please ask a question related to your driving licence journey or RTO services!
+[[SUGGESTIONS: How do I apply for a Learner Licence? | What documents do I need for DL? | How to book a driving test slot?]]`;
+  }
 
   if (query.includes('document') || query.includes('proof') || query.includes('aadhaar')) {
     return `For your Driving Licence & RTO services, here are the required documents:
