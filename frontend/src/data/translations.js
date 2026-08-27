@@ -4,7 +4,7 @@ const en = {
   nav: {
     dashboard: "Dashboard",
     journey: "My Journey",
-    ask: "Ask Indian Drives",
+    ask: "Ask DriveSEVA",
     help: "Help",
     notifications: "Notifications",
     profile: "Profile",
@@ -81,7 +81,7 @@ const en = {
     feat4Desc: "Selectively update Name, Address, or Contact details with dynamic live fee calculation and instant doc uploads.",
     feat5Title: "Verified Digital Licence Wallet",
     feat5Desc: "Access your official QR-verified digital driving licence anytime on mobile or desktop for instant verification.",
-    feat6Title: "Ask Indian Drives 24/7 AI Assistant",
+    feat6Title: "Ask DriveSEVA 24/7 AI Assistant",
     feat6Desc: "Get instant, accurate answers about RTO rules, required documents, fee structures, and application queries.",
     ctaTitle: "Ready to Experience Misguidance-Free Driving Licence Services?",
     ctaDesc: "Join thousands of citizens managing their driving licences effortlessly on Indian Drives.",
@@ -220,7 +220,7 @@ const en = {
     greeting: "Ask me what to do next, which documents you need, or how renewal works.",
     sample: "What do I need to do next?",
     sources: "Sources",
-    placeholder: "Ask Indian Drives"
+    placeholder: "Ask DriveSEVA..."
   },
   help: {
     subtitle: "Search common licence questions and continue into the right workflow.",

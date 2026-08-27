@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import {
   FileCheck2, Car, ShieldCheck, CheckCircle2, ArrowRight, ArrowLeft, Upload,
   Clock, AlertTriangle, Play, HelpCircle, Award, RefreshCw, FileText, MapPin,
-  Laptop, Check, Info, HeartPulse, CreditCard, Edit3, User, Eye, Save, Lock
+  Laptop, Check, Info, HeartPulse, CreditCard, Edit3, User, Eye, Save, Lock,
+  Download, Truck, Zap
 } from 'lucide-react';
 import { StatusBadge } from '../../components/ui/StatusBadge';
 import { centralDataStore } from '../../data/centralDataStore';
@@ -417,79 +418,299 @@ export function LLAddressDetailsPage() {
 }
 
 // ----------------------------------------------------------------------
-// STAGE 3: Vehicle Class (/ll/vehicle)
+// STAGE 3: Vehicle Class (/ll/vehicle) - Comprehensive Parivahan COV Catalog
 // ----------------------------------------------------------------------
 export function LLVehicleSelectionPage() {
   const navigate = useNavigate();
   const { t } = useLanguage();
-  const [selected, setSelected] = useState(['lmv', 'mcwg']);
+  const savedDraft = centralDataStore.getDraftForm('ll_vehicle');
+  const [selected, setSelected] = useState(savedDraft?.selected || ['lmv', 'mcwg']);
+  const [activeCategory, setActiveCategory] = useState('all');
+
+  const VEHICLE_CATALOG = [
+    // Personal / Non-Transport
+    {
+      id: 'mcwog',
+      code: 'MCWOG',
+      name: 'Motor Cycle Without Gear',
+      category: 'personal',
+      description: 'Scooters, Mopeds, Gearless Two-Wheelers & Electric Scooters',
+      minAge: 'Min. Age 16 for 50cc / 18 general',
+      icon: BikeIcon,
+      badge: 'NON-TRANSPORT'
+    },
+    {
+      id: 'mcwg',
+      code: 'MCWG',
+      name: 'Motor Cycle With Gear',
+      category: 'personal',
+      description: 'Standard Motorcycles, Geared Motorbikes, Cruisers',
+      minAge: 'Min. Age 18 Years',
+      icon: BikeIcon,
+      badge: 'POPULAR'
+    },
+    {
+      id: 'lmv',
+      code: 'LMV',
+      name: 'Light Motor Vehicle (Car/SUV)',
+      category: 'personal',
+      description: 'Private Motor Cars, Sedans, Hatchbacks, SUVs, Jeeps, Personal Vans',
+      minAge: 'Min. Age 18 Years',
+      icon: Car,
+      badge: 'POPULAR'
+    },
+    {
+      id: 'lmv-nt',
+      code: 'LMV-NT',
+      name: 'Light Motor Vehicle - Non Transport',
+      category: 'personal',
+      description: 'Private light passenger vehicles exclusively for non-commercial use',
+      minAge: 'Min. Age 18 Years',
+      icon: Car,
+      badge: 'NON-TRANSPORT'
+    },
+    // Commercial & Transport
+    {
+      id: 'trans',
+      code: 'TRANS / HGV',
+      name: 'Transport / Heavy Goods Vehicle',
+      category: 'commercial',
+      description: 'Commercial Goods Carriers, Multi-Axle Trucks, Lorries, Container Trailers',
+      minAge: 'Min. Age 20 Years (Valid LMV 1yr+)',
+      icon: Truck,
+      badge: 'COMMERCIAL'
+    },
+    {
+      id: 'hpv',
+      code: 'HPV / HPMV',
+      name: 'Heavy Passenger Motor Vehicle',
+      category: 'commercial',
+      description: 'Commercial Passenger Buses, Tourist Coaches, Heavy Maxi Cabs',
+      minAge: 'Min. Age 20 Years',
+      icon: Truck,
+      badge: 'COMMERCIAL'
+    },
+    {
+      id: 'erick',
+      code: 'e-RICKSHAW / e-CART',
+      name: 'Electric Rickshaw & E-Cart',
+      category: 'commercial',
+      description: 'Battery-operated 3-wheeled passenger rickshaws and electric cargo carts',
+      minAge: 'Min. Age 20 Years',
+      icon: Zap,
+      badge: 'CLEAN ENERGY'
+    },
+    // Specialized & Adapted
+    {
+      id: 'invcrx',
+      code: 'INVCRX (Adapted)',
+      name: 'Adapted Vehicle (Invalid Carriage)',
+      category: 'specialized',
+      description: 'Specially modified and adapted vehicles for Divyangjan (Persons with Disabilities)',
+      minAge: 'Min. Age 18 Years',
+      icon: Car,
+      badge: 'DIVYANGJAN'
+    },
+    {
+      id: 'agritrn',
+      code: 'AGRI / TRACTOR',
+      name: 'Agricultural Tractor & Trailer',
+      category: 'specialized',
+      description: 'Agricultural Tractors, Harvesters, and Field Machinery with Trolleys',
+      minAge: 'Min. Age 18 Years',
+      icon: Truck,
+      badge: 'AGRICULTURE'
+    },
+    {
+      id: 'rdrlr',
+      code: 'RDRLR',
+      name: 'Road Roller / Construction',
+      category: 'specialized',
+      description: 'Heavy road compaction rollers and civil highway engineering equipment',
+      minAge: 'Min. Age 20 Years',
+      icon: Truck,
+      badge: 'SPECIAL PURPOSE'
+    }
+  ];
 
   const toggle = (id) => {
-    setSelected(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+    const updated = selected.includes(id) ? selected.filter(x => x !== id) : [...selected, id];
+    setSelected(updated);
+    centralDataStore.saveDraftForm('ll_vehicle', { selected: updated });
   };
 
-  return (
-    <LLFlowLayout currentStepIndex={2} title={t('llFlow.vehicleTitle')}>
-      <div style={{ background: '#ffffff', borderRadius: '24px', padding: '36px', border: '1px solid #e2e8f0', boxShadow: '0 4px 20px rgba(0,37,66,0.04)' }}>
-        <h2 style={{ fontSize: '24px', fontWeight: 800, color: '#173b57', margin: '0 0 6px 0' }}>
-          {t('llFlow.vehicleTitle')}
-        </h2>
-        <p style={{ fontSize: '14px', color: '#64748b', margin: '0 0 28px 0', borderBottom: '1px solid #f1f5f9', paddingBottom: '16px' }}>
-          {t('llFlow.vehicleSub')}
-        </p>
+  const handleContinue = () => {
+    if (selected.length === 0) {
+      alert('Please select at least one vehicle category to continue.');
+      return;
+    }
+    centralDataStore.saveDraftForm('ll_vehicle', { selected });
+    navigate('/ll/documents');
+  };
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '32px' }}>
-          <div
-            onClick={() => toggle('lmv')}
-            style={{
-              border: selected.includes('lmv') ? '2px solid #173b57' : '1px solid #e2e8f0',
-              borderRadius: '16px',
-              padding: '20px',
-              background: selected.includes('lmv') ? '#f8fafc' : '#ffffff',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '16px'
-            }}
-          >
-            <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: '#eef6ff', color: '#173b57', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Car size={24} />
-            </div>
-            <div>
-              <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#173b57', margin: '0 0 4px 0' }}>LMV</h3>
-              <p style={{ fontSize: '13px', color: '#64748b', margin: 0 }}>Light Motor Vehicle (Car, Jeep, etc.)</p>
-            </div>
+  const filteredVehicles = activeCategory === 'all'
+    ? VEHICLE_CATALOG
+    : VEHICLE_CATALOG.filter(v => v.category === activeCategory);
+
+  return (
+    <LLFlowLayout currentStepIndex={2} title={t('llFlow.vehicleTitle') || 'Vehicle Class Selection'}>
+      <div style={{ background: '#ffffff', borderRadius: '24px', padding: '36px', border: '1px solid #e2e8f0', boxShadow: '0 4px 20px rgba(0,37,66,0.04)' }}>
+        
+        {/* Header & Subtitle */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '1px solid #f1f5f9', paddingBottom: '20px', marginBottom: '24px', flexWrap: 'wrap', gap: '12px' }}>
+          <div>
+            <h2 style={{ fontSize: '24px', fontWeight: 800, color: 'var(--color-deep-navy)', margin: '0 0 6px 0' }}>
+              Official Parivahan Class of Vehicles (COV)
+            </h2>
+            <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', margin: 0, maxWidth: '640px', lineHeight: 1.5 }}>
+              Select one or more vehicle categories for your Learner Licence application according to Ministry of Road Transport & Highways guidelines.
+            </p>
           </div>
 
-          <div
-            onClick={() => toggle('mcwg')}
-            style={{
-              border: selected.includes('mcwg') ? '2px solid #173b57' : '1px solid #e2e8f0',
-              borderRadius: '16px',
-              padding: '20px',
-              background: selected.includes('mcwg') ? '#f8fafc' : '#ffffff',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '16px'
-            }}
-          >
-            <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: '#eef6ff', color: '#173b57', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <BikeIcon />
-            </div>
-            <div>
-              <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#173b57', margin: '0 0 4px 0' }}>MCWG</h3>
-              <p style={{ fontSize: '13px', color: '#64748b', margin: 0 }}>Motorcycle With Gear</p>
-            </div>
+          <div style={{ background: 'var(--color-pale-indigo)', border: '1px solid var(--color-border)', borderRadius: '12px', padding: '8px 16px', textAlign: 'right' }}>
+            <span style={{ fontSize: '11px', fontWeight: 800, color: 'var(--color-indigo)', textTransform: 'uppercase', letterSpacing: '0.6px' }}>SELECTED CLASSES</span>
+            <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--color-deep-navy)' }}>{selected.length} {selected.length === 1 ? 'Class' : 'Classes'}</div>
           </div>
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
-          <button onClick={() => navigate('/ll/address')} style={{ background: '#e0f0ff', color: '#002542', border: 'none', padding: '12px 24px', borderRadius: '10px', fontWeight: 700, fontSize: '14px', cursor: 'pointer' }}>
-            {t('common.back')}
+        {/* Category Filters */}
+        <div style={{ display: 'flex', gap: '10px', marginBottom: '24px', flexWrap: 'wrap' }}>
+          {[
+            { id: 'all', label: 'All Categories (10)' },
+            { id: 'personal', label: '🚗 Personal / Non-Transport (4)' },
+            { id: 'commercial', label: '🚛 Commercial & Transport (3)' },
+            { id: 'specialized', label: '🚜 Specialized & Adapted (3)' }
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setActiveCategory(tab.id)}
+              style={{
+                padding: '8px 16px',
+                borderRadius: '20px',
+                fontSize: '13px',
+                fontWeight: 700,
+                border: activeCategory === tab.id ? '1px solid var(--color-deep-navy)' : '1px solid var(--color-border)',
+                background: activeCategory === tab.id ? 'var(--color-deep-navy)' : '#ffffff',
+                color: activeCategory === tab.id ? '#ffffff' : 'var(--color-text-secondary)',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Vehicle Selection Grid */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '18px', marginBottom: '36px' }}>
+          {filteredVehicles.map((veh) => {
+            const isSelected = selected.includes(veh.id);
+            const Icon = veh.icon;
+
+            return (
+              <div
+                key={veh.id}
+                onClick={() => toggle(veh.id)}
+                style={{
+                  border: isSelected ? '2px solid var(--color-deep-navy)' : '1px solid var(--color-border)',
+                  borderRadius: '16px',
+                  padding: '20px',
+                  background: isSelected ? 'var(--color-pale-indigo)' : '#ffffff',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '12px',
+                  boxShadow: isSelected ? '0 4px 16px rgba(16, 45, 67, 0.08)' : '0 1px 3px rgba(0,0,0,0.02)',
+                  transition: 'all 0.18s ease',
+                  position: 'relative'
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{
+                      width: '44px',
+                      height: '44px',
+                      borderRadius: '12px',
+                      background: isSelected ? '#ffffff' : 'var(--color-bg)',
+                      border: '1px solid var(--color-border)',
+                      color: 'var(--color-deep-navy)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0
+                    }}>
+                      <Icon size={22} />
+                    </div>
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                        <span style={{ fontSize: '15px', fontWeight: 800, color: 'var(--color-deep-navy)' }}>{veh.code}</span>
+                        <span style={{
+                          fontSize: '10px',
+                          fontWeight: 800,
+                          padding: '2px 6px',
+                          borderRadius: '4px',
+                          background: veh.badge === 'POPULAR' ? '#dcfce7' : 'var(--color-sky)',
+                          color: veh.badge === 'POPULAR' ? '#16a34a' : 'var(--color-primary-navy)'
+                        }}>
+                          {veh.badge}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-primary)', marginTop: '2px' }}>
+                        {veh.name}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div style={{
+                    width: '22px',
+                    height: '22px',
+                    borderRadius: '6px',
+                    border: isSelected ? '2px solid var(--color-deep-navy)' : '2px solid var(--color-border)',
+                    background: isSelected ? 'var(--color-deep-navy)' : '#ffffff',
+                    color: '#ffffff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0
+                  }}>
+                    {isSelected && <Check size={14} strokeWidth={3} />}
+                  </div>
+                </div>
+
+                <p style={{ fontSize: '12.5px', color: 'var(--color-text-secondary)', lineHeight: 1.45, margin: 0, flexGrow: 1 }}>
+                  {veh.description}
+                </p>
+
+                <div style={{ borderTop: '1px solid var(--color-border-subtle)', paddingTop: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '11px', color: 'var(--color-text-muted)', fontWeight: 600 }}>
+                  <span>⏳ {veh.minAge}</span>
+                  <span style={{ color: isSelected ? 'var(--color-deep-navy)' : 'transparent', fontWeight: 700 }}>
+                    {isSelected ? '✓ Added to LL' : ''}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Bottom Actions */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px', borderTop: '1px solid var(--color-border-subtle)', paddingTop: '20px' }}>
+          <button
+            type="button"
+            onClick={() => navigate('/ll/address')}
+            className="secondary-button"
+            style={{ padding: '12px 24px', fontSize: '14px', fontWeight: 700 }}
+          >
+            ← {t('common.back')}
           </button>
-          <button onClick={() => navigate('/ll/documents')} style={{ background: '#0f2942', color: '#ffffff', border: 'none', padding: '12px 28px', borderRadius: '10px', fontWeight: 700, fontSize: '14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            {t('common.continue')} <ArrowRight size={16} />
+
+          <button
+            type="button"
+            onClick={handleContinue}
+            className="primary-button"
+            style={{ padding: '12px 32px', fontSize: '14px', fontWeight: 800, display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+          >
+            {t('common.continue')} ({selected.length} Selected) <ArrowRight size={16} />
           </button>
         </div>
       </div>
@@ -497,9 +718,9 @@ export function LLVehicleSelectionPage() {
   );
 }
 
-function BikeIcon() {
+function BikeIcon({ size = 24 }) {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <circle cx="5.5" cy="17.5" r="3.5" />
       <circle cx="18.5" cy="17.5" r="3.5" />
       <path d="M15 6h2.57a2 2 0 0 1 1.8 1.1l2.13 4.26a2 2 0 0 1 .23.94v2.7" />
@@ -581,7 +802,7 @@ export function LLApplicationReviewPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           
           {/* Blue Alert Banner */}
-          <div style={{ background: '#f0f4ff', padding: '20px 24px', borderRadius: '16px', border: '1px solid #dbefe', display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
+          <div style={{ background: '#f0f4ff', padding: '20px 24px', borderRadius: '16px', border: '1px solid #bfdbfe', display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
             <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#173b57', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 800, flexShrink: 0, marginTop: '2px' }}>
               i
             </div>
@@ -701,26 +922,35 @@ export function LLApplicationReviewPage() {
               </button>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-              <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '14px', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '14px' }}>
-                <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#eef6ff', color: '#173b57', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Car size={20} />
-                </div>
-                <div>
-                  <div style={{ fontWeight: 800, color: '#173b57', fontSize: '16px' }}>LMV</div>
-                  <div style={{ fontSize: '12px', color: '#64748b' }}>Light Motor Vehicle (Car, Jeep, etc.)</div>
-                </div>
-              </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '14px' }}>
+              {(centralDataStore.getDraftForm('ll_vehicle')?.selected || ['lmv', 'mcwg']).map((vId) => {
+                const labels = {
+                  mcwog: { code: 'MCWOG', name: 'Motor Cycle Without Gear', icon: BikeIcon },
+                  mcwg: { code: 'MCWG', name: 'Motor Cycle With Gear', icon: BikeIcon },
+                  lmv: { code: 'LMV', name: 'Light Motor Vehicle (Car/SUV)', icon: Car },
+                  'lmv-nt': { code: 'LMV-NT', name: 'LMV Non-Transport', icon: Car },
+                  trans: { code: 'TRANS / HGV', name: 'Transport Heavy Goods Vehicle', icon: Truck },
+                  hpv: { code: 'HPV', name: 'Heavy Passenger Vehicle', icon: Truck },
+                  erick: { code: 'e-RICKSHAW', name: 'Electric Rickshaw / E-Cart', icon: Zap },
+                  invcrx: { code: 'INVCRX', name: 'Adapted Vehicle (Divyangjan)', icon: Car },
+                  agritrn: { code: 'AGRI', name: 'Agricultural Tractor & Machinery', icon: Truck },
+                  rdrlr: { code: 'RDRLR', name: 'Road Roller / Construction', icon: Truck }
+                };
+                const veh = labels[vId] || { code: vId.toUpperCase(), name: 'Vehicle Class', icon: Car };
+                const Icon = veh.icon;
 
-              <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '14px', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '14px' }}>
-                <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#eef6ff', color: '#173b57', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <BikeIcon />
-                </div>
-                <div>
-                  <div style={{ fontWeight: 800, color: '#173b57', fontSize: '16px' }}>MCWG</div>
-                  <div style={{ fontSize: '12px', color: '#64748b' }}>Motorcycle With Gear</div>
-                </div>
-              </div>
+                return (
+                  <div key={vId} style={{ background: '#f8fafc', padding: '14px 16px', borderRadius: '12px', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#eef6ff', color: '#173b57', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <Icon size={18} />
+                    </div>
+                    <div>
+                      <div style={{ fontWeight: 800, color: '#173b57', fontSize: '14px' }}>{veh.code}</div>
+                      <div style={{ fontSize: '11.5px', color: '#64748b' }}>{veh.name}</div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
@@ -873,23 +1103,130 @@ export function LLFeePaymentPage() {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const [paid, setPaid] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState('upi'); // 'upi' | 'card' | 'netbanking'
+
+  // UPI State
   const [selectedUpiApp, setSelectedUpiApp] = useState('gpay');
   const [upiId, setUpiId] = useState('');
-  const [verifiedUpi, setVerifiedUpi] = useState(false);
+  const [upiVerified, setUpiVerified] = useState(false);
+  const [upiMode, setUpiMode] = useState('apps'); // 'apps' | 'id' | 'qr'
 
-  // If Payment is Completed, render the 1:1 "Payment Successful" Screen (Image 2)
+  // Card State
+  const [cardNumber, setCardNumber] = useState('');
+  const [cardName, setCardName] = useState('');
+  const [cardExpiry, setCardExpiry] = useState('');
+  const [cardCvv, setCardCvv] = useState('');
+  const [cardErrors, setCardErrors] = useState({});
+
+  // Net Banking State
+  const [selectedBank, setSelectedBank] = useState('hdfc');
+  const [customBank, setCustomBank] = useState('');
+
+  // Successful receipt metadata
+  const [receiptMeta, setReceiptMeta] = useState(null);
+
+  // Card Number Formatter
+  const handleCardNumberChange = (e) => {
+    const val = e.target.value.replace(/\D/g, '').slice(0, 16);
+    const formatted = val.match(/.{1,4}/g)?.join(' ') || val;
+    setCardNumber(formatted);
+    if (cardErrors.number) setCardErrors(prev => ({ ...prev, number: null }));
+  };
+
+  // Expiry Formatter
+  const handleExpiryChange = (e) => {
+    let val = e.target.value.replace(/\D/g, '').slice(0, 4);
+    if (val.length >= 3) {
+      val = `${val.slice(0, 2)}/${val.slice(2)}`;
+    }
+    setCardExpiry(val);
+    if (cardErrors.expiry) setCardErrors(prev => ({ ...prev, expiry: null }));
+  };
+
+  // CVV Formatter
+  const handleCvvChange = (e) => {
+    const val = e.target.value.replace(/\D/g, '').slice(0, 3);
+    setCardCvv(val);
+    if (cardErrors.cvv) setCardErrors(prev => ({ ...prev, cvv: null }));
+  };
+
+  const handleProcessPayment = () => {
+    let methodDisplay = 'UPI (Google Pay)';
+
+    if (paymentMethod === 'upi') {
+      if (upiMode === 'id') {
+        if (!upiId.trim() || !upiId.includes('@')) {
+          alert('Please enter a valid UPI ID (e.g. yourname@okhdfcbank)');
+          return;
+        }
+        methodDisplay = `UPI (${upiId})`;
+      } else if (upiMode === 'qr') {
+        methodDisplay = 'UPI (QR Code Scan)';
+      } else {
+        const appNames = { gpay: 'Google Pay', phonepe: 'PhonePe', paytm: 'Paytm', bhim: 'BHIM UPI' };
+        methodDisplay = `UPI (${appNames[selectedUpiApp] || 'Google Pay'})`;
+      }
+    } else if (paymentMethod === 'card') {
+      const errs = {};
+      const cleanNum = cardNumber.replace(/\s/g, '');
+      if (cleanNum.length < 16) errs.number = 'Enter a valid 16-digit card number';
+      if (!cardName.trim()) errs.name = 'Cardholder name is required';
+      if (cardExpiry.length < 5) errs.expiry = 'MM/YY required';
+      if (cardCvv.length < 3) errs.cvv = '3-digit CVV required';
+
+      if (Object.keys(errs).length > 0) {
+        setCardErrors(errs);
+        return;
+      }
+      const last4 = cleanNum.slice(-4);
+      methodDisplay = `Credit/Debit Card (ending in •••• ${last4})`;
+    } else if (paymentMethod === 'netbanking') {
+      const bankNames = {
+        sbi: 'State Bank of India',
+        hdfc: 'HDFC Bank',
+        icici: 'ICICI Bank',
+        axis: 'Axis Bank',
+        pnb: 'Punjab National Bank',
+        kotak: 'Kotak Mahindra Bank'
+      };
+      methodDisplay = `Net Banking (${customBank || bankNames[selectedBank] || 'HDFC Bank'})`;
+    }
+
+    const txnId = `DS-PAY-${Math.floor(1000 + Math.random() * 9000)}-LL`;
+    const now = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+    setReceiptMeta({
+      txnId,
+      date: now,
+      method: methodDisplay,
+      amount: '₹220.00',
+      appId: 'IND-2026-98124'
+    });
+
+    centralDataStore.createPayment({
+      title: 'Learner Licence Application Fee',
+      amount: 220,
+      purpose: 'LL Application Fee',
+      method: methodDisplay,
+      breakdown: [
+        { label: 'Application Fee', fee: '₹150.00' },
+        { label: 'LL Test Fee', fee: '₹50.00' },
+        { label: 'Service Charge', fee: '₹20.00' }
+      ]
+    });
+
+    setPaid(true);
+  };
+
+  // SUCCESS SCREEN WITH COOL CELEBRATION ANIMATION
   if (paid) {
     return (
       <div className="page page-ll-payment-success" style={{ width: 'min(1184px, calc(100% - 48px))', margin: '36px auto', fontFamily: 'Inter, system-ui, sans-serif' }}>
         
-        {/* Top Stepper Bar (Details -> Documents -> Payment (Active Green) -> Approval) */}
+        {/* Top Stepper Bar */}
         <div style={{ background: '#ffffff', borderRadius: '16px', padding: '24px 48px', border: '1px solid #e2e8f0', boxShadow: '0 4px 16px rgba(0, 37, 66, 0.03)', marginBottom: '40px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative', maxWidth: '700px', margin: '0 auto' }}>
-            
-            {/* Background Line */}
             <div style={{ position: 'absolute', top: '16px', left: '30px', right: '30px', height: '3px', background: '#cbd5e1', zIndex: 0 }} />
-            
-            {/* Green Progress Line */}
             <div style={{ position: 'absolute', top: '16px', left: '30px', width: '66%', height: '3px', background: '#16a34a', zIndex: 1 }} />
 
             {[
@@ -923,37 +1260,40 @@ export function LLFeePaymentPage() {
           </div>
         </div>
 
-        {/* Center Success Header */}
-        <div style={{ textAlign: 'center', marginBottom: '36px' }}>
-          <div style={{
-            width: '80px',
-            height: '80px',
-            borderRadius: '50%',
-            background: '#dcfce7',
-            color: '#16a34a',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            margin: '0 auto 20px auto',
-            boxShadow: '0 0 0 8px rgba(22, 163, 74, 0.12)'
-          }}>
-            <Check size={44} strokeWidth={3} />
+        {/* Center Success Header with Radiating Animation */}
+        <div style={{ textAlign: 'center', marginBottom: '36px', position: 'relative' }}>
+          <div style={{ position: 'absolute', top: '10px', left: '30%', color: 'var(--color-saffron)' }} className="payment-sparkle">✦</div>
+          <div style={{ position: 'absolute', top: '20px', right: '32%', color: 'var(--color-teal)' }} className="payment-sparkle">✦</div>
+
+          <div
+            className="payment-success-badge-anim"
+            style={{
+              width: '84px',
+              height: '84px',
+              borderRadius: '50%',
+              background: '#dcfce7',
+              color: '#16a34a',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 20px auto'
+            }}
+          >
+            <div className="payment-checkmark-anim" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Check size={46} strokeWidth={3} />
+            </div>
           </div>
 
-          <h1 style={{ fontSize: '36px', fontWeight: 800, color: '#173b57', margin: '0 0 8px 0', letterSpacing: '-0.5px' }}>
+          <h1 style={{ fontSize: '36px', fontWeight: 800, color: '#102D43', margin: '0 0 8px 0', letterSpacing: '-0.5px' }}>
             {t('llFlow.paymentSuccessTitle') || 'Payment Successful'}
           </h1>
-          <p style={{ color: '#64748b', fontSize: '16px', maxWidth: '520px', margin: '0 auto', lineHeight: 1.5 }}>
-            Your payment of <strong>₹220.00</strong> has been recorded. Your application is now moving to the next stage.
+          <p style={{ color: '#607083', fontSize: '16px', maxWidth: '520px', margin: '0 auto', lineHeight: 1.5 }}>
+            Your fee of <strong>₹220.00</strong> has been confirmed by the gateway. Your test slot is now ready.
           </p>
         </div>
 
         {/* Transaction Receipt Card */}
         <div style={{ background: '#ffffff', borderRadius: '24px', padding: '32px', border: '1px solid #e2e8f0', boxShadow: '0 4px 20px rgba(0,37,66,0.04)', maxWidth: '640px', margin: '0 auto 36px auto', position: 'relative', overflow: 'hidden' }}>
-          
-          {/* Subtle Corner Decoration */}
-          <div style={{ position: 'absolute', top: 0, right: 0, width: '100px', height: '100px', background: '#f1f5f9', borderRadius: '0 0 0 100px', opacity: 0.6, pointerEvents: 'none' }} />
-
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '24px' }}>
             <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#eef6ff', color: '#173b57', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <FileText size={20} />
@@ -972,28 +1312,27 @@ export function LLFeePaymentPage() {
             <div>
               <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>TRANSACTION ID</div>
               <span style={{ background: '#f1f5f9', padding: '4px 10px', borderRadius: '6px', fontSize: '13px', fontWeight: 700, color: '#173b57' }}>
-                DS-PAY-9842-XKL
+                {receiptMeta?.txnId || 'DS-PAY-9842-XKL'}
               </span>
             </div>
 
             <div>
               <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>DATE & TIME</div>
-              <div style={{ fontWeight: 700, color: '#173b57', fontSize: '14px' }}>24 Aug 2024, 02:45 PM</div>
+              <div style={{ fontWeight: 700, color: '#173b57', fontSize: '14px' }}>{receiptMeta?.date || 'Just now'}</div>
             </div>
 
             <div>
               <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>APPLICATION NUMBER</div>
-              <div style={{ fontWeight: 800, color: '#173b57', fontSize: '14px' }}>DS-2409-KLM</div>
+              <div style={{ fontWeight: 800, color: '#173b57', fontSize: '14px' }}>IND-2026-98124</div>
             </div>
           </div>
 
           <div style={{ borderTop: '1px dashed #cbd5e1', paddingTop: '20px' }}>
             <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>PAYMENT METHOD</div>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: '#f8fafc', padding: '8px 14px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '13px', fontWeight: 700, color: '#173b57' }}>
-              <CreditCard size={16} /> UPI (GPay)
+              <CreditCard size={16} /> {receiptMeta?.method || 'UPI (Google Pay)'}
             </div>
           </div>
-
         </div>
 
         {/* LL Test Scenario Readiness Banner */}
@@ -1010,19 +1349,21 @@ export function LLFeePaymentPage() {
         </div>
 
         {/* Bottom Action Buttons */}
-        <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
+        <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
           <button
             onClick={() => navigate('/ll/assessment-cockpit')}
-            style={{ background: '#002542', color: '#ffffff', border: 'none', padding: '16px 32px', borderRadius: '12px', fontWeight: 800, fontSize: '15px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 14px rgba(0, 37, 66, 0.2)' }}
+            className="primary-button"
+            style={{ padding: '16px 32px', borderRadius: '12px', fontWeight: 800, fontSize: '15px', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
           >
             Start LL Test Scenario <ArrowRight size={18} />
           </button>
 
           <button
-            onClick={() => alert("Downloading official government fee receipt (PDF)...")}
-            style={{ background: '#ffffff', color: '#173b57', border: '1px solid #cbd5e1', padding: '16px 24px', borderRadius: '12px', fontWeight: 700, fontSize: '15px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
+            onClick={() => window.print()}
+            className="secondary-button"
+            style={{ padding: '16px 24px', borderRadius: '12px', fontWeight: 700, fontSize: '15px', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
           >
-            📥 Download Receipt
+            <Download size={16} /> Print / Save Receipt
           </button>
         </div>
 
@@ -1030,22 +1371,22 @@ export function LLFeePaymentPage() {
     );
   }
 
-  // Otherwise, render the 1:1 "Secure Payment" Screen (Image 1)
+  // MAIN CHECKOUT FORM SCREEN
   return (
     <div className="page page-ll-secure-payment" style={{ width: 'min(1184px, calc(100% - 48px))', margin: '36px auto', fontFamily: 'Inter, system-ui, sans-serif' }}>
       
       {/* Title Header & Badges */}
       <div style={{ marginBottom: '28px' }}>
-        <h1 style={{ fontSize: '32px', fontWeight: 800, color: '#173b57', margin: '0 0 12px 0', letterSpacing: '-0.5px' }}>
+        <h1 style={{ fontSize: '32px', fontWeight: 800, color: '#102D43', margin: '0 0 12px 0', letterSpacing: '-0.5px' }}>
           {t('llFlow.checkoutTitle') || 'Secure Payment'}
         </h1>
 
         <div style={{ display: 'flex', gap: '12px' }}>
           <span style={{ background: '#f1f5f9', border: '1px solid #e2e8f0', color: '#476179', padding: '6px 14px', borderRadius: '20px', fontSize: '13px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}>
-            🪪 App ID: DS-2409-KLM
+            🪪 App ID: IND-2026-98124
           </span>
           <span style={{ background: '#f1f5f9', border: '1px solid #e2e8f0', color: '#476179', padding: '6px 14px', borderRadius: '20px', fontSize: '13px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}>
-            📍 RTO Bangalore Central (KA-01)
+            📍 RTO Jamshedpur (JH-05)
           </span>
         </div>
       </div>
@@ -1060,118 +1401,207 @@ export function LLFeePaymentPage() {
           </h2>
 
           {/* Option 1: UPI (RECOMMENDED) */}
-          <div style={{ background: '#f8fafc', borderRadius: '16px', border: '1px solid #e2e8f0', overflow: 'hidden', marginBottom: '16px' }}>
-            <div style={{ background: '#eef6ff', padding: '16px 20px', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', fontWeight: 800, color: '#173b57', letterSpacing: '0.3px' }}>
-                📱 UPI (RECOMMENDED)
+          <div style={{ background: '#f8fafc', borderRadius: '16px', border: paymentMethod === 'upi' ? '2px solid var(--color-deep-navy)' : '1px solid #e2e8f0', overflow: 'hidden', marginBottom: '16px' }}>
+            <div style={{ background: '#eef6ff', padding: '16px 20px', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }} onClick={() => setPaymentMethod('upi')}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '14px', fontWeight: 800, color: '#173b57' }}>
+                📱 Instant UPI (GPay, PhonePe, Paytm, BHIM)
               </div>
-              <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: '#173b57', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Check size={13} strokeWidth={3} />
-              </div>
+              <span style={{ background: '#dcfce7', color: '#16a34a', fontSize: '11px', fontWeight: 800, padding: '4px 10px', borderRadius: '12px' }}>
+                FASTEST
+              </span>
             </div>
 
-            <div style={{ padding: '20px' }}>
-              
-              {/* 3 App Cards */}
-              <div className="grid-4col-to-2col" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '14px', marginBottom: '20px' }}>
+            {paymentMethod === 'upi' && (
+              <div style={{ padding: '20px' }}>
                 
-                {/* GPay */}
-                <div
-                  onClick={() => setSelectedUpiApp('gpay')}
-                  style={{
-                    border: selectedUpiApp === 'gpay' ? '2px solid #173b57' : '1px solid #e2e8f0',
-                    background: '#ffffff',
-                    borderRadius: '12px',
-                    padding: '16px 12px',
-                    textAlign: 'center',
-                    cursor: 'pointer',
-                    boxShadow: selectedUpiApp === 'gpay' ? '0 4px 12px rgba(23, 59, 87, 0.06)' : 'none'
-                  }}
-                >
-                  <div style={{ fontSize: '13px', fontWeight: 800, color: '#4285F4', marginBottom: '2px' }}>
-                    <span style={{ color: '#4285F4' }}>G</span><span style={{ color: '#EA4335' }}>P</span><span style={{ color: '#FBBC05' }}>a</span><span style={{ color: '#34A853' }}>y</span>
-                  </div>
-                  <span style={{ fontSize: '12px', fontWeight: 700, color: '#173b57' }}>GPay</span>
+                {/* 3 App Cards */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px', marginBottom: '20px' }}>
+                  {[
+                    { id: 'gpay', label: 'GPay', sub: 'Google Pay' },
+                    { id: 'phonepe', label: 'PhonePe', sub: 'PhonePe' },
+                    { id: 'paytm', label: 'Paytm', sub: 'Paytm' },
+                    { id: 'bhim', label: 'BHIM', sub: 'BHIM UPI' }
+                  ].map((app) => (
+                    <div
+                      key={app.id}
+                      onClick={() => setSelectedUpiApp(app.id)}
+                      style={{
+                        border: selectedUpiApp === app.id ? '2px solid #173b57' : '1px solid #e2e8f0',
+                        background: selectedUpiApp === app.id ? '#eef6ff' : '#ffffff',
+                        borderRadius: '12px',
+                        padding: '14px 8px',
+                        textAlign: 'center',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <div style={{ fontSize: '13px', fontWeight: 800, color: '#173b57' }}>{app.label}</div>
+                      <div style={{ fontSize: '10.5px', color: '#64748b', marginTop: '2px' }}>{app.sub}</div>
+                    </div>
+                  ))}
                 </div>
 
-                {/* PhonePe */}
-                <div
-                  onClick={() => setSelectedUpiApp('phonepe')}
-                  style={{
-                    border: selectedUpiApp === 'phonepe' ? '2px solid #173b57' : '1px solid #e2e8f0',
-                    background: '#ffffff',
-                    borderRadius: '12px',
-                    padding: '16px 12px',
-                    textAlign: 'center',
-                    cursor: 'pointer',
-                    boxShadow: selectedUpiApp === 'phonepe' ? '0 4px 12px rgba(23, 59, 87, 0.06)' : 'none'
-                  }}
-                >
-                  <div style={{ fontSize: '13px', fontWeight: 800, color: '#5f259f', marginBottom: '2px' }}>
-                    पे
+                {/* UPI ID entry */}
+                <div>
+                  <label style={{ fontSize: '12px', fontWeight: 700, color: '#476179', display: 'block', marginBottom: '8px' }}>
+                    Or enter UPI ID / VPA
+                  </label>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <input
+                      value={upiId}
+                      onChange={(e) => {
+                        setUpiId(e.target.value);
+                        setUpiVerified(false);
+                      }}
+                      placeholder="e.g. mobile@upi"
+                      style={{ flex: 1, padding: '12px 14px', borderRadius: '10px', border: '1px solid #e2e8f0', fontSize: '14px', background: '#ffffff', boxSizing: 'border-box' }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (upiId.includes('@')) setUpiVerified(true);
+                        else alert('Enter a valid UPI ID (e.g. user@okhdfcbank)');
+                      }}
+                      className="secondary-button"
+                      style={{ padding: '12px 16px', fontSize: '13px', fontWeight: 700 }}
+                    >
+                      {upiVerified ? '✓ Verified' : 'Verify'}
+                    </button>
                   </div>
-                  <span style={{ fontSize: '12px', fontWeight: 700, color: '#173b57' }}>PhonePe</span>
-                </div>
-
-                {/* Paytm */}
-                <div
-                  onClick={() => setSelectedUpiApp('paytm')}
-                  style={{
-                    border: selectedUpiApp === 'paytm' ? '2px solid #173b57' : '1px solid #e2e8f0',
-                    background: '#ffffff',
-                    borderRadius: '12px',
-                    padding: '16px 12px',
-                    textAlign: 'center',
-                    cursor: 'pointer',
-                    boxShadow: selectedUpiApp === 'paytm' ? '0 4px 12px rgba(23, 59, 87, 0.06)' : 'none'
-                  }}
-                >
-                  <div style={{ fontSize: '13px', fontWeight: 800, color: '#00baf2', marginBottom: '2px' }}>
-                    Paytm
-                  </div>
-                  <span style={{ fontSize: '12px', fontWeight: 700, color: '#173b57' }}>Paytm</span>
+                  {upiVerified && (
+                    <div style={{ fontSize: '12px', color: '#16a34a', fontWeight: 700, marginTop: '6px' }}>
+                      ✓ Verified: Yanshi Chauhan (HDFC Bank)
+                    </div>
+                  )}
                 </div>
 
               </div>
+            )}
+          </div>
 
-              {/* Or enter UPI ID */}
-              <div>
-                <label style={{ fontSize: '12px', fontWeight: 700, color: '#476179', display: 'block', marginBottom: '8px' }}>
-                  Or enter UPI ID
-                </label>
-                <div style={{ position: 'relative' }}>
+          {/* Option 2: Credit / Debit Card */}
+          <div style={{ background: '#ffffff', borderRadius: '16px', border: paymentMethod === 'card' ? '2px solid var(--color-deep-navy)' : '1px solid #e2e8f0', padding: '18px 20px', marginBottom: '14px', cursor: 'pointer' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} onClick={() => setPaymentMethod('card')}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '15px', fontWeight: 700, color: '#173b57' }}>
+                <div style={{ width: '18px', height: '18px', borderRadius: '50%', border: paymentMethod === 'card' ? '5px solid var(--color-deep-navy)' : '2px solid #cbd5e1', boxSizing: 'border-box' }} />
+                💳 Credit / Debit Card (Visa, Mastercard, RuPay)
+              </div>
+              <span style={{ fontSize: '11px', color: '#64748b' }}>All Cards</span>
+            </div>
+
+            {paymentMethod === 'card' && (
+              <div style={{ marginTop: '16px', borderTop: '1px solid #f1f5f9', paddingTop: '16px', display: 'grid', gap: '14px' }}>
+                <div>
+                  <label style={{ fontSize: '11px', fontWeight: 800, color: '#476179', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>CARD NUMBER</label>
                   <input
-                    value={upiId}
-                    onChange={(e) => setUpiId(e.target.value)}
-                    placeholder="username@upi"
-                    style={{ width: '100%', padding: '12px 90px 12px 14px', borderRadius: '10px', border: '1px solid #e2e8f0', fontSize: '14px', background: '#ffffff' }}
+                    type="text"
+                    placeholder="4532 •••• •••• ••••"
+                    value={cardNumber}
+                    onChange={handleCardNumberChange}
+                    style={{ width: '100%', padding: '12px 14px', borderRadius: '10px', border: cardErrors.number ? '1px solid #ef4444' : '1px solid #e2e8f0', fontSize: '14px', boxSizing: 'border-box' }}
                   />
-                  <button
-                    onClick={() => setVerifiedUpi(true)}
-                    style={{ position: 'absolute', right: '8px', top: '7px', background: 'none', border: 'none', color: '#173b57', fontWeight: 800, fontSize: '13px', cursor: 'pointer' }}
-                  >
-                    {verifiedUpi ? '✓ Verified' : 'Verify'}
-                  </button>
+                  {cardErrors.number && <div style={{ fontSize: '11.5px', color: '#ef4444', marginTop: '4px' }}>{cardErrors.number}</div>}
+                </div>
+
+                <div>
+                  <label style={{ fontSize: '11px', fontWeight: 800, color: '#476179', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>NAME ON CARD</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. YANSHI CHAUHAN"
+                    value={cardName}
+                    onChange={(e) => {
+                      setCardName(e.target.value.toUpperCase());
+                      if (cardErrors.name) setCardErrors(prev => ({ ...prev, name: null }));
+                    }}
+                    style={{ width: '100%', padding: '12px 14px', borderRadius: '10px', border: cardErrors.name ? '1px solid #ef4444' : '1px solid #e2e8f0', fontSize: '14px', boxSizing: 'border-box' }}
+                  />
+                  {cardErrors.name && <div style={{ fontSize: '11.5px', color: '#ef4444', marginTop: '4px' }}>{cardErrors.name}</div>}
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                  <div>
+                    <label style={{ fontSize: '11px', fontWeight: 800, color: '#476179', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>EXPIRY DATE</label>
+                    <input
+                      type="text"
+                      placeholder="MM/YY"
+                      value={cardExpiry}
+                      onChange={handleExpiryChange}
+                      style={{ width: '100%', padding: '12px 14px', borderRadius: '10px', border: cardErrors.expiry ? '1px solid #ef4444' : '1px solid #e2e8f0', fontSize: '14px', boxSizing: 'border-box' }}
+                    />
+                    {cardErrors.expiry && <div style={{ fontSize: '11.5px', color: '#ef4444', marginTop: '4px' }}>{cardErrors.expiry}</div>}
+                  </div>
+
+                  <div>
+                    <label style={{ fontSize: '11px', fontWeight: 800, color: '#476179', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>CVV</label>
+                    <input
+                      type="password"
+                      placeholder="•••"
+                      value={cardCvv}
+                      onChange={handleCvvChange}
+                      maxLength={3}
+                      style={{ width: '100%', padding: '12px 14px', borderRadius: '10px', border: cardErrors.cvv ? '1px solid #ef4444' : '1px solid #e2e8f0', fontSize: '14px', boxSizing: 'border-box' }}
+                    />
+                    {cardErrors.cvv && <div style={{ fontSize: '11.5px', color: '#ef4444', marginTop: '4px' }}>{cardErrors.cvv}</div>}
+                  </div>
                 </div>
               </div>
-
-            </div>
+            )}
           </div>
 
-          {/* Option 2: Net Banking */}
-          <div style={{ background: '#ffffff', borderRadius: '14px', border: '1px solid #e2e8f0', padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', cursor: 'pointer' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '14px', fontWeight: 700, color: '#173b57' }}>
-              🏛 Net Banking
+          {/* Option 3: Net Banking */}
+          <div style={{ background: '#ffffff', borderRadius: '16px', border: paymentMethod === 'netbanking' ? '2px solid var(--color-deep-navy)' : '1px solid #e2e8f0', padding: '18px 20px', cursor: 'pointer' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} onClick={() => setPaymentMethod('netbanking')}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '15px', fontWeight: 700, color: '#173b57' }}>
+                <div style={{ width: '18px', height: '18px', borderRadius: '50%', border: paymentMethod === 'netbanking' ? '5px solid var(--color-deep-navy)' : '2px solid #cbd5e1', boxSizing: 'border-box' }} />
+                🏛 Net Banking (All Indian Banks)
+              </div>
+              <span style={{ fontSize: '11px', color: '#64748b' }}>Instant</span>
             </div>
-            <span style={{ fontSize: '16px', color: '#64748b' }}>›</span>
-          </div>
 
-          {/* Option 3: Credit / Debit Card */}
-          <div style={{ background: '#ffffff', borderRadius: '14px', border: '1px solid #e2e8f0', padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '14px', fontWeight: 700, color: '#173b57' }}>
-              💳 Credit / Debit Card
-            </div>
-            <span style={{ fontSize: '16px', color: '#64748b' }}>›</span>
+            {paymentMethod === 'netbanking' && (
+              <div style={{ marginTop: '16px', borderTop: '1px solid #f1f5f9', paddingTop: '16px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', marginBottom: '14px' }}>
+                  {['HDFC Bank', 'SBI', 'ICICI Bank', 'Axis Bank', 'Kotak Bank', 'PNB'].map((bankName) => (
+                    <div
+                      key={bankName}
+                      onClick={() => {
+                        setSelectedBank(bankName.toLowerCase());
+                        setCustomBank('');
+                      }}
+                      style={{
+                        padding: '12px 8px',
+                        borderRadius: '10px',
+                        border: selectedBank === bankName.toLowerCase() && !customBank ? '2px solid var(--color-deep-navy)' : '1px solid #e2e8f0',
+                        background: selectedBank === bankName.toLowerCase() && !customBank ? '#eef6ff' : '#ffffff',
+                        textAlign: 'center',
+                        fontSize: '12px',
+                        fontWeight: 700,
+                        color: '#173b57',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {bankName}
+                    </div>
+                  ))}
+                </div>
+
+                <select
+                  value={customBank}
+                  onChange={(e) => {
+                    setCustomBank(e.target.value);
+                    setSelectedBank('');
+                  }}
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '13.5px', background: '#ffffff' }}
+                >
+                  <option value="">-- Or choose from other banks --</option>
+                  <option value="Bank of Baroda">Bank of Baroda</option>
+                  <option value="Canara Bank">Canara Bank</option>
+                  <option value="Union Bank of India">Union Bank of India</option>
+                  <option value="IndusInd Bank">IndusInd Bank</option>
+                  <option value="IDBI Bank">IDBI Bank</option>
+                  <option value="Federal Bank">Federal Bank</option>
+                </select>
+              </div>
+            )}
           </div>
 
         </div>
@@ -1205,26 +1635,23 @@ export function LLFeePaymentPage() {
           </div>
 
           <button
-            onClick={() => setPaid(true)}
+            type="button"
+            onClick={handleProcessPayment}
+            className="primary-button"
             style={{
               width: '100%',
-              background: '#002542',
-              color: '#ffffff',
-              border: 'none',
               padding: '14px',
               borderRadius: '10px',
               fontWeight: 800,
               fontSize: '15px',
-              cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               gap: '8px',
-              marginBottom: '16px',
-              boxShadow: '0 4px 12px rgba(0, 37, 66, 0.2)'
+              marginBottom: '16px'
             }}
           >
-            🔒 PAY ₹220.00
+            {paymentMethod === 'upi' ? '🔒 PAY ₹220.00 VIA UPI' : paymentMethod === 'card' ? '🔒 PAY ₹220.00 WITH CARD' : '🔒 PROCEED TO BANK (₹220.00)'}
           </button>
 
           <div style={{ textAlign: 'center', fontSize: '12px', color: '#16a34a', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
@@ -1238,14 +1665,15 @@ export function LLFeePaymentPage() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <button
           onClick={() => navigate('/ll/review')}
-          style={{ background: 'none', border: 'none', color: '#173b57', fontWeight: 700, fontSize: '14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+          className="secondary-button"
+          style={{ padding: '8px 16px', fontSize: '13.5px' }}
         >
           ← Cancel & Return
         </button>
 
         <button
           onClick={() => alert("Connecting to 24x7 RTO Citizen Support...")}
-          style={{ background: 'none', border: 'none', color: '#64748b', fontWeight: 700, fontSize: '14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+          style={{ background: 'none', border: 'none', color: '#64748b', fontWeight: 700, fontSize: '13px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
         >
           <HelpCircle size={16} /> Need Help?
         </button>

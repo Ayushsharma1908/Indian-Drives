@@ -537,234 +537,192 @@ export function DashboardPage() {
           >
             
             {/* CARD 01: STARTING FRESH */}
-            <div
+            <DestinationCard
+              step="01"
+              tag="STARTING FRESH"
+              title="I'm starting from scratch"
+              desc="I don't have a Learner Licence yet. Start your online Form 2 application with Aadhaar."
+              cta="Start with LL process"
+              icon={Car}
+              theme={{
+                baseBg: '#ffffff',
+                border: '#e2e8f0',
+                hoverBorder: '#818cf8',
+                hoverGlow: '0 10px 25px rgba(99, 102, 241, 0.12)',
+                iconBg: '#eef2ff',
+                iconBorder: '#e0e7ff',
+                iconColor: '#4f46e5',
+                accentColor: '#4f46e5'
+              }}
               onClick={() => navigate('/journey?stage=ll')}
-              className="card"
-              style={{
-                padding: '28px 24px',
-                display: 'flex',
-                flexDirection: 'column',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease'
+            />
+
+            {/* CARD 02: CONTINUE YOUR JOURNEY */}
+            <DestinationCard
+              step="02"
+              tag="CONTINUE YOUR JOURNEY"
+              title="I have a Learner Licence"
+              desc="Continue towards your Driving Licence and schedule your practical driving test."
+              cta="Start with DL process"
+              icon={FileText}
+              theme={{
+                baseBg: '#ffffff',
+                border: '#e2e8f0',
+                hoverBorder: '#fb923c',
+                hoverGlow: '0 10px 25px rgba(234, 88, 12, 0.12)',
+                iconBg: '#fff7ed',
+                iconBorder: '#ffedd5',
+                iconColor: '#ea580c',
+                accentColor: '#ea580c'
               }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-3px)';
-                e.currentTarget.style.borderColor = 'var(--color-slate-blue)';
-                e.currentTarget.style.boxShadow = 'var(--shadow-hover)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.borderColor = 'var(--color-border)';
-                e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
-              }}
-            >
-              <div
-                style={{
-                  width: '44px',
-                  height: '44px',
-                  borderRadius: '12px',
-                  background: 'var(--color-pale-indigo)',
-                  border: '1px solid var(--color-border)',
-                  color: 'var(--color-primary-navy)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginBottom: '16px'
-                }}
-              >
-                <Car size={22} />
-              </div>
-
-              <div
-                style={{
-                  fontSize: '11px',
-                  fontWeight: 700,
-                  letterSpacing: '0.8px',
-                  textTransform: 'uppercase',
-                  color: 'var(--color-text-secondary)',
-                  marginBottom: '8px'
-                }}
-              >
-                01 · STARTING FRESH
-              </div>
-
-              <h3 style={{ fontSize: '19px', fontWeight: 700, color: 'var(--color-deep-navy)', margin: '0 0 8px 0', lineHeight: 1.3 }}>
-                {"I'm starting from scratch"}
-              </h3>
-              <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', lineHeight: 1.6, margin: '0 0 24px 0', flexGrow: 1 }}>
-                {"I don't have a Learner Licence yet. Start your online Form 2 application with Aadhaar."}
-              </p>
-
-              <div
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  color: 'var(--color-primary-navy)',
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  marginTop: 'auto'
-                }}
-              >
-                <span>Start with LL</span>
-                <ArrowRight size={15} />
-              </div>
-            </div>
-
-            {/* CARD 02: CONTINUE YOUR JOURNEY (ACTIVE) */}
-            <div
               onClick={() => navigate('/journey?stage=dl')}
-              className="card"
-              style={{
-                padding: '28px 24px',
-                display: 'flex',
-                flexDirection: 'column',
-                cursor: 'pointer',
-                border: '1px solid var(--color-slate-blue)',
-                position: 'relative'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-3px)';
-                e.currentTarget.style.borderColor = 'var(--color-primary-navy)';
-                e.currentTarget.style.boxShadow = 'var(--shadow-hover)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.borderColor = 'var(--color-slate-blue)';
-                e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
-              }}
-            >
-              <div
-                style={{
-                  width: '44px',
-                  height: '44px',
-                  borderRadius: '12px',
-                  background: 'var(--color-pale-amber)',
-                  border: '1px solid #F6D8B0',
-                  color: 'var(--color-deep-navy)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginBottom: '16px'
-                }}
-              >
-                <FileText size={22} />
-              </div>
-
-              <div
-                style={{
-                  fontSize: '11px',
-                  fontWeight: 700,
-                  letterSpacing: '0.8px',
-                  textTransform: 'uppercase',
-                  color: 'var(--color-deep-navy)',
-                  marginBottom: '8px'
-                }}
-              >
-                02 · CONTINUE YOUR JOURNEY
-              </div>
-
-              <h3 style={{ fontSize: '19px', fontWeight: 700, color: 'var(--color-deep-navy)', margin: '0 0 8px 0', lineHeight: 1.3 }}>
-                I have a Learner Licence
-              </h3>
-              <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', lineHeight: 1.6, margin: '0 0 24px 0', flexGrow: 1 }}>
-                Continue towards your Driving Licence and schedule your practical driving test.
-              </p>
-
-              <div
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  color: 'var(--color-primary-navy)',
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  marginTop: 'auto'
-                }}
-              >
-                <span>Continue to DL</span>
-                <ArrowRight size={15} />
-              </div>
-            </div>
+            />
 
             {/* CARD 03: EXISTING LICENCE */}
-            <div
+            <DestinationCard
+              step="03"
+              tag="EXISTING LICENCE"
+              title="I already have a Driving Licence"
+              desc="Manage renewals, duplicate Smart Cards, address updates and citizen services."
+              cta="Manage Licence Services"
+              icon={Shield}
+              theme={{
+                baseBg: '#ffffff',
+                border: '#e2e8f0',
+                hoverBorder: '#34d399',
+                hoverGlow: '0 10px 25px rgba(16, 185, 129, 0.12)',
+                iconBg: '#ecfdf5',
+                iconBorder: '#d1fae5',
+                iconColor: '#059669',
+                accentColor: '#059669'
+              }}
               onClick={() => navigate('/licence-services')}
-              className="card"
-              style={{
-                padding: '28px 24px',
-                display: 'flex',
-                flexDirection: 'column',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-3px)';
-                e.currentTarget.style.borderColor = 'var(--color-slate-blue)';
-                e.currentTarget.style.boxShadow = 'var(--shadow-hover)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.borderColor = 'var(--color-border)';
-                e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
-              }}
-            >
-              <div
-                style={{
-                  width: '44px',
-                  height: '44px',
-                  borderRadius: '12px',
-                  background: 'var(--color-pale-teal)',
-                  border: '1px solid #B8E4DD',
-                  color: 'var(--color-teal)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginBottom: '16px'
-                }}
-              >
-                <Shield size={22} />
-              </div>
-
-              <div
-                style={{
-                  fontSize: '11px',
-                  fontWeight: 700,
-                  letterSpacing: '0.8px',
-                  textTransform: 'uppercase',
-                  color: 'var(--color-text-secondary)',
-                  marginBottom: '8px'
-                }}
-              >
-                03 · EXISTING LICENCE
-              </div>
-
-              <h3 style={{ fontSize: '19px', fontWeight: 700, color: 'var(--color-deep-navy)', margin: '0 0 8px 0', lineHeight: 1.3 }}>
-                I already have a Driving Licence
-              </h3>
-              <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', lineHeight: 1.6, margin: '0 0 24px 0', flexGrow: 1 }}>
-                Manage renewals, duplicate Smart Cards, address updates and citizen services.
-              </p>
-
-              <div
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  color: 'var(--color-primary-navy)',
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  marginTop: 'auto'
-                }}
-              >
-                <span>View licence services</span>
-                <ArrowRight size={15} />
-              </div>
-            </div>
+            />
 
           </div>
         </div>
 
+      </div>
+    </div>
+  );
+}
+
+function DestinationCard({ step, tag, title, desc, cta, icon: Icon, theme, onClick }) {
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <div
+      onClick={onClick}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      style={{
+        background: theme.baseBg,
+        borderRadius: '20px',
+        border: `1px solid ${isHovered ? theme.hoverBorder : theme.border}`,
+        padding: '30px 26px',
+        display: 'flex',
+        flexDirection: 'column',
+        cursor: 'pointer',
+        boxShadow: isHovered ? theme.hoverGlow : '0 2px 10px rgba(0, 37, 66, 0.03)',
+        transform: isHovered ? 'translateY(-5px)' : 'translateY(0)',
+        transition: 'all 0.22s cubic-bezier(0.16, 1, 0.3, 1)',
+        position: 'relative',
+        overflow: 'hidden'
+      }}
+    >
+      {/* Top subtle highlight line when hovered */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: '3px',
+          background: isHovered ? theme.hoverBorder : 'transparent',
+          transition: 'all 0.22s ease'
+        }}
+      />
+
+      <div
+        style={{
+          width: '46px',
+          height: '46px',
+          borderRadius: '14px',
+          background: isHovered ? theme.iconBg : 'var(--color-bg)',
+          border: `1px solid ${isHovered ? theme.iconBorder : 'var(--color-border)'}`,
+          color: isHovered ? theme.iconColor : 'var(--color-deep-navy)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginBottom: '18px',
+          transition: 'all 0.22s ease',
+          transform: isHovered ? 'scale(1.06)' : 'scale(1)'
+        }}
+      >
+        <Icon size={22} />
+      </div>
+
+      <div
+        style={{
+          fontSize: '11px',
+          fontWeight: 800,
+          letterSpacing: '1px',
+          textTransform: 'uppercase',
+          color: isHovered ? theme.accentColor : 'var(--color-text-secondary)',
+          marginBottom: '8px',
+          transition: 'color 0.2s ease'
+        }}
+      >
+        {step} · {tag}
+      </div>
+
+      <h3
+        style={{
+          fontSize: '20px',
+          fontWeight: 700,
+          color: 'var(--color-deep-navy)',
+          margin: '0 0 10px 0',
+          lineHeight: 1.3
+        }}
+      >
+        {title}
+      </h3>
+
+      <p
+        style={{
+          fontSize: '14px',
+          color: 'var(--color-text-secondary)',
+          lineHeight: 1.6,
+          margin: '0 0 24px 0',
+          flexGrow: 1
+        }}
+      >
+        {desc}
+      </p>
+
+      <div
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '8px',
+          color: isHovered ? theme.accentColor : 'var(--color-deep-navy)',
+          fontSize: '14.5px',
+          fontWeight: 700,
+          marginTop: 'auto',
+          transition: 'all 0.2s ease'
+        }}
+      >
+        <span>{cta}</span>
+        <span
+          style={{
+            display: 'inline-flex',
+            transform: isHovered ? 'translateX(6px)' : 'translateX(0)',
+            transition: 'transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1)',
+            color: isHovered ? theme.accentColor : 'var(--color-deep-navy)'
+          }}
+        >
+          <ArrowRight size={16} />
+        </span>
       </div>
     </div>
   );

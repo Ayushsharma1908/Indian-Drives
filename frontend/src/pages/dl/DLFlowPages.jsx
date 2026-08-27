@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import {
   Car, ShieldCheck, CheckCircle2, CalendarDays, MapPin, CreditCard, Clock,
   ArrowRight, ArrowLeft, Download, Check, Truck, Award, Lock, Info, Calendar,
-  User, FileText, Home, ExternalLink, Shield, Sparkles, Building2, HelpCircle
+  User, FileText, Home, ExternalLink, Shield, Sparkles, Building2, HelpCircle,
+  Search, Navigation, Compass, LocateFixed, SlidersHorizontal, Settings
 } from 'lucide-react';
 import { StatusBadge } from '../../components/ui/StatusBadge';
 import { centralDataStore } from '../../data/centralDataStore';
@@ -438,19 +439,53 @@ export function DLConfirmAddressPage() {
   const [isEditing, setIsEditing] = useState(false);
   const [unchanged, setUnchanged] = useState(true);
 
-  // Editable Address Form State
-  const [flatNo, setFlatNo] = useState('123, Sector 4, MG Road');
-  const [area, setArea] = useState('Indiranagar');
-  const [city, setCity] = useState('Bengaluru');
-  const [stateName, setStateName] = useState('Karnataka');
-  const [pincode, setPincode] = useState('560034');
-  const [docUploaded, setDocUploaded] = useState(true);
+  // Editable Current Address Form State
+  const initialAddress = centralDataStore.getDraftForm('dl_address') || {
+    flatNo: '28-A Royal Enclave',
+    area: 'Gautam Nagar',
+    city: 'Kashipur',
+    stateName: 'Uttarakhand',
+    pincode: '244713',
+    fullAddress: '28-A Royal Enclave, Gautam Nagar, Kashipur, Uttarakhand 244713'
+  };
+
+  const [flatNo, setFlatNo] = useState(initialAddress.flatNo || '28-A Royal Enclave');
+  const [area, setArea] = useState(initialAddress.area || 'Gautam Nagar');
+  const [city, setCity] = useState(initialAddress.city || 'Kashipur');
+  const [stateName, setStateName] = useState(initialAddress.stateName || 'Uttarakhand');
+  const [pincode, setPincode] = useState(initialAddress.pincode || '244713');
+
+  const getFullAddressObj = () => ({
+    flatNo,
+    area,
+    city,
+    stateName,
+    pincode,
+    fullAddress: `${flatNo}, ${area}, ${city}, ${stateName} – ${pincode}`,
+    unchanged
+  });
+
+  const handleConfirmAddress = () => {
+    const chosenAddress = getFullAddressObj();
+    centralDataStore.saveDraftForm('dl_address', chosenAddress);
+    navigate('/dl/documents');
+  };
 
   const handleSaveUpdatedAddress = (e) => {
     e.preventDefault();
     setUnchanged(false);
     setIsEditing(false);
-    alert("Updated address saved successfully! Proceeding to document verification.");
+    const updated = {
+      flatNo,
+      area,
+      city,
+      stateName,
+      pincode,
+      fullAddress: `${flatNo}, ${area}, ${city}, ${stateName} – ${pincode}`,
+      unchanged: false
+    };
+    centralDataStore.saveDraftForm('dl_address', updated);
+    alert("Address updated successfully! Proceeding to document verification.");
     navigate('/dl/documents');
   };
 
@@ -458,7 +493,7 @@ export function DLConfirmAddressPage() {
     <div className="page page-dl-address" style={{ width: 'min(1080px, calc(100% - 48px))', margin: '36px auto', fontFamily: 'Inter, system-ui, sans-serif' }}>
       
       {!isEditing ? (
-        /* NORMAL CONFIRM ADDRESS VIEW (IMAGE 4) */
+        /* NORMAL CONFIRM ADDRESS VIEW: ONE CLEAN VERIFIED ADDRESS CARD */
         <div className="responsive-split-grid grid-2col" style={{ display: 'grid', gridTemplateColumns: '380px 1fr', gap: '48px', alignItems: 'start', marginBottom: '40px' }}>
           
           {/* Left Column: Heading & Subtext */}
@@ -471,68 +506,48 @@ export function DLConfirmAddressPage() {
               Confirm your address
             </h1>
 
-            <p style={{ color: '#64748b', fontSize: '15px', lineHeight: 1.6, margin: '0 0 32px 0' }}>
-              We've retrieved your address from your Learner Licence. Please review the details below to ensure they are still accurate before proceeding.
+            <p style={{ color: '#64748b', fontSize: '15px', lineHeight: 1.6, margin: '0' }}>
+              We've retrieved your registered address from your Learner Licence. Please review the details below before booking your Driving Test.
             </p>
-
-            {/* Decorative Grid Pattern Box */}
-            <div style={{
-              width: '180px',
-              height: '180px',
-              border: '2px dashed #cbd5e1',
-              borderRadius: '16px',
-              backgroundImage: 'radial-gradient(#cbd5e1 1px, transparent 1px)',
-              backgroundSize: '16px 16px',
-              opacity: 0.6
-            }} />
           </div>
 
-          {/* Right Column: Address Cards & Actions */}
+          {/* Right Column: Address Card & Actions */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             
-            {/* Current Address Card */}
+            {/* Single Verified Address Card */}
             <div style={{
               background: '#ffffff',
               borderRadius: '20px',
-              padding: '24px 28px',
-              border: '1px solid #e2e8f0',
-              boxShadow: '0 4px 16px rgba(0, 37, 66, 0.03)'
+              padding: '28px 32px',
+              border: '2px solid #002542',
+              boxShadow: '0 6px 24px rgba(0, 37, 66, 0.05)',
+              position: 'relative'
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '18px', fontWeight: 800, color: '#173b57' }}>
-                  <MapPin size={20} color="#002542" /> Current Address
+                  <MapPin size={22} color="#e88a2d" /> Registered Address
                 </div>
-                {!unchanged && (
-                  <span style={{ background: '#fff7ed', color: '#e88a2d', fontSize: '11px', fontWeight: 800, padding: '4px 10px', borderRadius: '12px' }}>
-                    Updated Address
-                  </span>
-                )}
-              </div>
-              <p style={{ margin: 0, fontSize: '15px', color: '#476179', lineHeight: 1.6, paddingLeft: '30px' }}>
-                {flatNo}, {area},<br />
-                {city}, {stateName} {pincode}
-              </p>
-            </div>
 
-            {/* Permanent Address Card */}
-            <div style={{
-              background: '#ffffff',
-              borderRadius: '20px',
-              padding: '24px 28px',
-              border: '1px solid #e2e8f0',
-              boxShadow: '0 4px 16px rgba(0, 37, 66, 0.03)'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '18px', fontWeight: 800, color: '#173b57', marginBottom: '12px' }}>
-                <Home size={20} color="#002542" /> Permanent Address
+                <span style={{ background: '#f0fdf4', color: '#16a34a', border: '1px solid #bbf7d0', fontSize: '11px', fontWeight: 800, padding: '4px 12px', borderRadius: '14px', letterSpacing: '0.4px' }}>
+                  ● Verified from LL Record
+                </span>
               </div>
-              <p style={{ margin: 0, fontSize: '15px', color: '#476179', lineHeight: 1.6, paddingLeft: '30px' }}>
-                45, Model Town, Civil Lines,<br />
-                New Delhi, Delhi 110009
-              </p>
+
+              <div style={{ paddingLeft: '32px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <div style={{ fontSize: '16px', fontWeight: 700, color: '#173b57' }}>
+                  {flatNo}, {area}
+                </div>
+                <div style={{ fontSize: '15px', color: '#476179', fontWeight: 600 }}>
+                  {city}, {stateName} – {pincode}
+                </div>
+                <div style={{ fontSize: '13px', color: '#94a3b8', marginTop: '4px' }}>
+                  District: Udham Singh Nagar · Kumaon Division
+                </div>
+              </div>
             </div>
 
             {/* Unchanged Checkbox */}
-            <label style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', margin: '8px 0', select: 'none' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', margin: '4px 0', userSelect: 'none' }}>
               <div style={{
                 width: '20px',
                 height: '20px',
@@ -552,9 +567,9 @@ export function DLConfirmAddressPage() {
             </label>
 
             {/* Action Buttons */}
-            <div style={{ display: 'flex', gap: '16px', marginTop: '12px' }}>
+            <div style={{ display: 'flex', gap: '16px', marginTop: '8px' }}>
               <button
-                onClick={() => navigate('/dl/documents')}
+                onClick={handleConfirmAddress}
                 style={{
                   background: '#002542',
                   color: '#ffffff',
@@ -876,120 +891,243 @@ export function DLPaymentCheckoutPage() {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const [paid, setPaid] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState('upi');
-  const [upiId, setUpiId] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('upi'); // 'upi' | 'card' | 'netbanking'
 
+  // UPI State
+  const [selectedUpiApp, setSelectedUpiApp] = useState('gpay');
+  const [upiId, setUpiId] = useState('');
+  const [upiVerified, setUpiVerified] = useState(false);
+  const [upiMode, setUpiMode] = useState('apps'); // 'apps' | 'id' | 'qr'
+
+  // Card State
+  const [cardNumber, setCardNumber] = useState('');
+  const [cardName, setCardName] = useState('');
+  const [cardExpiry, setCardExpiry] = useState('');
+  const [cardCvv, setCardCvv] = useState('');
+  const [cardErrors, setCardErrors] = useState({});
+
+  // Net Banking State
+  const [selectedBank, setSelectedBank] = useState('hdfc');
+  const [customBank, setCustomBank] = useState('');
+
+  // Successful receipt metadata
+  const [receiptMeta, setReceiptMeta] = useState(null);
+
+  // Card Number Formatter
+  const handleCardNumberChange = (e) => {
+    const val = e.target.value.replace(/\D/g, '').slice(0, 16);
+    const formatted = val.match(/.{1,4}/g)?.join(' ') || val;
+    setCardNumber(formatted);
+    if (cardErrors.number) setCardErrors(prev => ({ ...prev, number: null }));
+  };
+
+  // Expiry Formatter
+  const handleExpiryChange = (e) => {
+    let val = e.target.value.replace(/\D/g, '').slice(0, 4);
+    if (val.length >= 3) {
+      val = `${val.slice(0, 2)}/${val.slice(2)}`;
+    }
+    setCardExpiry(val);
+    if (cardErrors.expiry) setCardErrors(prev => ({ ...prev, expiry: null }));
+  };
+
+  // CVV Formatter
+  const handleCvvChange = (e) => {
+    const val = e.target.value.replace(/\D/g, '').slice(0, 3);
+    setCardCvv(val);
+    if (cardErrors.cvv) setCardErrors(prev => ({ ...prev, cvv: null }));
+  };
+
+  const handleProcessPayment = () => {
+    let methodDisplay = 'UPI (Google Pay)';
+
+    if (paymentMethod === 'upi') {
+      if (upiMode === 'id') {
+        if (!upiId.trim() || !upiId.includes('@')) {
+          alert('Please enter a valid UPI ID (e.g. yourname@okhdfcbank)');
+          return;
+        }
+        methodDisplay = `UPI (${upiId})`;
+      } else if (upiMode === 'qr') {
+        methodDisplay = 'UPI (QR Code Scan)';
+      } else {
+        const appNames = { gpay: 'Google Pay', phonepe: 'PhonePe', paytm: 'Paytm', bhim: 'BHIM UPI' };
+        methodDisplay = `UPI (${appNames[selectedUpiApp] || 'Google Pay'})`;
+      }
+    } else if (paymentMethod === 'card') {
+      const errs = {};
+      const cleanNum = cardNumber.replace(/\s/g, '');
+      if (cleanNum.length < 16) errs.number = 'Enter a valid 16-digit card number';
+      if (!cardName.trim()) errs.name = 'Cardholder name is required';
+      if (cardExpiry.length < 5) errs.expiry = 'MM/YY required';
+      if (cardCvv.length < 3) errs.cvv = '3-digit CVV required';
+
+      if (Object.keys(errs).length > 0) {
+        setCardErrors(errs);
+        return;
+      }
+      const last4 = cleanNum.slice(-4);
+      methodDisplay = `Credit/Debit Card (ending in •••• ${last4})`;
+    } else if (paymentMethod === 'netbanking') {
+      const bankNames = {
+        sbi: 'State Bank of India',
+        hdfc: 'HDFC Bank',
+        icici: 'ICICI Bank',
+        axis: 'Axis Bank',
+        pnb: 'Punjab National Bank',
+        kotak: 'Kotak Mahindra Bank'
+      };
+      methodDisplay = `Net Banking (${customBank || bankNames[selectedBank] || 'HDFC Bank'})`;
+    }
+
+    const txnId = `DS-PAY-${Math.floor(1000 + Math.random() * 9000)}-DL`;
+    const now = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+    setReceiptMeta({
+      txnId,
+      date: now,
+      method: methodDisplay,
+      amount: '₹700.00',
+      appId: 'IND-2026-98124'
+    });
+
+    centralDataStore.createPayment({
+      title: 'Driving Licence Application & Test Fee',
+      amount: 700,
+      purpose: 'DL Application Fee',
+      method: methodDisplay,
+      breakdown: [
+        { label: 'DL Form Fee (Form 7)', fee: '₹200.00' },
+        { label: 'Automated Track Test Fee', fee: '₹300.00' },
+        { label: 'Smartcard Licence Printing', fee: '₹200.00' }
+      ]
+    });
+
+    setPaid(true);
+  };
+
+  // SUCCESS SCREEN WITH COOL CELEBRATION ANIMATION
   if (paid) {
     return (
       <div className="page page-dl-payment-success" style={{ width: 'min(760px, calc(100% - 48px))', margin: '40px auto', fontFamily: 'Inter, system-ui, sans-serif' }}>
-        <div style={{ background: '#ffffff', borderRadius: '24px', padding: '40px', border: '1px solid #e2e8f0', boxShadow: '0 6px 24px rgba(0, 37, 66, 0.05)', textAlign: 'center' }}>
+        <div style={{ background: '#ffffff', borderRadius: '24px', padding: '44px 36px', border: '1px solid #e2e8f0', boxShadow: '0 10px 30px rgba(16, 45, 67, 0.08)', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
           
-          {/* Success Icon */}
-          <div style={{
-            width: '72px',
-            height: '72px',
-            borderRadius: '50%',
-            background: '#dcfce7',
-            color: '#16a34a',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            margin: '0 auto 20px auto',
-            boxShadow: '0 0 0 8px #f0fdf4'
-          }}>
-            <CheckCircle2 size={42} strokeWidth={2.5} />
+          {/* Animated Ambient Sparkles */}
+          <div style={{ position: 'absolute', top: '24px', left: '20%', color: 'var(--color-saffron)' }} className="payment-sparkle">✦</div>
+          <div style={{ position: 'absolute', top: '40px', right: '22%', color: 'var(--color-teal)' }} className="payment-sparkle">✦</div>
+          <div style={{ position: 'absolute', top: '90px', left: '15%', color: 'var(--color-indigo)' }} className="payment-sparkle">✦</div>
+          <div style={{ position: 'absolute', top: '100px', right: '16%', color: 'var(--color-warm-amber)' }} className="payment-sparkle">✦</div>
+
+          {/* Animated Success Checkmark Badge with Concentric Ripples */}
+          <div
+            className="payment-success-badge-anim"
+            style={{
+              width: '84px',
+              height: '84px',
+              borderRadius: '50%',
+              background: '#dcfce7',
+              color: '#16a34a',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 24px auto'
+            }}
+          >
+            <div className="payment-checkmark-anim" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <CheckCircle2 size={48} strokeWidth={2.6} />
+            </div>
           </div>
 
-          <h1 style={{ fontSize: '32px', fontWeight: 800, color: '#173b57', margin: '0 0 8px 0', letterSpacing: '-0.5px' }}>
+          <div style={{ display: 'inline-block', background: '#f0fdf4', border: '1px solid #bbf7d0', color: '#16a34a', padding: '4px 14px', borderRadius: '20px', fontSize: '11px', fontWeight: 800, letterSpacing: '0.8px', textTransform: 'uppercase', marginBottom: '12px' }}>
+            GOVERNMENT PAYMENT VERIFIED ✓
+          </div>
+
+          <h1 style={{ fontSize: '32px', fontWeight: 800, color: '#102D43', margin: '0 0 8px 0', letterSpacing: '-0.6px' }}>
             {t('dlFlow.paymentSuccessTitle') || 'Payment Successful!'}
           </h1>
 
-          <p style={{ color: '#64748b', fontSize: '15px', margin: '0 auto 32px auto', maxWidth: '520px', lineHeight: 1.5 }}>
-            Your transaction has been processed securely. A confirmation email and SMS have been sent with your official payment receipt.
+          <p style={{ color: '#607083', fontSize: '15px', margin: '0 auto 32px auto', maxWidth: '520px', lineHeight: 1.5 }}>
+            Your fee has been received and credited to the Transport Department account. Your practical driving test booking is now unlocked.
           </p>
 
           {/* Detailed Receipt Card */}
-          <div style={{ background: '#f8fafc', borderRadius: '20px', border: '1px solid #e2e8f0', padding: '28px', marginBottom: '32px', textAlign: 'left' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e2e8f0', paddingBottom: '16px', marginBottom: '20px' }}>
-              <span style={{ fontSize: '12px', fontWeight: 800, color: '#002542', textTransform: 'uppercase', letterSpacing: '0.8px' }}>
-                TRANSACTION RECEIPT
+          <div style={{ background: 'var(--color-bg)', borderRadius: '20px', border: '1px solid var(--color-border)', padding: '28px', marginBottom: '32px', textAlign: 'left' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--color-border)', paddingBottom: '16px', marginBottom: '20px', flexWrap: 'wrap', gap: '8px' }}>
+              <span style={{ fontSize: '12px', fontWeight: 800, color: 'var(--color-deep-navy)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>
+                OFFICIAL TRANSACTION RECEIPT
               </span>
-              <span style={{ fontSize: '12px', fontWeight: 700, color: '#64748b' }}>
-                RECEIPT ID: DS-PAY-9844-DL
+              <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)' }}>
+                RECEIPT ID: <strong style={{ color: 'var(--color-text-primary)' }}>{receiptMeta?.txnId || 'DS-PAY-9844-DL'}</strong>
               </span>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px 32px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px 28px' }}>
               <div>
-                <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Transaction ID</div>
-                <div style={{ fontSize: '15px', fontWeight: 700, color: '#173b57', marginTop: '4px' }}>DS-PAY-9844-DL</div>
+                <div style={{ fontSize: '11px', fontWeight: 800, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Transaction ID</div>
+                <div style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-deep-navy)', marginTop: '4px' }}>{receiptMeta?.txnId || 'DS-PAY-9844-DL'}</div>
               </div>
 
               <div>
-                <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Date & Time</div>
-                <div style={{ fontSize: '15px', fontWeight: 700, color: '#173b57', marginTop: '4px' }}>24 Aug 2026, 04:15 PM</div>
+                <div style={{ fontSize: '11px', fontWeight: 800, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Date & Time</div>
+                <div style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-deep-navy)', marginTop: '4px' }}>{receiptMeta?.date || 'Just now'}</div>
               </div>
 
               <div>
-                <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Application Number</div>
-                <div style={{ fontSize: '15px', fontWeight: 700, color: '#173b57', marginTop: '4px' }}>DS-2409-KLM</div>
+                <div style={{ fontSize: '11px', fontWeight: 800, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Application Number</div>
+                <div style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-deep-navy)', marginTop: '4px' }}>{receiptMeta?.appId || 'IND-2026-98124'}</div>
               </div>
 
               <div>
-                <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Payment Method</div>
-                <div style={{ fontSize: '15px', fontWeight: 700, color: '#173b57', marginTop: '4px' }}>UPI (GPay - 98****12@upi)</div>
+                <div style={{ fontSize: '11px', fontWeight: 800, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Payment Mode Used</div>
+                <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-deep-navy)', marginTop: '4px' }}>{receiptMeta?.method || 'UPI (Google Pay)'}</div>
               </div>
 
               <div>
-                <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Amount Paid</div>
-                <div style={{ fontSize: '20px', fontWeight: 800, color: '#002542', marginTop: '2px' }}>₹700.00</div>
+                <div style={{ fontSize: '11px', fontWeight: 800, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Total Amount Paid</div>
+                <div style={{ fontSize: '22px', fontWeight: 800, color: 'var(--color-deep-navy)', marginTop: '2px' }}>₹700.00</div>
               </div>
 
               <div>
-                <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Payment Status</div>
+                <div style={{ fontSize: '11px', fontWeight: 800, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Gateway Status</div>
                 <div style={{ fontSize: '14px', fontWeight: 800, color: '#16a34a', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#16a34a' }} /> SUCCESS
+                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#16a34a' }} /> VERIFIED & CREDITED
                 </div>
               </div>
             </div>
           </div>
 
           {/* Action Buttons */}
-          <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
+          <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
             <button
               onClick={() => navigate('/dl/test-center')}
+              className="primary-button"
               style={{
-                background: '#002542',
-                color: '#ffffff',
-                border: 'none',
                 padding: '16px 32px',
                 borderRadius: '12px',
                 fontWeight: 800,
                 fontSize: '15px',
-                cursor: 'pointer',
-                display: 'flex',
+                display: 'inline-flex',
                 alignItems: 'center',
-                gap: '8px',
-                boxShadow: '0 4px 14px rgba(0, 37, 66, 0.2)'
+                gap: '8px'
               }}
             >
               Select Driving Test RTO & Slot <ArrowRight size={18} />
             </button>
 
             <button
-              onClick={() => alert("Downloading official RTO Payment Receipt PDF...")}
+              onClick={() => window.print()}
+              className="secondary-button"
               style={{
-                background: '#ffffff',
-                color: '#173b57',
-                border: '1px solid #cbd5e1',
                 padding: '16px 24px',
                 borderRadius: '12px',
                 fontWeight: 700,
                 fontSize: '15px',
-                cursor: 'pointer'
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px'
               }}
             >
-              📥 Download Receipt
+              <Download size={16} /> Print / Save Receipt
             </button>
           </div>
 
@@ -998,31 +1136,32 @@ export function DLPaymentCheckoutPage() {
     );
   }
 
+  // MAIN CHECKOUT FORM SCREEN
   return (
     <div className="page page-dl-payment" style={{ width: 'min(1080px, calc(100% - 48px))', margin: '36px auto', fontFamily: 'Inter, system-ui, sans-serif' }}>
       
       {/* Header Section */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '32px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '32px', flexWrap: 'wrap', gap: '16px' }}>
         <div>
-          <div style={{ fontSize: '11px', fontWeight: 800, color: '#e88a2d', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '6px' }}>
+          <div style={{ fontSize: '11px', fontWeight: 800, color: 'var(--color-saffron)', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '6px' }}>
             STEP 4 OF 5 · SECURE PAYMENT
           </div>
 
-          <h1 style={{ fontSize: '32px', fontWeight: 800, color: '#173b57', margin: 0, letterSpacing: '-0.5px' }}>
+          <h1 style={{ fontSize: '32px', fontWeight: 800, color: 'var(--color-deep-navy)', margin: 0, letterSpacing: '-0.5px' }}>
             Secure Payment
           </h1>
 
-          <p style={{ color: '#64748b', fontSize: '14px', margin: '4px 0 0 0' }}>
-            Application ID: <strong style={{ color: '#173b57' }}>DS-2409-KLM</strong> • RTO Bengaluru Central KA-01
+          <p style={{ color: 'var(--color-text-secondary)', fontSize: '14px', margin: '4px 0 0 0' }}>
+            Application ID: <strong style={{ color: 'var(--color-deep-navy)' }}>IND-2026-98124</strong> • Jamshedpur RTO (JH-05)
           </p>
         </div>
 
         <div style={{ display: 'flex', gap: '12px' }}>
-          <span style={{ background: '#ffffff', border: '1px solid #e2e8f0', color: '#173b57', padding: '8px 16px', borderRadius: '20px', fontSize: '12px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <span style={{ background: '#ffffff', border: '1px solid var(--color-border)', color: 'var(--color-deep-navy)', padding: '8px 16px', borderRadius: '20px', fontSize: '12px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}>
             🔒 256-bit Encrypted
           </span>
-          <span style={{ background: '#e0f2fe', color: '#0369a1', padding: '8px 16px', borderRadius: '20px', fontSize: '12px', fontWeight: 700 }}>
-            RTO Verified
+          <span style={{ background: 'var(--color-pale-teal)', color: 'var(--color-teal)', padding: '8px 16px', borderRadius: '20px', fontSize: '12px', fontWeight: 700 }}>
+            RTO Verified Gateway
           </span>
         </div>
       </div>
@@ -1032,7 +1171,7 @@ export function DLPaymentCheckoutPage() {
         
         {/* Left Column: Payment Options */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <span style={{ fontSize: '13px', fontWeight: 800, color: '#173b57', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+          <span style={{ fontSize: '13px', fontWeight: 800, color: 'var(--color-deep-navy)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
             SELECT PAYMENT METHOD
           </span>
 
@@ -1040,131 +1179,385 @@ export function DLPaymentCheckoutPage() {
           <div style={{
             background: '#ffffff',
             borderRadius: '16px',
-            border: paymentMethod === 'upi' ? '2px solid #002542' : '1px solid #e2e8f0',
+            border: paymentMethod === 'upi' ? '2px solid var(--color-deep-navy)' : '1px solid var(--color-border)',
             padding: '20px',
-            boxShadow: paymentMethod === 'upi' ? '0 4px 16px rgba(0, 37, 66, 0.08)' : 'none'
+            boxShadow: paymentMethod === 'upi' ? '0 4px 16px rgba(16, 45, 67, 0.08)' : 'none',
+            transition: 'all 0.2s ease'
           }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', cursor: 'pointer' }} onClick={() => setPaymentMethod('upi')}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '16px', fontWeight: 700, color: '#173b57' }}>
-                <div style={{ width: '18px', height: '18px', borderRadius: '50%', border: paymentMethod === 'upi' ? '5px solid #002542' : '2px solid #cbd5e1' }} />
-                ⚡ UPI (GPay, PhonePe, Paytm, BHIM)
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }} onClick={() => setPaymentMethod('upi')}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '16px', fontWeight: 700, color: 'var(--color-deep-navy)' }}>
+                <div style={{ width: '18px', height: '18px', borderRadius: '50%', border: paymentMethod === 'upi' ? '5px solid var(--color-deep-navy)' : '2px solid var(--color-border)', boxSizing: 'border-box' }} />
+                ⚡ Instant UPI (GPay, PhonePe, Paytm, BHIM)
               </div>
               <span style={{ background: '#dcfce7', color: '#16a34a', fontSize: '11px', fontWeight: 800, padding: '4px 10px', borderRadius: '12px' }}>
-                RECOMMENDED
+                FASTEST
               </span>
             </div>
 
             {paymentMethod === 'upi' && (
-              <div style={{ paddingLeft: '30px', marginTop: '12px' }}>
-                <div style={{ display: 'flex', gap: '10px', marginBottom: '16px' }}>
-                  {['Google Pay', 'PhonePe', 'Paytm', 'BHIM'].map((app, idx) => (
-                    <div key={idx} style={{ background: '#f8fafc', border: '1px solid #e2e8f0', padding: '8px 14px', borderRadius: '10px', fontSize: '12px', fontWeight: 700, color: '#173b57' }}>
-                      {app}
-                    </div>
-                  ))}
-                </div>
-
-                <label style={{ fontSize: '11px', fontWeight: 800, color: '#476179', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>
-                  ENTER YOUR VPA / UPI ID
-                </label>
-                <div style={{ display: 'flex', gap: '10px' }}>
-                  <input
-                    type="text"
-                    placeholder="username@upi"
-                    value={upiId}
-                    onChange={(e) => setUpiId(e.target.value)}
-                    style={{ flex: 1, padding: '12px 16px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '14px', fontWeight: 600, color: '#173b57' }}
-                  />
-                  <button style={{ background: '#f1f5f9', border: '1px solid #cbd5e1', padding: '12px 20px', borderRadius: '10px', fontWeight: 700, fontSize: '13px', color: '#173b57', cursor: 'pointer' }}>
-                    Verify
+              <div style={{ paddingLeft: '30px', marginTop: '16px', borderTop: '1px solid var(--color-border-subtle)', paddingTop: '16px' }}>
+                
+                {/* Mode Switcher: Apps vs Custom ID vs QR Code */}
+                <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+                  <button
+                    type="button"
+                    onClick={() => setUpiMode('apps')}
+                    style={{
+                      padding: '6px 14px',
+                      borderRadius: '8px',
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      border: upiMode === 'apps' ? '1px solid var(--color-deep-navy)' : '1px solid var(--color-border)',
+                      background: upiMode === 'apps' ? 'var(--color-deep-navy)' : '#ffffff',
+                      color: upiMode === 'apps' ? '#ffffff' : 'var(--color-text-secondary)',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    UPI Apps
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setUpiMode('id')}
+                    style={{
+                      padding: '6px 14px',
+                      borderRadius: '8px',
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      border: upiMode === 'id' ? '1px solid var(--color-deep-navy)' : '1px solid var(--color-border)',
+                      background: upiMode === 'id' ? 'var(--color-deep-navy)' : '#ffffff',
+                      color: upiMode === 'id' ? '#ffffff' : 'var(--color-text-secondary)',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    UPI ID / VPA
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setUpiMode('qr')}
+                    style={{
+                      padding: '6px 14px',
+                      borderRadius: '8px',
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      border: upiMode === 'qr' ? '1px solid var(--color-deep-navy)' : '1px solid var(--color-border)',
+                      background: upiMode === 'qr' ? 'var(--color-deep-navy)' : '#ffffff',
+                      color: upiMode === 'qr' ? '#ffffff' : 'var(--color-text-secondary)',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Scan QR
                   </button>
                 </div>
+
+                {upiMode === 'apps' && (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px' }}>
+                    {[
+                      { id: 'gpay', label: 'Google Pay', badge: 'GPay' },
+                      { id: 'phonepe', label: 'PhonePe', badge: 'PhonePe' },
+                      { id: 'paytm', label: 'Paytm', badge: 'Paytm' },
+                      { id: 'bhim', label: 'BHIM UPI', badge: 'BHIM' }
+                    ].map((app) => (
+                      <div
+                        key={app.id}
+                        onClick={() => setSelectedUpiApp(app.id)}
+                        style={{
+                          background: selectedUpiApp === app.id ? 'var(--color-pale-indigo)' : '#ffffff',
+                          border: selectedUpiApp === app.id ? '2px solid var(--color-deep-navy)' : '1px solid var(--color-border)',
+                          padding: '12px 8px',
+                          borderRadius: '10px',
+                          textAlign: 'center',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        <div style={{ fontSize: '13px', fontWeight: 800, color: 'var(--color-deep-navy)' }}>{app.badge}</div>
+                        <div style={{ fontSize: '10.5px', color: 'var(--color-text-secondary)', marginTop: '2px' }}>{app.label}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {upiMode === 'id' && (
+                  <div>
+                    <label style={{ fontSize: '11px', fontWeight: 800, color: 'var(--color-text-secondary)', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>
+                      ENTER YOUR VPA / UPI ID
+                    </label>
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                      <input
+                        type="text"
+                        placeholder="e.g. username@okhdfcbank"
+                        value={upiId}
+                        onChange={(e) => {
+                          setUpiId(e.target.value);
+                          setUpiVerified(false);
+                        }}
+                        style={{ flex: 1, padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--color-border)', fontSize: '14px', fontWeight: 600, color: 'var(--color-deep-navy)', boxSizing: 'border-box' }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (upiId.includes('@')) setUpiVerified(true);
+                          else alert('Enter a valid UPI ID (e.g. mobile@upi)');
+                        }}
+                        className="secondary-button"
+                        style={{ padding: '12px 18px', fontSize: '13px', fontWeight: 700 }}
+                      >
+                        {upiVerified ? '✓ Verified' : 'Verify'}
+                      </button>
+                    </div>
+                    {upiVerified && (
+                      <div style={{ fontSize: '12px', color: '#16a34a', fontWeight: 700, marginTop: '6px' }}>
+                        ✓ Verified: Yanshi Chauhan (HDFC Bank)
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {upiMode === 'qr' && (
+                  <div style={{ textAlign: 'center', padding: '12px', background: 'var(--color-bg)', borderRadius: '12px', border: '1px solid var(--color-border)' }}>
+                    <div style={{ display: 'inline-block', background: '#ffffff', padding: '12px', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
+                      <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="var(--color-deep-navy)" strokeWidth="1.5">
+                        <rect x="3" y="3" width="7" height="7" rx="1" />
+                        <rect x="14" y="3" width="7" height="7" rx="1" />
+                        <rect x="3" y="14" width="7" height="7" rx="1" />
+                        <rect x="14" y="14" width="3" height="3" />
+                        <rect x="18" y="14" width="3" height="3" />
+                        <rect x="14" y="18" width="7" height="3" />
+                      </svg>
+                    </div>
+                    <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-deep-navy)', marginTop: '8px' }}>
+                      Scan QR using any UPI App (GPay, Paytm, PhonePe, Cred)
+                    </div>
+                  </div>
+                )}
+
               </div>
             )}
           </div>
 
-          {/* Option 2: Net Banking */}
-          <div style={{ background: '#ffffff', borderRadius: '16px', border: '1px solid #e2e8f0', padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }} onClick={() => setPaymentMethod('netbanking')}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '15px', fontWeight: 700, color: '#173b57' }}>
-              <div style={{ width: '18px', height: '18px', borderRadius: '50%', border: paymentMethod === 'netbanking' ? '5px solid #002542' : '2px solid #cbd5e1' }} />
-              🏦 Net Banking (All Indian Banks)
+          {/* Option 2: Credit / Debit Card */}
+          <div style={{
+            background: '#ffffff',
+            borderRadius: '16px',
+            border: paymentMethod === 'card' ? '2px solid var(--color-deep-navy)' : '1px solid var(--color-border)',
+            padding: '20px',
+            boxShadow: paymentMethod === 'card' ? '0 4px 16px rgba(16, 45, 67, 0.08)' : 'none',
+            transition: 'all 0.2s ease'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }} onClick={() => setPaymentMethod('card')}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '16px', fontWeight: 700, color: 'var(--color-deep-navy)' }}>
+                <div style={{ width: '18px', height: '18px', borderRadius: '50%', border: paymentMethod === 'card' ? '5px solid var(--color-deep-navy)' : '2px solid var(--color-border)', boxSizing: 'border-box' }} />
+                💳 Credit / Debit Card (Visa, Mastercard, RuPay)
+              </div>
+              <span style={{ fontSize: '11px', color: 'var(--color-text-secondary)', fontWeight: 700 }}>
+                All Cards Accepted
+              </span>
             </div>
-            <span style={{ fontSize: '16px', color: '#64748b' }}>›</span>
+
+            {paymentMethod === 'card' && (
+              <div style={{ paddingLeft: '30px', marginTop: '16px', borderTop: '1px solid var(--color-border-subtle)', paddingTop: '16px', display: 'grid', gap: '14px' }}>
+                
+                <div>
+                  <label style={{ fontSize: '11px', fontWeight: 800, color: 'var(--color-text-secondary)', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>
+                    CARD NUMBER
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="4532 •••• •••• ••••"
+                    value={cardNumber}
+                    onChange={handleCardNumberChange}
+                    style={{ width: '100%', padding: '12px 14px', borderRadius: '10px', border: cardErrors.number ? '1px solid var(--color-error)' : '1px solid var(--color-border)', fontSize: '14px', fontWeight: 600, color: 'var(--color-deep-navy)', boxSizing: 'border-box' }}
+                  />
+                  {cardErrors.number && <div style={{ fontSize: '11.5px', color: 'var(--color-error)', marginTop: '4px' }}>{cardErrors.number}</div>}
+                </div>
+
+                <div>
+                  <label style={{ fontSize: '11px', fontWeight: 800, color: 'var(--color-text-secondary)', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>
+                    NAME ON CARD
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. YANSHI CHAUHAN"
+                    value={cardName}
+                    onChange={(e) => {
+                      setCardName(e.target.value.toUpperCase());
+                      if (cardErrors.name) setCardErrors(prev => ({ ...prev, name: null }));
+                    }}
+                    style={{ width: '100%', padding: '12px 14px', borderRadius: '10px', border: cardErrors.name ? '1px solid var(--color-error)' : '1px solid var(--color-border)', fontSize: '14px', fontWeight: 600, color: 'var(--color-deep-navy)', boxSizing: 'border-box' }}
+                  />
+                  {cardErrors.name && <div style={{ fontSize: '11.5px', color: 'var(--color-error)', marginTop: '4px' }}>{cardErrors.name}</div>}
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                  <div>
+                    <label style={{ fontSize: '11px', fontWeight: 800, color: 'var(--color-text-secondary)', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>
+                      EXPIRY DATE
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="MM/YY"
+                      value={cardExpiry}
+                      onChange={handleExpiryChange}
+                      style={{ width: '100%', padding: '12px 14px', borderRadius: '10px', border: cardErrors.expiry ? '1px solid var(--color-error)' : '1px solid var(--color-border)', fontSize: '14px', fontWeight: 600, color: 'var(--color-deep-navy)', boxSizing: 'border-box' }}
+                    />
+                    {cardErrors.expiry && <div style={{ fontSize: '11.5px', color: 'var(--color-error)', marginTop: '4px' }}>{cardErrors.expiry}</div>}
+                  </div>
+
+                  <div>
+                    <label style={{ fontSize: '11px', fontWeight: 800, color: 'var(--color-text-secondary)', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>
+                      CVV / CVC
+                    </label>
+                    <input
+                      type="password"
+                      placeholder="•••"
+                      value={cardCvv}
+                      onChange={handleCvvChange}
+                      maxLength={3}
+                      style={{ width: '100%', padding: '12px 14px', borderRadius: '10px', border: cardErrors.cvv ? '1px solid var(--color-error)' : '1px solid var(--color-border)', fontSize: '14px', fontWeight: 600, color: 'var(--color-deep-navy)', boxSizing: 'border-box' }}
+                    />
+                    {cardErrors.cvv && <div style={{ fontSize: '11.5px', color: 'var(--color-error)', marginTop: '4px' }}>{cardErrors.cvv}</div>}
+                  </div>
+                </div>
+
+              </div>
+            )}
           </div>
 
-          {/* Option 3: Credit / Debit Card */}
-          <div style={{ background: '#ffffff', borderRadius: '16px', border: '1px solid #e2e8f0', padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }} onClick={() => setPaymentMethod('card')}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '15px', fontWeight: 700, color: '#173b57' }}>
-              <div style={{ width: '18px', height: '18px', borderRadius: '50%', border: paymentMethod === 'card' ? '5px solid #002542' : '2px solid #cbd5e1' }} />
-              💳 Credit / Debit Card
+          {/* Option 3: Net Banking */}
+          <div style={{
+            background: '#ffffff',
+            borderRadius: '16px',
+            border: paymentMethod === 'netbanking' ? '2px solid var(--color-deep-navy)' : '1px solid var(--color-border)',
+            padding: '20px',
+            boxShadow: paymentMethod === 'netbanking' ? '0 4px 16px rgba(16, 45, 67, 0.08)' : 'none',
+            transition: 'all 0.2s ease'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }} onClick={() => setPaymentMethod('netbanking')}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '16px', fontWeight: 700, color: 'var(--color-deep-navy)' }}>
+                <div style={{ width: '18px', height: '18px', borderRadius: '50%', border: paymentMethod === 'netbanking' ? '5px solid var(--color-deep-navy)' : '2px solid var(--color-border)', boxSizing: 'border-box' }} />
+                🏛 Net Banking (All Indian Banks)
+              </div>
+              <span style={{ fontSize: '11px', color: 'var(--color-text-secondary)', fontWeight: 700 }}>
+                Instant Gateway
+              </span>
             </div>
-            <span style={{ fontSize: '16px', color: '#64748b' }}>›</span>
+
+            {paymentMethod === 'netbanking' && (
+              <div style={{ paddingLeft: '30px', marginTop: '16px', borderTop: '1px solid var(--color-border-subtle)', paddingTop: '16px' }}>
+                
+                <label style={{ fontSize: '11px', fontWeight: 800, color: 'var(--color-text-secondary)', textTransform: 'uppercase', display: 'block', marginBottom: '8px' }}>
+                  POPULAR BANKS
+                </label>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', marginBottom: '16px' }}>
+                  {[
+                    { id: 'hdfc', name: 'HDFC Bank' },
+                    { id: 'sbi', name: 'State Bank of India' },
+                    { id: 'icici', name: 'ICICI Bank' },
+                    { id: 'axis', name: 'Axis Bank' },
+                    { id: 'kotak', name: 'Kotak Bank' },
+                    { id: 'pnb', name: 'Punjab National Bank' }
+                  ].map((b) => (
+                    <div
+                      key={b.id}
+                      onClick={() => {
+                        setSelectedBank(b.id);
+                        setCustomBank('');
+                      }}
+                      style={{
+                        padding: '12px 10px',
+                        borderRadius: '10px',
+                        border: selectedBank === b.id && !customBank ? '2px solid var(--color-deep-navy)' : '1px solid var(--color-border)',
+                        background: selectedBank === b.id && !customBank ? 'var(--color-pale-indigo)' : '#ffffff',
+                        textAlign: 'center',
+                        fontSize: '12.5px',
+                        fontWeight: 700,
+                        color: 'var(--color-deep-navy)',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {b.name}
+                    </div>
+                  ))}
+                </div>
+
+                <div>
+                  <label style={{ fontSize: '11px', fontWeight: 800, color: 'var(--color-text-secondary)', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>
+                    OR SELECT OTHER INDIAN BANK
+                  </label>
+                  <select
+                    value={customBank}
+                    onChange={(e) => {
+                      setCustomBank(e.target.value);
+                      setSelectedBank('');
+                    }}
+                    style={{ width: '100%', padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--color-border)', fontSize: '14px', background: '#ffffff', color: 'var(--color-deep-navy)', boxSizing: 'border-box' }}
+                  >
+                    <option value="">-- Choose from 30+ other banks --</option>
+                    <option value="Bank of Baroda">Bank of Baroda</option>
+                    <option value="Canara Bank">Canara Bank</option>
+                    <option value="Union Bank of India">Union Bank of India</option>
+                    <option value="IndusInd Bank">IndusInd Bank</option>
+                    <option value="IDBI Bank">IDBI Bank</option>
+                    <option value="YES Bank">YES Bank</option>
+                    <option value="Federal Bank">Federal Bank</option>
+                    <option value="Indian Bank">Indian Bank</option>
+                    <option value="Bank of India">Bank of India</option>
+                    <option value="Central Bank of India">Central Bank of India</option>
+                  </select>
+                </div>
+
+              </div>
+            )}
           </div>
 
         </div>
 
         {/* Right Column: Payment Summary */}
-        <div style={{ background: '#ffffff', borderRadius: '20px', padding: '28px', border: '1px solid #e2e8f0', boxShadow: '0 4px 16px rgba(0, 37, 66, 0.03)' }}>
-          <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#173b57', margin: '0 0 20px 0' }}>
+        <div style={{ background: '#ffffff', borderRadius: '20px', padding: '28px', border: '1px solid var(--color-border)', boxShadow: '0 4px 16px rgba(16, 45, 67, 0.04)' }}>
+          <h3 style={{ fontSize: '16px', fontWeight: 800, color: 'var(--color-deep-navy)', margin: '0 0 20px 0' }}>
             Payment Summary
           </h3>
 
           <div style={{ display: 'grid', gap: '12px', fontSize: '14px', marginBottom: '24px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: '#64748b' }}>DL Form Fee (Form 7)</span>
-              <strong style={{ color: '#173b57' }}>₹200.00</strong>
+              <span style={{ color: 'var(--color-text-secondary)' }}>DL Form Fee (Form 7)</span>
+              <strong style={{ color: 'var(--color-deep-navy)' }}>₹200.00</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: '#64748b' }}>Automated Track Test Fee</span>
-              <strong style={{ color: '#173b57' }}>₹300.00</strong>
+              <span style={{ color: 'var(--color-text-secondary)' }}>Automated Track Test Fee</span>
+              <strong style={{ color: 'var(--color-deep-navy)' }}>₹300.00</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: '#64748b' }}>Smartcard Licence Printing</span>
-              <strong style={{ color: '#173b57' }}>₹200.00</strong>
+              <span style={{ color: 'var(--color-text-secondary)' }}>Smartcard Licence Printing</span>
+              <strong style={{ color: 'var(--color-deep-navy)' }}>₹200.00</strong>
             </div>
           </div>
 
-          <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '16px', marginBottom: '24px' }}>
+          <div style={{ borderTop: '1px solid var(--color-border-subtle)', paddingTop: '16px', marginBottom: '24px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-              <span style={{ fontSize: '14px', fontWeight: 600, color: '#173b57' }}>Total Amount</span>
-              <span style={{ fontSize: '28px', fontWeight: 800, color: '#173b57', letterSpacing: '-0.5px' }}>₹700.00</span>
+              <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-deep-navy)' }}>Total Amount</span>
+              <span style={{ fontSize: '28px', fontWeight: 800, color: 'var(--color-deep-navy)', letterSpacing: '-0.5px' }}>₹700.00</span>
             </div>
           </div>
 
           <button
-            onClick={() => {
-              centralDataStore.createPayment({
-                title: 'Driving Licence Application & Test Fee',
-                amount: 700,
-                purpose: 'DL Application Fee',
-                method: paymentMethod === 'upi' ? 'UPI (GPay)' : paymentMethod === 'netbanking' ? 'Net Banking' : 'Credit Card',
-                breakdown: [
-                  { label: 'DL Form Fee (Form 7)', fee: '₹200.00' },
-                  { label: 'Automated Track Test Fee', fee: '₹300.00' },
-                  { label: 'Smartcard Licence Printing', fee: '₹200.00' }
-                ]
-              });
-              setPaid(true);
-            }}
+            type="button"
+            onClick={handleProcessPayment}
+            className="primary-button"
             style={{
               width: '100%',
-              background: '#002542',
-              color: '#ffffff',
-              border: 'none',
               padding: '14px',
               borderRadius: '10px',
               fontWeight: 800,
               fontSize: '15px',
-              cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               gap: '8px',
-              marginBottom: '16px',
-              boxShadow: '0 4px 12px rgba(0, 37, 66, 0.2)'
+              marginBottom: '16px'
             }}
           >
-            🔒 PAY ₹700.00 NOW
+            {paymentMethod === 'upi' ? '🔒 PAY ₹700.00 VIA UPI' : paymentMethod === 'card' ? '🔒 PAY ₹700.00 WITH CARD' : '🔒 PROCEED TO BANK (₹700.00)'}
           </button>
 
           <div style={{ textAlign: 'center', fontSize: '12px', color: '#16a34a', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
@@ -1178,14 +1571,15 @@ export function DLPaymentCheckoutPage() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <button
           onClick={() => navigate('/dl/documents')}
-          style={{ background: 'none', border: 'none', color: '#173b57', fontWeight: 700, fontSize: '14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+          className="secondary-button"
+          style={{ padding: '8px 16px', fontSize: '13.5px' }}
         >
           ← Cancel & Return
         </button>
 
         <button
           onClick={() => alert("Connecting to 24x7 RTO Citizen Support...")}
-          style={{ background: 'none', border: 'none', color: '#64748b', fontWeight: 700, fontSize: '14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+          style={{ background: 'none', border: 'none', color: 'var(--color-text-secondary)', fontWeight: 700, fontSize: '13px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
         >
           <HelpCircle size={16} /> Need Help?
         </button>
@@ -1196,40 +1590,673 @@ export function DLPaymentCheckoutPage() {
 }
 
 // ----------------------------------------------------------------------
-// 7A. DL TEST CENTRE SELECTION PAGE (1:1 IMAGE 2 MATCH)
+// 7A. DL TEST CENTRE SELECTION PAGE (NATIONWIDE RTOs, PIN/CITY/STATE SEARCH & MAP SYNC)
 // ----------------------------------------------------------------------
 export function DLTestCenterSelectionPage() {
   const navigate = useNavigate();
   const { t } = useLanguage();
-  const [selectedCenter, setSelectedCenter] = useState('sarai');
-  const [searchQuery, setSearchQuery] = useState('');
+  
+  // Read confirmed registered address from Step 3 (DL Confirm Address) or profile
+  const [addressData, setAddressData] = useState(() => {
+    const draft = centralDataStore.getDraftForm('dl_address');
+    if (draft && (draft.city || draft.fullAddress)) return draft;
+    const profile = getStoredUserProfile();
+    if (profile && (profile.city || profile.streetAddress)) {
+      return {
+        flatNo: profile.streetAddress || '28-A ROYAL ENCLAVE',
+        area: profile.district || 'KASHIPUR',
+        city: profile.city || 'Kashipur',
+        stateName: profile.state || 'Uttarakhand',
+        pincode: profile.pincode || '244713',
+        fullAddress: profile.fullAddress || `28-A ROYAL ENCLAVE, KASHIPUR, UTTARAKHAND 244713`
+      };
+    }
+    return {
+      flatNo: '28-A ROYAL ENCLAVE',
+      area: 'KASHIPUR',
+      city: 'Kashipur',
+      stateName: 'Uttarakhand',
+      pincode: '244713',
+      fullAddress: '28-A ROYAL ENCLAVE , KASHIPUR , UTTARAKHAND , 244713'
+    };
+  });
 
-  const centers = [
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showEditAddressModal, setShowEditAddressModal] = useState(false);
+
+  // Edit Address Form State
+  const [editFlat, setEditFlat] = useState(addressData.flatNo || '');
+  const [editArea, setEditArea] = useState(addressData.area || '');
+  const [editCity, setEditCity] = useState(addressData.city || 'Kashipur');
+  const [editPin, setEditPin] = useState(addressData.pincode || '244713');
+
+  // Comprehensive Nationwide RTO Automated Driving Test Track (ADTT) Database
+  const NATIONWIDE_RTO_DATABASE = [
+    // --- UTTARAKHAND / KASHIPUR & REGIONAL TEST TRACKS ---
     {
-      id: 'sarai',
-      name: 'Sarai Kale Khan RTO',
-      distance: '3.2km away',
+      id: 'uk-kashipur',
+      name: 'ARTO Kashipur Driving Test Track (UK-18)',
+      rtoCode: 'UK-18',
+      area: 'Ramnagar Road, Kashipur',
+      city: 'Kashipur',
+      state: 'Uttarakhand',
+      pin: '244713',
+      pinPrefix: '244',
+      address: 'ARTO Office & Testing Ground, Near Mandi Samiti, Ramnagar Road, Kashipur, Udham Singh Nagar, Uttarakhand 244713',
+      lat: 29.2245,
+      lng: 78.9690,
       slots: ['12 Oct', '14 Oct']
     },
     {
-      id: 'vasant',
-      name: 'Vasant Vihar Test Track',
-      distance: '5.8km away',
-      slots: ['Checking slots...']
+      id: 'uk-ramnagar',
+      name: 'ARTO Ramnagar Test Track (UK-19)',
+      rtoCode: 'UK-19',
+      area: 'Kashipur-Ramnagar Highway, Ramnagar',
+      city: 'Ramnagar',
+      state: 'Uttarakhand',
+      pin: '244715',
+      pinPrefix: '244',
+      address: 'ARTO Office, Near Degree College, Ramnagar, Nainital, Uttarakhand 244715',
+      lat: 29.3950,
+      lng: 79.1260,
+      slots: ['13 Oct', '15 Oct']
     },
     {
-      id: 'dwarka',
-      name: 'Dwarka Sector 22',
-      distance: '12.4km away',
-      slots: ['18 Oct']
+      id: 'up-moradabad',
+      name: 'RTO Moradabad Automated Track (UP-21)',
+      rtoCode: 'UP-21',
+      area: 'Majhola, Delhi Road, Moradabad',
+      city: 'Moradabad',
+      state: 'Uttar Pradesh',
+      pin: '244001',
+      pinPrefix: '244',
+      address: 'Regional Transport Office, Transport Nagar, Majhola, Moradabad, Uttar Pradesh 244001',
+      lat: 28.8386,
+      lng: 78.7733,
+      slots: ['14 Oct', '16 Oct']
+    },
+    {
+      id: 'uk-rudrapur',
+      name: 'RTO Rudrapur Automated Facility (UK-06)',
+      rtoCode: 'UK-06',
+      area: 'Kichha Bypass Road, Rudrapur',
+      city: 'Rudrapur',
+      state: 'Uttarakhand',
+      pin: '263153',
+      pinPrefix: '263',
+      address: 'District Transport Office, Kichha Bypass Road, Rudrapur, Uttarakhand 263153',
+      lat: 28.9800,
+      lng: 79.4000,
+      slots: ['15 Oct', '16 Oct']
+    },
+    {
+      id: 'uk-haldwani',
+      name: 'ARTO Haldwani Automated Track (UK-04)',
+      rtoCode: 'UK-04',
+      area: 'Transport Nagar, Haldwani',
+      city: 'Haldwani',
+      state: 'Uttarakhand',
+      pin: '263139',
+      pinPrefix: '263',
+      address: 'Sub-Regional Transport Office, Bareilly Road, Haldwani, Uttarakhand 263139',
+      lat: 29.2183,
+      lng: 79.5130,
+      slots: ['14 Oct', '17 Oct']
+    },
+    {
+      id: 'uk-dehradun',
+      name: 'RTO Dehradun Central Track (UK-07)',
+      rtoCode: 'UK-07',
+      area: 'Transport Nagar, Dehradun',
+      city: 'Dehradun',
+      state: 'Uttarakhand',
+      pin: '248001',
+      pinPrefix: '248',
+      address: 'Transport Nagar, Saharanpur Road, Dehradun, Uttarakhand 248001',
+      lat: 30.2925,
+      lng: 77.9930,
+      slots: ['16 Oct', '19 Oct']
+    },
+
+    // --- KARNATAKA / BENGALURU ---
+    {
+      id: 'blr-indiranagar',
+      name: 'Indiranagar Automated Test Track (ADTT)',
+      rtoCode: 'KA-03',
+      area: 'Indiranagar, East Bengaluru',
+      city: 'Bengaluru',
+      state: 'Karnataka',
+      pin: '560038',
+      pinPrefix: '560',
+      address: '100 Feet Road, Near CMH Hospital, Indiranagar, Bengaluru, Karnataka 560038',
+      lat: 12.9784,
+      lng: 77.6408,
+      slots: ['12 Oct', '14 Oct']
+    },
+    {
+      id: 'blr-koramangala',
+      name: 'Koramangala RTO (KA-01)',
+      rtoCode: 'KA-01',
+      area: 'Koramangala, South-East Bengaluru',
+      city: 'Bengaluru',
+      state: 'Karnataka',
+      pin: '560034',
+      pinPrefix: '560',
+      address: '80 Feet Road, 3rd Block, Koramangala, Bengaluru, Karnataka 560034',
+      lat: 12.9345,
+      lng: 77.6266,
+      slots: ['15 Oct', '16 Oct']
+    },
+    {
+      id: 'blr-jayanagar',
+      name: 'Jayanagar Automated Test Track (KA-05)',
+      rtoCode: 'KA-05',
+      area: 'Jayanagar, South Bengaluru',
+      city: 'Bengaluru',
+      state: 'Karnataka',
+      pin: '560011',
+      pinPrefix: '560',
+      address: '4th Block, 9th Main Road, Jayanagar, Bengaluru, Karnataka 560011',
+      lat: 12.9250,
+      lng: 77.5838,
+      slots: ['14 Oct', '17 Oct']
+    },
+    {
+      id: 'blr-yeshwanthpur',
+      name: 'Yeshwanthpur RTO Facility (KA-04)',
+      rtoCode: 'KA-04',
+      area: 'Yeshwanthpur, North-West Bengaluru',
+      city: 'Bengaluru',
+      state: 'Karnataka',
+      pin: '560022',
+      pinPrefix: '560',
+      address: 'Near Yeshwanthpur Metro Station, Tumkur Road, Bengaluru, Karnataka 560022',
+      lat: 13.0285,
+      lng: 77.5458,
+      slots: ['18 Oct', '20 Oct']
+    },
+    {
+      id: 'blr-ecity',
+      name: 'Electronic City Automated Track (KA-51)',
+      rtoCode: 'KA-51',
+      area: 'Electronic City, South Bengaluru',
+      city: 'Bengaluru',
+      state: 'Karnataka',
+      pin: '560100',
+      pinPrefix: '560',
+      address: 'Phase 1, Hosur Road, Electronic City, Bengaluru, Karnataka 560100',
+      lat: 12.8452,
+      lng: 77.6602,
+      slots: ['16 Oct', '19 Oct']
+    },
+
+    // --- DELHI NCR ---
+    {
+      id: 'dl-sarai',
+      name: 'Sarai Kale Khan RTO (ADTT)',
+      rtoCode: 'DL-06',
+      area: 'Sarai Kale Khan, South-East Delhi',
+      city: 'Delhi',
+      state: 'Delhi',
+      pin: '110013',
+      pinPrefix: '110',
+      address: 'Near ISBT Sarai Kale Khan, Ring Road, New Delhi, 110013',
+      lat: 28.5892,
+      lng: 77.2588,
+      slots: ['12 Oct', '14 Oct']
+    },
+    {
+      id: 'dl-vasant',
+      name: 'Vasant Vihar Automated Test Track',
+      rtoCode: 'DL-03',
+      area: 'Vasant Vihar, South Delhi',
+      city: 'Delhi',
+      state: 'Delhi',
+      pin: '110057',
+      pinPrefix: '110',
+      address: 'Sub-Divisional Complex, Outer Ring Rd, Vasant Vihar, New Delhi, 110057',
+      lat: 28.5583,
+      lng: 77.1637,
+      slots: ['15 Oct', '16 Oct']
+    },
+    {
+      id: 'dl-dwarka',
+      name: 'Dwarka Sector 22 RTO Track',
+      rtoCode: 'DL-09',
+      area: 'Dwarka Sector 22, South-West Delhi',
+      city: 'Delhi',
+      state: 'Delhi',
+      pin: '110075',
+      pinPrefix: '110',
+      address: 'Sector 22, Near Sector 21 Metro Station, Dwarka, New Delhi, 110075',
+      lat: 28.5562,
+      lng: 77.0544,
+      slots: ['18 Oct', '20 Oct']
+    },
+    {
+      id: 'dl-mayur',
+      name: 'Mayur Vihar Phase 1 ADTT',
+      rtoCode: 'DL-07',
+      area: 'Mayur Vihar, East Delhi',
+      city: 'Delhi',
+      state: 'Delhi',
+      pin: '110091',
+      pinPrefix: '110',
+      address: 'Mayur Vihar Phase 1, Near Pocket 1 Metro, New Delhi, 110091',
+      lat: 28.6089,
+      lng: 77.2942,
+      slots: ['15 Oct', '17 Oct']
+    },
+    {
+      id: 'dl-rohini',
+      name: 'Rohini Sector 16 Test Center',
+      rtoCode: 'DL-11',
+      area: 'Rohini, North-West Delhi',
+      city: 'Delhi',
+      state: 'Delhi',
+      pin: '110089',
+      pinPrefix: '110',
+      address: 'Sector 16, Institutional Area, Rohini, New Delhi, 110089',
+      lat: 28.7324,
+      lng: 77.1189,
+      slots: ['19 Oct', '21 Oct']
+    },
+    {
+      id: 'dl-janakpuri',
+      name: 'Janakpuri District Transport Office',
+      rtoCode: 'DL-04',
+      area: 'Janakpuri, West Delhi',
+      city: 'Delhi',
+      state: 'Delhi',
+      pin: '110058',
+      pinPrefix: '110',
+      address: 'Near District Centre, Janakpuri, New Delhi, 110058',
+      lat: 28.6219,
+      lng: 77.0878,
+      slots: ['14 Oct', '17 Oct']
+    },
+
+    // --- MAHARASHTRA / MUMBAI & PUNE ---
+    {
+      id: 'mum-andheri',
+      name: 'Andheri RTO Automated Track (MH-02)',
+      rtoCode: 'MH-02',
+      area: 'Andheri West, Western Suburbs',
+      city: 'Mumbai',
+      state: 'Maharashtra',
+      pin: '400053',
+      pinPrefix: '400',
+      address: 'D.N. Nagar, Link Road, Andheri West, Mumbai, Maharashtra 400053',
+      lat: 19.1197,
+      lng: 72.8464,
+      slots: ['14 Oct', '16 Oct']
+    },
+    {
+      id: 'mum-tardeo',
+      name: 'Tardeo Central RTO (MH-01)',
+      rtoCode: 'MH-01',
+      area: 'Tardeo, South Mumbai',
+      city: 'Mumbai',
+      state: 'Maharashtra',
+      pin: '400034',
+      pinPrefix: '400',
+      address: 'Old Bodyguard Lane, Tardeo, Mumbai, Maharashtra 400034',
+      lat: 18.9696,
+      lng: 72.8193,
+      slots: ['15 Oct', '17 Oct']
+    },
+    {
+      id: 'mum-wadala',
+      name: 'Wadala Automated RTO Facility (MH-03)',
+      rtoCode: 'MH-03',
+      area: 'Wadala, Central Mumbai',
+      city: 'Mumbai',
+      state: 'Maharashtra',
+      pin: '400037',
+      pinPrefix: '400',
+      address: 'Truck Terminal Road, Wadala, Mumbai, Maharashtra 400037',
+      lat: 19.0178,
+      lng: 72.8688,
+      slots: ['13 Oct', '16 Oct']
+    },
+    {
+      id: 'pune-sangamwadi',
+      name: 'Pune RTO Automated Track (MH-12)',
+      rtoCode: 'MH-12',
+      area: 'Sangamwadi, Pune',
+      city: 'Pune',
+      state: 'Maharashtra',
+      pin: '411001',
+      pinPrefix: '411',
+      address: 'Dr. Ambedkar Road, Near Sangam Bridge, Pune, Maharashtra 411001',
+      lat: 18.5304,
+      lng: 73.8647,
+      slots: ['14 Oct', '18 Oct']
+    },
+
+    // --- JHARKHAND ---
+    {
+      id: 'jsr-sakchi',
+      name: 'Jamshedpur Sakchi RTO (JH-05)',
+      rtoCode: 'JH-05',
+      area: 'Sakchi, Jamshedpur',
+      city: 'Jamshedpur',
+      state: 'Jharkhand',
+      pin: '831001',
+      pinPrefix: '831',
+      address: 'Near Old Court, Sakchi, Jamshedpur, Jharkhand 831001',
+      lat: 22.8046,
+      lng: 86.2029,
+      slots: ['13 Oct', '15 Oct']
+    },
+    {
+      id: 'ranchi-dhurwa',
+      name: 'Ranchi Dhurwa Automated Track (JH-01)',
+      rtoCode: 'JH-01',
+      area: 'Dhurwa, Ranchi',
+      city: 'Ranchi',
+      state: 'Jharkhand',
+      pin: '834004',
+      pinPrefix: '834',
+      address: 'Sector 4, HEC Township, Dhurwa, Ranchi, Jharkhand 834004',
+      lat: 23.3105,
+      lng: 85.2894,
+      slots: ['16 Oct', '19 Oct']
+    },
+
+    // --- TELANGANA / HYDERABAD ---
+    {
+      id: 'hyd-kondapur',
+      name: 'Kondapur RTO Automated Track (TS-09)',
+      rtoCode: 'TS-09',
+      area: 'Kondapur, Hitec City, Hyderabad',
+      city: 'Hyderabad',
+      state: 'Telangana',
+      pin: '500084',
+      pinPrefix: '500',
+      address: 'Near Botanical Garden Road, Kondapur, Hyderabad, Telangana 500084',
+      lat: 17.4645,
+      lng: 78.3582,
+      slots: ['15 Oct', '18 Oct']
+    },
+
+    // --- TAMIL NADU / CHENNAI ---
+    {
+      id: 'chn-annanagar',
+      name: 'Anna Nagar RTO Test Track (TN-02)',
+      rtoCode: 'TN-02',
+      area: 'Anna Nagar, Chennai',
+      city: 'Chennai',
+      state: 'Tamil Nadu',
+      pin: '600040',
+      pinPrefix: '600',
+      address: '2nd Avenue, Anna Nagar West, Chennai, Tamil Nadu 600040',
+      lat: 13.0850,
+      lng: 80.2101,
+      slots: ['14 Oct', '17 Oct']
+    },
+
+    // --- WEST BENGAL / KOLKATA ---
+    {
+      id: 'kol-saltlake',
+      name: 'Salt Lake Automated Test Facility (WB-08)',
+      rtoCode: 'WB-08',
+      area: 'Salt Lake Sector 5, Kolkata',
+      city: 'Kolkata',
+      state: 'West Bengal',
+      pin: '700091',
+      pinPrefix: '700',
+      address: 'Salt Lake Sector V, Bidhannagar, Kolkata, West Bengal 700091',
+      lat: 22.5804,
+      lng: 88.4378,
+      slots: ['15 Oct', '19 Oct']
+    },
+
+    // --- UTTAR PRADESH ---
+    {
+      id: 'up-noida',
+      name: 'Noida Sector 32 Transport Office (UP-16)',
+      rtoCode: 'UP-16',
+      area: 'Sector 32, Noida',
+      city: 'Noida',
+      state: 'Uttar Pradesh',
+      pin: '201301',
+      pinPrefix: '201',
+      address: 'Near City Center Metro, Sector 32, Noida, Uttar Pradesh 201301',
+      lat: 28.5744,
+      lng: 77.3560,
+      slots: ['13 Oct', '16 Oct']
+    },
+    {
+      id: 'up-lucknow',
+      name: 'Lucknow Transport Nagar ADTT (UP-32)',
+      rtoCode: 'UP-32',
+      area: 'Transport Nagar, Lucknow',
+      city: 'Lucknow',
+      state: 'Uttar Pradesh',
+      pin: '226012',
+      pinPrefix: '226',
+      address: 'Kanpur Road, Transport Nagar, Lucknow, Uttar Pradesh 226012',
+      lat: 26.7825,
+      lng: 80.8920,
+      slots: ['16 Oct', '18 Oct']
+    },
+
+    // --- RAJASTHAN ---
+    {
+      id: 'rj-jaipur',
+      name: 'Jaipur Jagatpura Automated Track (RJ-14)',
+      rtoCode: 'RJ-14',
+      area: 'Jagatpura, Jaipur',
+      city: 'Jaipur',
+      state: 'Rajasthan',
+      pin: '302017',
+      pinPrefix: '302',
+      address: 'Jhalana Institutional Area, Jagatpura, Jaipur, Rajasthan 302017',
+      lat: 26.8335,
+      lng: 75.8239,
+      slots: ['15 Oct', '18 Oct']
     }
   ];
+
+  // Helper: Get user's reference coordinates based on address
+  const getUserCoordinates = (addr) => {
+    const text = `${addr.area || ''} ${addr.city || ''} ${addr.flatNo || ''} ${addr.stateName || ''} ${addr.pincode || ''}`.toLowerCase();
+    
+    // Locality specific
+    if (text.includes('gautam nagar') || text.includes('royal enclave') || text.includes('kashipur')) return { lat: 29.2085, lng: 78.9580 };
+    if (text.includes('ramnagar')) return { lat: 29.3900, lng: 79.1200 };
+    if (text.includes('moradabad') || text.startsWith('2440')) return { lat: 28.8300, lng: 78.7700 };
+    if (text.includes('rudrapur')) return { lat: 28.9800, lng: 79.4000 };
+    if (text.includes('haldwani')) return { lat: 29.2183, lng: 79.5130 };
+    if (text.includes('dehradun') || text.includes('uttarakhand')) return { lat: 30.3165, lng: 78.0322 };
+    if (text.includes('indiranagar')) return { lat: 12.9784, lng: 77.6408 };
+    if (text.includes('koramangala')) return { lat: 12.9352, lng: 77.6245 };
+    if (text.includes('jayanagar')) return { lat: 12.9308, lng: 77.5838 };
+    if (text.includes('yeshwanthpur')) return { lat: 13.0285, lng: 77.5458 };
+    if (text.includes('electronic city')) return { lat: 12.8452, lng: 77.6602 };
+    if (text.includes('dwarka')) return { lat: 28.5921, lng: 77.0460 };
+    if (text.includes('sarai') || text.includes('south delhi')) return { lat: 28.5892, lng: 77.2588 };
+    if (text.includes('rohini') || text.includes('civil lines') || text.includes('model town')) return { lat: 28.7041, lng: 77.1025 };
+    if (text.includes('vasant')) return { lat: 28.5583, lng: 77.1637 };
+    if (text.includes('andheri')) return { lat: 19.1136, lng: 72.8697 };
+    if (text.includes('tardeo')) return { lat: 18.9696, lng: 72.8193 };
+    if (text.includes('sakchi')) return { lat: 22.8046, lng: 86.2029 };
+
+    // City / State specific
+    if (text.includes('bengaluru') || text.includes('bangalore') || text.startsWith('560')) return { lat: 12.9716, lng: 77.5946 };
+    if (text.includes('delhi') || text.startsWith('110')) return { lat: 28.6139, lng: 77.2090 };
+    if (text.includes('mumbai') || text.startsWith('400')) return { lat: 19.0760, lng: 72.8777 };
+    if (text.includes('pune') || text.startsWith('411')) return { lat: 18.5204, lng: 73.8567 };
+    if (text.includes('jamshedpur') || text.startsWith('831')) return { lat: 22.8046, lng: 86.2029 };
+    if (text.includes('ranchi') || text.startsWith('834')) return { lat: 23.3441, lng: 85.3096 };
+    if (text.includes('hyderabad') || text.startsWith('500')) return { lat: 17.3850, lng: 78.4867 };
+    if (text.includes('chennai') || text.startsWith('600')) return { lat: 13.0827, lng: 80.2707 };
+    if (text.includes('kolkata') || text.startsWith('700')) return { lat: 22.5726, lng: 88.3639 };
+    if (text.includes('noida') || text.startsWith('201')) return { lat: 28.5744, lng: 77.3560 };
+    if (text.includes('lucknow') || text.startsWith('226')) return { lat: 26.8467, lng: 80.9462 };
+    if (text.includes('jaipur') || text.startsWith('302')) return { lat: 26.9124, lng: 75.7873 };
+
+    return { lat: 29.2085, lng: 78.9580 };
+  };
+
+  // Helper: Haversine distance in KM with realistic road routing factor
+  const calculateDistance = (lat1, lon1, lat2, lon2) => {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const dist = parseFloat((R * c * 1.25).toFixed(1));
+    return Math.max(2.4, dist);
+  };
+
+  // Get active user address coordinates
+  const userCoords = getUserCoordinates(addressData);
+
+  // Compute distance for all centers and prepare list
+  const centersWithDistances = NATIONWIDE_RTO_DATABASE.map((c) => {
+    const dist = calculateDistance(userCoords.lat, userCoords.lng, c.lat, c.lng);
+    return {
+      ...c,
+      distanceNum: dist,
+      distance: `${dist}km away`
+    };
+  }).sort((a, b) => a.distanceNum - b.distanceNum);
+
+  // Filter centers based on User Address & Search Query
+  const getDisplayCenters = () => {
+    const q = searchQuery.toLowerCase().trim();
+
+    // 1. IF SEARCH QUERY IS TYPED: Perform deep logical match across PIN, City, State, Area, RTO Code, Name
+    if (q) {
+      const searched = centersWithDistances.filter((c) => {
+        const matchPin = c.pin.includes(q) || c.pinPrefix.includes(q);
+        const matchCity = c.city.toLowerCase().includes(q);
+        const matchState = c.state.toLowerCase().includes(q);
+        const matchArea = c.area.toLowerCase().includes(q);
+        const matchRtoCode = c.rtoCode.toLowerCase().replace('-', '').includes(q.replace('-', ''));
+        const matchName = c.name.toLowerCase().includes(q);
+        const matchAddress = c.address.toLowerCase().includes(q);
+
+        return matchPin || matchCity || matchState || matchArea || matchRtoCode || matchName || matchAddress;
+      });
+
+      if (searched.length > 0) {
+        return searched;
+      }
+
+      // If user typed a custom city or PIN not explicitly listed, dynamically generate a matching RTO!
+      const isPinQuery = /^\d{3,6}$/.test(q);
+      return [
+        {
+          id: `custom-rto-${q.replace(/\s+/g, '-')}`,
+          name: isPinQuery ? `PIN ${q} Regional Transport Track` : `${q.toUpperCase()} Automated Driving Test Track`,
+          rtoCode: isPinQuery ? `PIN-${q.slice(0, 3)}` : 'RTO-ADTT',
+          area: isPinQuery ? `Pin Code ${q} Zone` : `${q} Division`,
+          city: isPinQuery ? 'Local Region' : q,
+          state: addressData.stateName || 'State Transport Division',
+          pin: isPinQuery ? q : 'Nearest Zone',
+          address: isPinQuery ? `Automated Driving Test Track, Near PIN ${q} Post Office` : `Central RTO Test Facility, Main Bypass Road, ${q}`,
+          lat: userCoords.lat + 0.02,
+          lng: userCoords.lng + 0.02,
+          distanceNum: 2.4,
+          distance: '2.4km away',
+          slots: ['14 Oct', '16 Oct']
+        }
+      ];
+    }
+
+    // 2. IF NO SEARCH QUERY: Filter primarily for the user's city/state
+    const userCity = (addressData.city || '').toLowerCase().trim();
+    const userState = (addressData.stateName || '').toLowerCase().trim();
+    const userPin = (addressData.pincode || '').trim();
+
+    // Priority 1: Centers in user's city or nearby surrounding district tracks (within 80km)
+    const sameCityCenters = centersWithDistances.filter(c => {
+      const matchCity = c.city.toLowerCase().includes(userCity) || (userCity && userCity.includes(c.city.toLowerCase()));
+      const matchPin = userPin && (c.pin.startsWith(userPin.slice(0, 3)) || c.pin === userPin);
+      return matchCity || matchPin;
+    });
+
+    if (sameCityCenters.length > 0) {
+      // Include nearby regional centers in the same state/division (under 80km)
+      const nearbyRegional = centersWithDistances.filter(c => {
+        const isSameState = userState && (c.state.toLowerCase().includes(userState) || userState.includes(c.state.toLowerCase()));
+        const isNear = c.distanceNum <= 80;
+        return isSameState && isNear;
+      });
+      return nearbyRegional.length > 0 ? nearbyRegional : sameCityCenters;
+    }
+
+    // Priority 2: Centers in user's state
+    const sameStateCenters = centersWithDistances.filter(c => {
+      return userState && (c.state.toLowerCase().includes(userState) || userState.includes(c.state.toLowerCase()));
+    });
+
+    if (sameStateCenters.length > 0) {
+      return sameStateCenters;
+    }
+
+    // Priority 3: Fallback - generate local RTO for user's entered city (never dump nationwide centers)
+    return [
+      {
+        id: `local-rto-${(addressData.city || 'local').toLowerCase().replace(/\s+/g, '-')}`,
+        name: `${addressData.city || 'Regional'} Automated Test Track (ADTT)`,
+        rtoCode: 'RTO-ADTT',
+        area: `${addressData.area || 'Central'}, ${addressData.city || 'District'}`,
+        city: addressData.city || 'City',
+        state: addressData.stateName || 'State Transport Division',
+        pin: addressData.pincode || 'Local Zone',
+        address: `Automated Driving Track, Near Transport Office, ${addressData.city || ''}, ${addressData.stateName || ''} ${addressData.pincode || ''}`,
+        lat: userCoords.lat,
+        lng: userCoords.lng,
+        distanceNum: 2.4,
+        distance: '2.4km away',
+        slots: ['12 Oct', '14 Oct']
+      }
+    ];
+  };
+
+  const displayCenters = getDisplayCenters();
+
+  // Selected center defaults to the closest/nearest displayed RTO
+  const [selectedCenter, setSelectedCenter] = useState(displayCenters[0]?.id);
+
+  // Sync selected center if displayed list changes (e.g. on search or address update)
+  useEffect(() => {
+    if (displayCenters.length > 0 && !displayCenters.some(c => c.id === selectedCenter)) {
+      setSelectedCenter(displayCenters[0].id);
+    }
+  }, [displayCenters, selectedCenter]);
+
+  // Handle in-place address update & automatically find nearest RTO center
+  const handleSaveInlineAddress = (e) => {
+    e.preventDefault();
+    const updated = {
+      flatNo: editFlat,
+      area: editArea,
+      city: editCity,
+      stateName: addressData.stateName || '',
+      pincode: editPin,
+      fullAddress: `${editFlat}, ${editArea}, ${editCity} – ${editPin}`
+    };
+    
+    setAddressData(updated);
+    centralDataStore.saveDraftForm('dl_address', updated);
+    setShowEditAddressModal(false);
+  };
+
+  const activeCenter = displayCenters.find(c => c.id === selectedCenter) || displayCenters[0] || NATIONWIDE_RTO_DATABASE[0];
 
   return (
     <div className="page page-dl-center-select" style={{ width: 'min(1120px, calc(100% - 48px))', margin: '36px auto', fontFamily: 'Inter, system-ui, sans-serif' }}>
       
-      {/* Header Section */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '28px' }}>
+      {/* Header Section (1:1 Reference Match) */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
         <div>
           <div style={{ fontSize: '11px', fontWeight: 800, color: '#e88a2d', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '8px' }}>
             LOCATION SELECTION
@@ -1239,47 +2266,122 @@ export function DLTestCenterSelectionPage() {
           </h1>
         </div>
         
-        <p style={{ color: '#64748b', fontSize: '15px', maxWidth: '420px', margin: 0, textAlign: 'right', lineHeight: 1.5 }}>
+        <p style={{ color: '#64748b', fontSize: '14.5px', maxWidth: '380px', margin: 0, textAlign: 'right', lineHeight: 1.5 }}>
           Find the most convenient location for your practical driving test. Availability is updated in real-time.
         </p>
       </div>
 
-      {/* Main 2-Column Grid (Left: List, Right: Map Preview) */}
+      {/* DIRECT VISIBLE ADDRESS BAR WITH 1-CLICK CHANGE ADDRESS */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        background: '#ffffff',
+        padding: '14px 20px',
+        borderRadius: '16px',
+        border: '1px solid #e2e8f0',
+        boxShadow: '0 2px 8px rgba(0, 37, 66, 0.03)',
+        marginBottom: '24px',
+        gap: '12px',
+        flexWrap: 'wrap'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#fff7ed', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <MapPin size={18} color="#e88a2d" />
+          </div>
+          <div>
+            <div style={{ fontSize: '11px', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
+              YOUR SELECTED ADDRESS
+            </div>
+            <div style={{ fontSize: '14px', fontWeight: 700, color: '#173b57' }}>
+              {addressData.fullAddress || `${addressData.flatNo}, ${addressData.area}, ${addressData.city} – ${addressData.pincode}`}
+            </div>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => {
+            setEditFlat(addressData.flatNo || '');
+            setEditArea(addressData.area || '');
+            setEditCity(addressData.city || '');
+            setEditPin(addressData.pincode || '');
+            setShowEditAddressModal(true);
+          }}
+          style={{
+            background: '#002542',
+            border: 'none',
+            color: '#ffffff',
+            padding: '8px 18px',
+            borderRadius: '10px',
+            fontSize: '13px',
+            fontWeight: 800,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            boxShadow: '0 2px 6px rgba(0, 37, 66, 0.15)',
+            transition: 'all 0.15s ease'
+          }}
+        >
+          Change Address ✏️
+        </button>
+      </div>
+
+      {/* Main 2-Column Grid */}
       <div className="responsive-split-grid grid-2col" style={{ display: 'grid', gridTemplateColumns: '440px 1fr', gap: '32px', alignItems: 'start' }}>
         
         {/* Left Column: Search & Test Center Cards */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           
-          {/* Search Bar */}
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-            <div style={{ flex: 1, position: 'relative' }}>
-              <input
-                type="text"
-                placeholder="Search by area or pin code"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '14px 16px 14px 42px',
-                  borderRadius: '12px',
-                  border: '1px solid #cbd5e1',
-                  fontSize: '14px',
-                  color: '#173b57',
-                  boxSizing: 'border-box',
-                  background: '#ffffff'
-                }}
-              />
-              <span style={{ position: 'absolute', left: '14px', top: '14px', color: '#94a3b8' }}>🔍</span>
-            </div>
-            
-            <button style={{ background: '#f1f5f9', border: '1px solid #cbd5e1', padding: '14px', borderRadius: '12px', color: '#173b57', cursor: 'pointer' }}>
-              ⚙️
-            </button>
+          {/* Intelligent Search Bar (Searches Pin, City, State, Area & Code) */}
+          <div style={{ position: 'relative' }}>
+            <input
+              type="text"
+              placeholder="Search by PIN, city, state, area or RTO code"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '13px 38px 13px 40px',
+                borderRadius: '12px',
+                border: '1px solid #cbd5e1',
+                fontSize: '14px',
+                color: '#173b57',
+                boxSizing: 'border-box',
+                background: '#ffffff'
+              }}
+            />
+            <span style={{ position: 'absolute', left: '13px', top: '13px', color: '#94a3b8', display: 'flex', alignItems: 'center' }}>
+              <Search size={17} />
+            </span>
+
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                style={{ position: 'absolute', right: '12px', top: '12px', background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: '14px' }}
+              >
+                ✕
+              </button>
+            )}
           </div>
 
-          {/* Test Center Cards Stack */}
-          {centers.map((c) => {
+          {/* Quick Context Summary */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '12px', color: '#64748b', fontWeight: 600, padding: '0 4px' }}>
+            <span>
+              {searchQuery ? `Search results for "${searchQuery}" (${displayCenters.length})` : `Available RTO Tracks near ${addressData.city || 'you'} (${displayCenters.length})`}
+            </span>
+            <span style={{ color: '#16a34a', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <Check size={13} strokeWidth={3} /> Auto-sorted by proximity
+            </span>
+          </div>
+
+          {/* Test Center Cards Stack (Sorted Closest to Farthest) */}
+          {displayCenters.map((c, index) => {
             const isSelected = selectedCenter === c.id;
+            const isNearest = index === 0;
+
             return (
               <div
                 key={c.id}
@@ -1292,25 +2394,33 @@ export function DLTestCenterSelectionPage() {
                   boxShadow: isSelected ? '0 6px 20px rgba(0, 37, 66, 0.08)' : '0 2px 10px rgba(0, 37, 66, 0.02)',
                   position: 'relative',
                   cursor: 'pointer',
-                  transition: 'all 0.2s ease'
+                  transition: 'all 0.18s ease'
                 }}
               >
-                {isSelected && (
-                  <span style={{ position: 'absolute', top: '16px', right: '16px', background: '#002542', color: '#ffffff', fontSize: '10px', fontWeight: 800, padding: '4px 10px', borderRadius: '12px', letterSpacing: '0.5px' }}>
-                    Selected
-                  </span>
-                )}
-
-                <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#173b57', margin: '0 0 6px 0' }}>
-                  {c.name}
-                </h3>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px', marginBottom: '8px' }}>
+                  <h3 style={{ fontSize: '17px', fontWeight: 800, color: '#173b57', margin: 0, lineHeight: 1.3, flex: 1 }}>
+                    {c.name}
+                  </h3>
+                  <div style={{ display: 'flex', gap: '6px', flexShrink: 0 }}>
+                    {isNearest && (
+                      <span style={{ background: '#f0fdf4', color: '#16a34a', border: '1px solid #bbf7d0', fontSize: '10px', fontWeight: 800, padding: '3px 8px', borderRadius: '12px', letterSpacing: '0.4px', whiteSpace: 'nowrap' }}>
+                        ⚡ NEAREST
+                      </span>
+                    )}
+                    {isSelected && (
+                      <span style={{ background: '#002542', color: '#ffffff', fontSize: '10px', fontWeight: 800, padding: '3px 10px', borderRadius: '12px', letterSpacing: '0.5px', whiteSpace: 'nowrap' }}>
+                        Selected
+                      </span>
+                    )}
+                  </div>
+                </div>
 
                 <div style={{ fontSize: '13px', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '16px' }}>
-                  <MapPin size={14} color="#002542" /> {c.distance}
+                  <MapPin size={14} color="#002542" /> <span style={{ fontWeight: 700, color: '#002542' }}>{c.distance}</span> · {c.area} ({c.pin})
                 </div>
 
                 <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>
-                  Earliest Availability
+                  EARLIEST AVAILABILITY
                 </div>
 
                 <div style={{ display: 'flex', gap: '8px', marginBottom: isSelected ? '20px' : '0' }}>
@@ -1353,76 +2463,141 @@ export function DLTestCenterSelectionPage() {
 
         </div>
 
-        {/* Right Column: High-Res Map Preview Card (Image 2) */}
+        {/* Right Column: Clean Live Map View (Auto-synced with Active Selection) */}
         <div style={{
           background: '#ffffff',
           borderRadius: '24px',
           overflow: 'hidden',
           border: '1px solid #e2e8f0',
           boxShadow: '0 6px 24px rgba(0, 37, 66, 0.05)',
-          height: '540px',
-          position: 'relative'
+          height: '520px',
+          position: 'sticky',
+          top: '24px'
         }}>
-          {/* Simulated Map Canvas */}
-          <div style={{
-            width: '100%',
-            height: '100%',
-            background: '#eef2f6',
-            backgroundImage: 'radial-gradient(#cbd5e1 1.5px, transparent 1.5px)',
-            backgroundSize: '24px 24px',
-            position: 'relative',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}>
-            {/* Map Road Vectors */}
-            <svg width="100%" height="100%" style={{ position: 'absolute', inset: 0, opacity: 0.7 }}>
-              <path d="M 0 120 Q 300 200 600 80" stroke="#ffffff" strokeWidth="24" fill="none" />
-              <path d="M 180 0 Q 220 300 350 540" stroke="#ffffff" strokeWidth="20" fill="none" />
-              <path d="M 0 380 Q 250 350 600 420" stroke="#ffffff" strokeWidth="16" fill="none" />
-            </svg>
-
-            {/* Selected Location Pin */}
-            <div style={{
-              position: 'absolute',
-              top: '40%',
-              left: '48%',
-              transform: 'translate(-50%, -50%)',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              zIndex: 10
-            }}>
-              <div style={{
-                background: '#002542',
-                color: '#ffffff',
-                padding: '8px 16px',
-                borderRadius: '20px',
-                fontSize: '12px',
-                fontWeight: 800,
-                boxShadow: '0 4px 14px rgba(0, 37, 66, 0.3)',
-                whiteSpace: 'nowrap',
-                marginBottom: '6px'
-              }}>
-                📍 {centers.find(c => c.id === selectedCenter)?.name || 'Sarai Kale Khan RTO'}
-              </div>
-              <div style={{ width: '16px', height: '16px', borderRadius: '50%', background: '#e88a2d', border: '3px solid #ffffff', boxShadow: '0 0 0 4px rgba(232, 138, 45, 0.4)' }} />
-            </div>
-
-            {/* Other RTO Pins */}
-            <div style={{ position: 'absolute', top: '25%', left: '20%', transform: 'translate(-50%, -50%)', opacity: 0.6 }}>
-              <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#002542', border: '2px solid #ffffff' }} />
-              <span style={{ fontSize: '10px', fontWeight: 700, color: '#476179' }}>Vasant Vihar</span>
-            </div>
-
-            <div style={{ position: 'absolute', top: '70%', left: '75%', transform: 'translate(-50%, -50%)', opacity: 0.6 }}>
-              <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#002542', border: '2px solid #ffffff' }} />
-              <span style={{ fontSize: '10px', fontWeight: 700, color: '#476179' }}>Dwarka Sec 22</span>
-            </div>
-          </div>
+          <iframe
+            key={activeCenter.id}
+            title="Live Test Center Map"
+            src={`https://maps.google.com/maps?q=${encodeURIComponent(activeCenter.name + ' ' + activeCenter.address)}&t=&z=14&ie=UTF8&iwloc=&output=embed`}
+            width="100%"
+            height="100%"
+            frameBorder="0"
+            style={{ border: 0, display: 'block', width: '100%', height: '100%' }}
+            allowFullScreen
+            loading="lazy"
+          />
         </div>
 
       </div>
+
+      {/* Inline Quick Edit Address Modal */}
+      {showEditAddressModal && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(0, 37, 66, 0.45)',
+          backdropFilter: 'blur(4px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          padding: '20px'
+        }}>
+          <div style={{
+            background: '#ffffff',
+            borderRadius: '20px',
+            padding: '28px 32px',
+            maxWidth: '480px',
+            width: '100%',
+            boxShadow: '0 20px 40px rgba(0, 37, 66, 0.15)',
+            border: '1px solid #e2e8f0'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#173b57', margin: 0 }}>
+                ✏️ Change Address
+              </h3>
+              <button
+                type="button"
+                onClick={() => setShowEditAddressModal(false)}
+                style={{ background: 'none', border: 'none', color: '#94a3b8', fontSize: '16px', cursor: 'pointer' }}
+              >
+                ✕
+              </button>
+            </div>
+
+            <p style={{ fontSize: '13px', color: '#64748b', margin: '0 0 20px 0', lineHeight: 1.4 }}>
+              Enter your address below. The system will automatically fetch all RTO test centres in your region and highlight the nearest one.
+            </p>
+
+            <form onSubmit={handleSaveInlineAddress} style={{ display: 'grid', gap: '14px' }}>
+              <div>
+                <label style={{ fontSize: '11px', fontWeight: 800, color: '#476179', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>Flat / House & Building</label>
+                <input
+                  type="text"
+                  value={editFlat}
+                  onChange={(e) => setEditFlat(e.target.value)}
+                  placeholder="e.g. Flat 402, Green Heights"
+                  required
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13.5px', boxSizing: 'border-box' }}
+                />
+              </div>
+
+              <div>
+                <label style={{ fontSize: '11px', fontWeight: 800, color: '#476179', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>Area / Locality</label>
+                <input
+                  type="text"
+                  value={editArea}
+                  onChange={(e) => setEditArea(e.target.value)}
+                  placeholder="e.g. Indiranagar, Dwarka, Andheri, Sakchi"
+                  required
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13.5px', boxSizing: 'border-box' }}
+                />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div>
+                  <label style={{ fontSize: '11px', fontWeight: 800, color: '#476179', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>City</label>
+                  <input
+                    type="text"
+                    value={editCity}
+                    onChange={(e) => setEditCity(e.target.value)}
+                    placeholder="e.g. Bengaluru, Delhi, Mumbai, Pune"
+                    required
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13.5px', boxSizing: 'border-box' }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ fontSize: '11px', fontWeight: 800, color: '#476179', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>Pin Code</label>
+                  <input
+                    type="text"
+                    value={editPin}
+                    onChange={(e) => setEditPin(e.target.value)}
+                    placeholder="e.g. 560034, 110013, 400053"
+                    required
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13.5px', boxSizing: 'border-box' }}
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '12px' }}>
+                <button
+                  type="button"
+                  onClick={() => setShowEditAddressModal(false)}
+                  style={{ background: '#f1f5f9', border: 'none', padding: '10px 16px', borderRadius: '8px', fontSize: '13px', fontWeight: 700, color: '#476179', cursor: 'pointer' }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  style={{ background: '#002542', border: 'none', padding: '10px 20px', borderRadius: '8px', fontSize: '13px', fontWeight: 800, color: '#ffffff', cursor: 'pointer' }}
+                >
+                  Save & Fetch RTOs
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
     </div>
   );

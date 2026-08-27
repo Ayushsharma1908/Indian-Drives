@@ -63,7 +63,7 @@ export function AskIndianDrivesPage() {
     {
       id: 'welcome',
       sender: 'assistant',
-      text: `Hello, Yanshi! 👋 I'm your Indian Drives Assistant. I can help you with your application steps, document checklists, fee payments, and driving test bookings. How can I help you today?`,
+      text: `Hello, Yanshi! 👋 I'm your DriveSEVA Assistant. I can help you with your application steps, document checklists, fee payments, and driving test bookings. How can I help you today?`,
       timestamp: 'Just now',
       followUps: [
         "What do I do next?",
@@ -374,7 +374,7 @@ export function AskIndianDrivesPage() {
               </div>
               <div>
                 <h3 className="card-header" style={{ fontSize: '24px', fontWeight: 600, color: '#173b57', margin: '0 0 3px 0' }}>
-                  Indian Drives Assistant
+                  DriveSEVA Assistant
                 </h3>
                 <p className="status-pill" style={{ fontSize: '13px', color: '#476179', margin: 0, fontWeight: 500, borderRadius: '9999px' }}>
                   Online • Ready to help

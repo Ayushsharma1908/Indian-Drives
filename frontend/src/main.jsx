@@ -353,11 +353,22 @@ function Shell({ children }) {
           <NavLink to="/journey" className={({ isActive }) => isActive ? "active" : ""}>
             {t('nav.journey')}
           </NavLink>
-          <NavLink to="/ask" className={({ isActive }) => isActive ? "active nav-ask-highlight" : "nav-ask-highlight"} style={({ isActive }) => ({ color: isActive ? '#e88a2d' : '#476179', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px' })}>
-            <span style={{ color: '#e88a2d', fontSize: '14px' }}>✦</span> {t('nav.ask')}
-          </NavLink>
           <NavLink to="/help" className={({ isActive }) => isActive ? "active" : ""}>
             {t('nav.help')}
+          </NavLink>
+          <NavLink
+            to="/ask"
+            className={({ isActive }) => isActive ? "active landing-ai-link" : "landing-ai-link"}
+            style={({ isActive }) => ({
+              color: '#e88a2d',
+              fontWeight: 700,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              opacity: isActive ? 1 : 0.95
+            })}
+          >
+            <span style={{ color: '#e88a2d', fontSize: '14px' }}>✦</span> {t('nav.ask')}
           </NavLink>
         </nav>
 
@@ -400,11 +411,11 @@ function Shell({ children }) {
           <NavLink to="/journey" className="landing-nav-link" onClick={() => setMobileMenuOpen(false)}>
             {t('nav.journey')}
           </NavLink>
-          <NavLink to="/ask" className="landing-ai-link" onClick={() => setMobileMenuOpen(false)}>
-            ✦ {t('nav.ask')}
-          </NavLink>
           <NavLink to="/help" className="landing-nav-link" onClick={() => setMobileMenuOpen(false)}>
             {t('nav.help')}
+          </NavLink>
+          <NavLink to="/ask" className="landing-ai-link" onClick={() => setMobileMenuOpen(false)}>
+            ✦ {t('nav.ask')}
           </NavLink>
         </div>
       </header>
