@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { CalendarDays, MapPin, Clock, CheckCircle2, XCircle, ArrowRight, Plus } from 'lucide-react';
 import { StatusBadge } from '../../components/ui/StatusBadge';
+import { useLanguage } from '../../main';
 
 export function AppointmentsPage() {
+  const { t } = useLanguage();
   const [tab, setTab] = useState('upcoming');
 
   const appointments = [
@@ -45,7 +47,7 @@ export function AppointmentsPage() {
       <div className="page-header flex-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <span className="eye-badge"><CalendarDays size={14} /> Slot Management</span>
-          <h1>Appointments</h1>
+          <h1>{t('userFlow.appointmentsTitle')}</h1>
           <p>Manage your upcoming tests and view past interactions with RTO centers.</p>
         </div>
         <button className="primary-button" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>

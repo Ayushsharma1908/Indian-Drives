@@ -26,6 +26,8 @@ import {
 import { executeAction } from '../../features/assistant/actions/actionCatalog';
 import { ConfirmationModal } from '../../features/assistant/components/ConfirmationModal';
 
+import { useLanguage } from '../../main';
+
 const SUGGESTED_QUESTIONS = [
   { id: 1, icon: FileText, text: 'How do I apply for a Learner Licence?' },
   { id: 2, icon: Folder, text: 'What documents do I need for an LL?' },
@@ -44,6 +46,7 @@ const FILTER_PILLS = [
 
 export function AskIndianDrivesPage() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [searchParams] = useSearchParams();
   const { context } = useJourneyContext();
   const [input, setInput] = useState('');
@@ -312,13 +315,13 @@ Book a Test: Schedule a slot for your practical driving test at your RTO.`,
           <div>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: '#e88a2d', fontSize: '12px', fontWeight: 800, letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '8px' }}>
               <span style={{ display: 'inline-block', width: '18px', height: '2px', background: '#e88a2d' }} />
-              ASK INDIAN DRIVES
+              {t('nav.ask')}
             </div>
             <h1 className="page-main-heading" style={{ fontSize: '48px', fontWeight: 700, color: '#173b57', margin: '0 0 6px 0', letterSpacing: '-0.8px', fontFamily: "'Hanken Grotesk', system-ui, sans-serif" }}>
-              Hello! How can we help?
+              {t('ask.greeting')}
             </h1>
             <p style={{ fontSize: '14px', color: '#476179', margin: 0, maxWidth: '640px' }}>
-              Get clear answers about Learner Licences, Driving Licences, documents, payments, tests and appointments.
+              {t('ask.subtitle')}
             </p>
           </div>
 

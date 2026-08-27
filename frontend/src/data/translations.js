@@ -282,6 +282,99 @@ const en = {
     processing: "Processing",
     licence: "DL Issued"
   },
+  stepper: {
+    application: "Application",
+    documents: "Documents",
+    payment: "Payment",
+    llAssessment: "LL Assessment",
+    drivingTest: "Driving Test",
+    licence: "Licence",
+    flowLL: "LEARNER LICENCE FLOW",
+    flowDL: "DRIVING LICENCE FLOW",
+    flowServices: "LICENCE SERVICES FLOW"
+  },
+  llFlow: {
+    introTitle: "Start Your Learner Licence Journey",
+    introSubtitle: "A guided digital pathway to your first driving milestone.",
+    journeyOverview: "Journey Overview",
+    stepsDesc: "5 guided steps: Personal info, Address, Vehicle choice, Upload proofs, & Final Review.",
+    rtoSelection: "RTO Selection",
+    rtoSelectionSub: "Auto-selected based on address.",
+    assessmentProcess: "Assessment Process",
+    assessmentProcessSub: "100% online assessment.",
+    startAppBtn: "Start LL Application",
+    applicantTitle: "Personal & Contact Details",
+    applicantSub: "Please fill in your basic identity details as per Aadhaar.",
+    fullName: "Full Name (as in Aadhaar)",
+    dob: "Date of Birth",
+    gender: "Gender",
+    mobile: "Mobile Number",
+    email: "Email Address",
+    aadhaarNo: "Aadhaar Number",
+    state: "State",
+    rtoOffice: "Select RTO Office",
+    addressTitle: "Address Details",
+    addressSub: "Provide your current and permanent residential address.",
+    doorNo: "Door / Flat / House No.",
+    street: "Street / Colony / Locality",
+    landmark: "Landmark (Optional)",
+    pincode: "Pincode",
+    city: "City / District",
+    vehicleTitle: "Select Vehicle Categories",
+    vehicleSub: "Choose the classes of vehicles you wish to get licensed for.",
+    docsTitle: "Mandatory Document Requirements",
+    docsSub: "Ensure clear digital scans before uploading.",
+    reviewTitle: "Application Review",
+    reviewSub: "Verify all details carefully before paying RTO fees.",
+    alertBanner: "Final Review Required",
+    paymentTitle: "Fee Payment Checkout",
+    paymentSub: "Official Government RTO Fee Payment",
+    verifiedTitle: "Learner Licence Issued!",
+    verifiedSub: "Congratulations! Your Learner Licence is now active and valid across India."
+  },
+  dlFlow: {
+    introTitle: "Continue to Your Driving Licence",
+    introSub: "Enter your active Learner Licence details to proceed.",
+    foundTitle: "Learner Licence Found!",
+    confirmAddrTitle: "Confirm your address",
+    docsTitle: "Verified Documents from LL",
+    checkoutTitle: "Secure DL Fee Payment",
+    centerTitle: "Select a Test Centre",
+    slotTitle: "Select a Test Slot",
+    fixedTitle: "Driving Test Appointment Fixed!",
+    resultTitle: "Driving Test Evaluation Result",
+    dispatchTitle: "Driving Licence Smartcard Dispatch Status"
+  },
+  servicesFlow: {
+    overviewTitle: "Licence Services & Maintenance",
+    renewalTitle: "Apply for DL Renewal",
+    duplicateTitle: "Request Duplicate DL Smartcard",
+    addressTitle: "Change Address in Driving Licence",
+    detailsTitle: "Update Personal & Contact Details",
+    idpTitle: "International Driving Permit (IDP)"
+  },
+  userFlow: {
+    profileTitle: "Citizen Profile & Settings",
+    notificationsTitle: "Notifications & System Alerts",
+    appointmentsTitle: "My Booked RTO Appointments",
+    helpTitle: "Help Center & FAQs"
+  },
+  ask: {
+    greeting: "Hello! How can we help?",
+    subtitle: "Get clear answers about Learner Licences, Driving Licences, documents, payments, tests and appointments."
+  },
+  journey: {
+    title: "YOUR DRIVING JOURNEY",
+    subtitle: "Real-time automotive speedometer dashboard & milestone tracker."
+  },
+  dashboard: {
+    title: "Namaste",
+    subtitle: "We'll guide you every step of the way.",
+    current: "Current Journey",
+    nextText: "Learner Licence is linked. Documents and payment are completed.",
+    nextStep: "Next Step",
+    nextHint: "Select a driving test slot at an available RTO test centre."
+  },
   footer: {
     line: "Indian Drives (DriveSeva) — Official Citizen Driving Licence Portal Concept."
   }

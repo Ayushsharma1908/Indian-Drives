@@ -4,11 +4,12 @@ import {
   User, Phone, Mail, FileText, Award, FolderCheck, Edit3, X, Check,
   ArrowRight, ShieldCheck, Calendar, MapPin, LogOut
 } from 'lucide-react';
-import { AuthContext } from '../../main';
+import { AuthContext, useLanguage } from '../../main';
 import { getStoredUserProfile, setStoredUserProfile } from '../../data/userProfileData';
 
 export function ProfilePage() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const auth = useContext(AuthContext);
 
   // Load initial profile details from unified single source of truth
@@ -111,7 +112,7 @@ export function ProfilePage() {
               transition: 'all 0.15s ease'
             }}
           >
-            <Edit3 size={16} /> Edit Profile
+            <Edit3 size={16} /> {t('userFlow.profileTitle')}
           </button>
 
           <button

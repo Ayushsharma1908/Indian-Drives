@@ -9,6 +9,8 @@ import { StatusBadge } from '../../components/ui/StatusBadge';
 import { getStoredUserProfile } from '../../data/userProfileData';
 import { UnifiedStageStepper } from '../../components/ui/UnifiedStageStepper';
 
+import { useLanguage } from '../../main';
+
 // ----------------------------------------------------------------------
 // COMMON DL FLOW TOP STEPPER COMPONENT (1:1 REFERENCE MATCH FROM IMAGE 1)
 // ----------------------------------------------------------------------
@@ -35,6 +37,7 @@ export function DLFlowHeaderStepper({ currentStep = 1 }) {
 // ----------------------------------------------------------------------
 export function DLIntroPage() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [llNumber, setLlNumber] = useState('LLA20260012345');
   const [dob, setDob] = useState('1998-08-14');
 
@@ -58,11 +61,11 @@ export function DLIntroPage() {
         textAlign: 'center'
       }}>
         <h1 style={{ fontSize: '26px', fontWeight: 800, color: '#173b57', margin: '0 0 10px 0', letterSpacing: '-0.5px' }}>
-          Continue to your Driving Licence
+          {t('dlFlow.introTitle')}
         </h1>
 
         <p style={{ color: '#64748b', fontSize: '14px', margin: '0 0 32px 0', lineHeight: 1.5 }}>
-          Enter your Learner Licence details to retrieve your existing information.
+          {t('dlFlow.introSub')}
         </p>
 
         <form onSubmit={handleVerify} style={{ textAlign: 'left', display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -174,6 +177,7 @@ export function DLIntroPage() {
 // ----------------------------------------------------------------------
 export function DLLearnerFoundPage() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const profile = getStoredUserProfile();
 
   return (
@@ -195,7 +199,7 @@ export function DLLearnerFoundPage() {
       </div>
 
       <h1 style={{ fontSize: '28px', fontWeight: 800, color: '#173b57', margin: '0 0 8px 0', letterSpacing: '-0.5px' }}>
-        Learner Licence Found
+        {t('dlFlow.learnerFoundTitle') || 'Learner Licence Found'}
       </h1>
 
       <p style={{ color: '#64748b', fontSize: '15px', margin: '0 0 32px 0' }}>
@@ -315,6 +319,7 @@ export function DLLearnerFoundPage() {
 // ----------------------------------------------------------------------
 export function DLStartIntroPage() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   return (
     <div className="page page-dl-start" style={{ width: 'min(1080px, calc(100% - 48px))', margin: '36px auto', fontFamily: 'Inter, system-ui, sans-serif' }}>
@@ -428,6 +433,7 @@ export function DLStartIntroPage() {
 // ----------------------------------------------------------------------
 export function DLConfirmAddressPage() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [isEditing, setIsEditing] = useState(false);
   const [unchanged, setUnchanged] = useState(true);
 
@@ -747,6 +753,7 @@ export function DLConfirmAddressPage() {
 // ----------------------------------------------------------------------
 export function DLVerifiedDocumentsPage() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const docCards = [
     {
@@ -866,6 +873,7 @@ export function DLVerifiedDocumentsPage() {
 // ----------------------------------------------------------------------
 export function DLPaymentCheckoutPage() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [paid, setPaid] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('upi');
   const [upiId, setUpiId] = useState('');
@@ -892,7 +900,7 @@ export function DLPaymentCheckoutPage() {
           </div>
 
           <h1 style={{ fontSize: '32px', fontWeight: 800, color: '#173b57', margin: '0 0 8px 0', letterSpacing: '-0.5px' }}>
-            Payment Successful!
+            {t('dlFlow.paymentSuccessTitle') || 'Payment Successful!'}
           </h1>
 
           <p style={{ color: '#64748b', fontSize: '15px', margin: '0 auto 32px auto', maxWidth: '520px', lineHeight: 1.5 }}>
@@ -1178,6 +1186,7 @@ export function DLPaymentCheckoutPage() {
 // ----------------------------------------------------------------------
 export function DLTestCenterSelectionPage() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [selectedCenter, setSelectedCenter] = useState('sarai');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -1212,7 +1221,7 @@ export function DLTestCenterSelectionPage() {
             LOCATION SELECTION
           </div>
           <h1 style={{ fontSize: '36px', fontWeight: 800, color: '#173b57', margin: '0 0 8px 0', letterSpacing: '-0.8px' }}>
-            Select a Test Centre
+            {t('dlFlow.centerTitle') || 'Select a Test Centre'}
           </h1>
         </div>
         
@@ -1410,6 +1419,7 @@ export function DLTestCenterSelectionPage() {
 // ----------------------------------------------------------------------
 export function DLTestSlotBookingPage() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [selectedDay, setSelectedDay] = useState('28');
   const [selectedSlot, setSelectedSlot] = useState('10:30 AM');
 
@@ -1744,6 +1754,7 @@ export function DLTestSlotBookingPage() {
 // ----------------------------------------------------------------------
 export function DLAppointmentFixedPage() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   useEffect(() => {
     localStorage.setItem('last_processed_flow', 'dl_appointment');
@@ -1771,7 +1782,7 @@ export function DLAppointmentFixedPage() {
         </div>
 
         <h1 style={{ fontSize: '32px', fontWeight: 800, color: '#173b57', margin: '0 0 8px 0', letterSpacing: '-0.5px' }}>
-          Driving Test Appointment Fixed! 🚗
+          {t('dlFlow.fixedTitle') || 'Driving Test Appointment Fixed!'} 🚗
         </h1>
 
         <p style={{ color: '#64748b', fontSize: '15px', margin: '0 auto 32px auto', maxWidth: '520px', lineHeight: 1.5 }}>
@@ -1919,6 +1930,7 @@ export function DLAppointmentFixedPage() {
 // ----------------------------------------------------------------------
 export function DLDashboardPage() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   return (
     <div className="page page-dl-dashboard" style={{ width: 'min(1080px, calc(100% - 48px))', margin: '36px auto', fontFamily: 'Inter, system-ui, sans-serif' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
@@ -1960,6 +1972,7 @@ export function DLDashboardPage() {
 // 8B. DRIVING TEST RESULT PAGE (1:1 REFERENCE IMAGE MATCH)
 export function DrivingTestResultPage() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [activeStep, setActiveStep] = useState(1);
 
   // Auto-process timeline to Step 3 (Dispatch & Tracking) in 1 second
@@ -2369,6 +2382,7 @@ export function DrivingTestResultPage() {
 // ----------------------------------------------------------------------
 export function LicenceDispatchPage() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   return (
     <div className="page page-dl-dispatch" style={{ width: 'min(1120px, calc(100% - 48px))', margin: '36px auto', fontFamily: 'Inter, system-ui, sans-serif' }}>

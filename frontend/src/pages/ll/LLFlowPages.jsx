@@ -8,7 +8,7 @@ import {
 import { StatusBadge } from '../../components/ui/StatusBadge';
 import { getStoredUserProfile } from '../../data/userProfileData';
 import { UnifiedStageStepper } from '../../components/ui/UnifiedStageStepper';
-import { LanguageContext } from '../../main';
+import { LanguageContext, useLanguage } from '../../main';
 
 // ----------------------------------------------------------------------
 // CONSISTENT 5-STEP HORIZONTAL STEPPER DESIGN FLOW
@@ -55,15 +55,16 @@ function LLFlowLayout({ currentStepIndex, title, children }) {
 // ----------------------------------------------------------------------
 export function LLApplicationIntroPage() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   return (
     <div className="page page-ll-intro" style={{ width: 'min(1140px, calc(100% - 48px))', margin: '36px auto', fontFamily: 'Inter, system-ui, sans-serif' }}>
       <div style={{ marginBottom: '32px' }}>
         <h1 style={{ fontSize: '42px', fontWeight: 800, color: '#173b57', margin: '0 0 8px 0', letterSpacing: '-1px' }}>
-          Start Your Learner Licence Journey
+          {t('llFlow.introTitle')}
         </h1>
         <p style={{ color: '#476179', fontSize: '16px', margin: 0, lineHeight: 1.5 }}>
-          A guided digital pathway to your first driving milestone.
+          {t('llFlow.introSubtitle')}
         </p>
       </div>
 
@@ -74,7 +75,7 @@ export function LLApplicationIntroPage() {
               ⇅
             </div>
             <h2 style={{ fontSize: '20px', fontWeight: 700, color: '#173b57', margin: 0 }}>
-              Journey Overview
+              {t('llFlow.journeyOverview')}
             </h2>
           </div>
 
@@ -104,7 +105,7 @@ export function LLApplicationIntroPage() {
           </div>
 
           <p style={{ color: '#476179', fontSize: '14px', margin: 0 }}>
-            5 guided steps: Personal info, Address, Vehicle choice, Upload proofs, & Final Review.
+            {t('llFlow.stepsDesc')}
           </p>
         </div>
 
@@ -114,8 +115,8 @@ export function LLApplicationIntroPage() {
               <MapPin size={20} />
             </div>
             <div>
-              <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#173b57', margin: '0 0 4px 0' }}>RTO Selection</h3>
-              <p style={{ fontSize: '14px', color: '#476179', margin: 0 }}>Auto-selected based on address.</p>
+              <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#173b57', margin: '0 0 4px 0' }}>{t('llFlow.rtoSelection')}</h3>
+              <p style={{ fontSize: '14px', color: '#476179', margin: 0 }}>{t('llFlow.rtoSelectionSub')}</p>
             </div>
           </div>
 
@@ -124,8 +125,8 @@ export function LLApplicationIntroPage() {
               <Laptop size={20} />
             </div>
             <div>
-              <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#173b57', margin: '0 0 4px 0' }}>Assessment Process</h3>
-              <p style={{ fontSize: '14px', color: '#476179', margin: 0 }}>100% online assessment.</p>
+              <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#173b57', margin: '0 0 4px 0' }}>{t('llFlow.assessmentProcess')}</h3>
+              <p style={{ fontSize: '14px', color: '#476179', margin: 0 }}>{t('llFlow.assessmentProcessSub')}</p>
             </div>
           </div>
         </div>
@@ -136,7 +137,7 @@ export function LLApplicationIntroPage() {
           onClick={() => navigate('/ll/applicant')}
           style={{ background: '#0f2942', color: '#ffffff', border: 'none', padding: '14px 32px', borderRadius: '10px', fontWeight: 700, fontSize: '15px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px' }}
         >
-          Start Application <ArrowRight size={18} />
+          {t('llFlow.startAppBtn')} <ArrowRight size={18} />
         </button>
       </div>
     </div>
@@ -148,22 +149,23 @@ export function LLApplicationIntroPage() {
 // ----------------------------------------------------------------------
 export function LLApplicantDetailsPage() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const profile = getStoredUserProfile();
 
   return (
-    <LLFlowLayout currentStepIndex={0} title="Personal Details">
+    <LLFlowLayout currentStepIndex={0} title={t('llFlow.applicantTitle')}>
       <div style={{ background: '#ffffff', borderRadius: '24px', padding: '36px', border: '1px solid #e2e8f0', boxShadow: '0 4px 20px rgba(0,37,66,0.04)' }}>
         <h2 style={{ fontSize: '24px', fontWeight: 800, color: '#173b57', margin: '0 0 6px 0' }}>
-          Applicant Information
+          {t('llFlow.applicantTitle')}
         </h2>
         <p style={{ fontSize: '14px', color: '#64748b', margin: '0 0 28px 0', borderBottom: '1px solid #f1f5f9', paddingBottom: '16px' }}>
-          Please provide your personal details as per official records.
+          {t('llFlow.applicantSub')}
         </p>
 
         <div style={{ display: 'grid', gap: '20px', marginBottom: '32px' }}>
           <div>
             <label style={{ fontSize: '13px', fontWeight: 700, color: '#173b57', display: 'block', marginBottom: '6px' }}>
-              Full Name (as per Aadhaar) <span style={{ color: '#ef4444' }}>*</span>
+              {t('llFlow.fullName')} <span style={{ color: '#ef4444' }}>*</span>
             </label>
             <input className="input-field" defaultValue={profile.fullName} placeholder={profile.fullName} style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid #e2e8f0', fontSize: '15px' }} />
           </div>
@@ -171,13 +173,13 @@ export function LLApplicantDetailsPage() {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
             <div>
               <label style={{ fontSize: '13px', fontWeight: 700, color: '#173b57', display: 'block', marginBottom: '6px' }}>
-                Date of Birth <span style={{ color: '#ef4444' }}>*</span>
+                {t('llFlow.dob')} <span style={{ color: '#ef4444' }}>*</span>
               </label>
               <input type="text" className="input-field" defaultValue={profile.dob} placeholder={profile.dob} style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid #e2e8f0', fontSize: '15px' }} />
             </div>
             <div>
               <label style={{ fontSize: '13px', fontWeight: 700, color: '#173b57', display: 'block', marginBottom: '6px' }}>
-                Gender <span style={{ color: '#ef4444' }}>*</span>
+                {t('llFlow.gender')} <span style={{ color: '#ef4444' }}>*</span>
               </label>
               <select className="input-field" defaultValue={profile.gender || "Male"} style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid #e2e8f0', fontSize: '15px' }}>
                 <option value="Male">Male</option>
@@ -199,7 +201,7 @@ export function LLApplicantDetailsPage() {
             </div>
             <div>
               <label style={{ fontSize: '13px', fontWeight: 700, color: '#173b57', display: 'block', marginBottom: '6px' }}>
-                Mobile Number <span style={{ color: '#ef4444' }}>*</span>
+                {t('llFlow.mobile')} <span style={{ color: '#ef4444' }}>*</span>
               </label>
               <input className="input-field" defaultValue={profile.mobile} placeholder={profile.mobile} style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid #e2e8f0', fontSize: '15px' }} />
             </div>
@@ -207,7 +209,7 @@ export function LLApplicantDetailsPage() {
 
           <div>
             <label style={{ fontSize: '13px', fontWeight: 700, color: '#173b57', display: 'block', marginBottom: '6px' }}>
-              Email Address
+              {t('llFlow.email')}
             </label>
             <input className="input-field" defaultValue={profile.email} placeholder={profile.email} style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid #e2e8f0', fontSize: '15px' }} />
           </div>
@@ -215,10 +217,10 @@ export function LLApplicantDetailsPage() {
 
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
           <button onClick={() => navigate('/ll/intro')} style={{ background: '#e0f0ff', color: '#002542', border: 'none', padding: '12px 24px', borderRadius: '10px', fontWeight: 700, fontSize: '14px', cursor: 'pointer' }}>
-            Back
+            {t('common.back')}
           </button>
           <button onClick={() => navigate('/ll/address')} style={{ background: '#0f2942', color: '#ffffff', border: 'none', padding: '12px 28px', borderRadius: '10px', fontWeight: 700, fontSize: '14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            Save & Continue <ArrowRight size={16} />
+            {t('common.continue')} <ArrowRight size={16} />
           </button>
         </div>
       </div>
@@ -231,31 +233,32 @@ export function LLApplicantDetailsPage() {
 // ----------------------------------------------------------------------
 export function LLAddressDetailsPage() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const profile = getStoredUserProfile();
 
   return (
-    <LLFlowLayout currentStepIndex={1} title="Address Details">
+    <LLFlowLayout currentStepIndex={1} title={t('llFlow.addressTitle')}>
       <div style={{ background: '#ffffff', borderRadius: '24px', padding: '36px', border: '1px solid #e2e8f0', boxShadow: '0 4px 20px rgba(0,37,66,0.04)' }}>
         <h2 style={{ fontSize: '24px', fontWeight: 800, color: '#173b57', margin: '0 0 6px 0' }}>
-          Residential Address
+          {t('llFlow.addressTitle')}
         </h2>
         <p style={{ fontSize: '14px', color: '#64748b', margin: '0 0 28px 0', borderBottom: '1px solid #f1f5f9', paddingBottom: '16px' }}>
-          Provide present address as per valid address proof.
+          {t('llFlow.addressSub')}
         </p>
 
         <div style={{ display: 'grid', gap: '20px', marginBottom: '32px' }}>
           <div>
-            <label style={{ fontSize: '13px', fontWeight: 700, color: '#173b57', display: 'block', marginBottom: '6px' }}>Street Address / Flat No.</label>
+            <label style={{ fontSize: '13px', fontWeight: 700, color: '#173b57', display: 'block', marginBottom: '6px' }}>{t('llFlow.street')}</label>
             <input className="input-field" defaultValue={profile.streetAddress} placeholder={profile.streetAddress} style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid #e2e8f0', fontSize: '15px' }} />
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
             <div>
-              <label style={{ fontSize: '13px', fontWeight: 700, color: '#173b57', display: 'block', marginBottom: '6px' }}>City / District</label>
+              <label style={{ fontSize: '13px', fontWeight: 700, color: '#173b57', display: 'block', marginBottom: '6px' }}>{t('llFlow.city')}</label>
               <input className="input-field" defaultValue={profile.city} placeholder={profile.city} style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid #e2e8f0', fontSize: '15px' }} />
             </div>
             <div>
-              <label style={{ fontSize: '13px', fontWeight: 700, color: '#173b57', display: 'block', marginBottom: '6px' }}>State & Pincode</label>
+              <label style={{ fontSize: '13px', fontWeight: 700, color: '#173b57', display: 'block', marginBottom: '6px' }}>{t('llFlow.pincode')}</label>
               <input className="input-field" defaultValue={`${profile.state} - ${profile.pincode}`} placeholder={`${profile.state} - ${profile.pincode}`} style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid #e2e8f0', fontSize: '15px' }} />
             </div>
           </div>
@@ -263,10 +266,10 @@ export function LLAddressDetailsPage() {
 
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
           <button onClick={() => navigate('/ll/applicant')} style={{ background: '#e0f0ff', color: '#002542', border: 'none', padding: '12px 24px', borderRadius: '10px', fontWeight: 700, fontSize: '14px', cursor: 'pointer' }}>
-            Back
+            {t('common.back')}
           </button>
           <button onClick={() => navigate('/ll/vehicle')} style={{ background: '#0f2942', color: '#ffffff', border: 'none', padding: '12px 28px', borderRadius: '10px', fontWeight: 700, fontSize: '14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            Save & Continue <ArrowRight size={16} />
+            {t('common.continue')} <ArrowRight size={16} />
           </button>
         </div>
       </div>
@@ -279,6 +282,7 @@ export function LLAddressDetailsPage() {
 // ----------------------------------------------------------------------
 export function LLVehicleSelectionPage() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [selected, setSelected] = useState(['lmv', 'mcwg']);
 
   const toggle = (id) => {
@@ -286,13 +290,13 @@ export function LLVehicleSelectionPage() {
   };
 
   return (
-    <LLFlowLayout currentStepIndex={2} title="Vehicle Class">
+    <LLFlowLayout currentStepIndex={2} title={t('llFlow.vehicleTitle')}>
       <div style={{ background: '#ffffff', borderRadius: '24px', padding: '36px', border: '1px solid #e2e8f0', boxShadow: '0 4px 20px rgba(0,37,66,0.04)' }}>
         <h2 style={{ fontSize: '24px', fontWeight: 800, color: '#173b57', margin: '0 0 6px 0' }}>
-          Select Vehicle Categories
+          {t('llFlow.vehicleTitle')}
         </h2>
         <p style={{ fontSize: '14px', color: '#64748b', margin: '0 0 28px 0', borderBottom: '1px solid #f1f5f9', paddingBottom: '16px' }}>
-          Choose vehicle classes you wish to be licensed for.
+          {t('llFlow.vehicleSub')}
         </p>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '32px' }}>
@@ -343,10 +347,10 @@ export function LLVehicleSelectionPage() {
 
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
           <button onClick={() => navigate('/ll/address')} style={{ background: '#e0f0ff', color: '#002542', border: 'none', padding: '12px 24px', borderRadius: '10px', fontWeight: 700, fontSize: '14px', cursor: 'pointer' }}>
-            Back
+            {t('common.back')}
           </button>
           <button onClick={() => navigate('/ll/documents')} style={{ background: '#0f2942', color: '#ffffff', border: 'none', padding: '12px 28px', borderRadius: '10px', fontWeight: 700, fontSize: '14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            Save & Continue <ArrowRight size={16} />
+            {t('common.continue')} <ArrowRight size={16} />
           </button>
         </div>
       </div>
@@ -370,15 +374,16 @@ function BikeIcon() {
 // ----------------------------------------------------------------------
 export function LLDocumentRequirementsPage() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   return (
-    <LLFlowLayout currentStepIndex={3} title="Document Upload">
+    <LLFlowLayout currentStepIndex={3} title={t('llFlow.docsTitle')}>
       <div style={{ background: '#ffffff', borderRadius: '24px', padding: '36px', border: '1px solid #e2e8f0', boxShadow: '0 4px 20px rgba(0,37,66,0.04)' }}>
         <h2 style={{ fontSize: '24px', fontWeight: 800, color: '#173b57', margin: '0 0 6px 0' }}>
-          Mandatory Proof Uploads
+          {t('llFlow.docsTitle')}
         </h2>
         <p style={{ fontSize: '14px', color: '#64748b', margin: '0 0 28px 0', borderBottom: '1px solid #f1f5f9', paddingBottom: '16px' }}>
-          Upload clear PDF or JPG copies of your identity, address, photo, and signature.
+          {t('llFlow.docsSub')}
         </p>
 
         <div style={{ display: 'grid', gap: '16px', marginBottom: '32px' }}>
@@ -407,10 +412,10 @@ export function LLDocumentRequirementsPage() {
 
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
           <button onClick={() => navigate('/ll/vehicle')} style={{ background: '#e0f0ff', color: '#002542', border: 'none', padding: '12px 24px', borderRadius: '10px', fontWeight: 700, fontSize: '14px', cursor: 'pointer' }}>
-            Back
+            {t('common.back')}
           </button>
           <button onClick={() => navigate('/ll/review')} style={{ background: '#0f2942', color: '#ffffff', border: 'none', padding: '12px 28px', borderRadius: '10px', fontWeight: 700, fontSize: '14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            Proceed to Review <ArrowRight size={16} />
+            {t('common.continue')} <ArrowRight size={16} />
           </button>
         </div>
       </div>
@@ -423,11 +428,12 @@ export function LLDocumentRequirementsPage() {
 // ----------------------------------------------------------------------
 export function LLApplicationReviewPage() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [confirmed, setConfirmed] = useState(false);
   const profile = getStoredUserProfile();
 
   return (
-    <LLFlowLayout currentStepIndex={4} title="Application Review">
+    <LLFlowLayout currentStepIndex={4} title={t('llFlow.reviewTitle')}>
       
       {/* 2-Column Main Section */}
       <div className="responsive-split-grid grid-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '28px', alignItems: 'start', marginBottom: '32px' }}>
@@ -442,7 +448,7 @@ export function LLApplicationReviewPage() {
             </div>
             <div>
               <h4 style={{ margin: '0 0 4px 0', fontSize: '15px', fontWeight: 800, color: '#173b57' }}>
-                Final Review Required
+                {t('llFlow.alertBanner')}
               </h4>
               <p style={{ margin: 0, fontSize: '13px', color: '#476179', lineHeight: 1.5 }}>
                 Please verify all details carefully. Changes cannot be made after submission without starting a new application.
@@ -726,6 +732,7 @@ export function LLApplicationReviewPage() {
 // ----------------------------------------------------------------------
 export function LLFeePaymentPage() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [paid, setPaid] = useState(false);
   const [selectedUpiApp, setSelectedUpiApp] = useState('gpay');
   const [upiId, setUpiId] = useState('');
@@ -795,7 +802,7 @@ export function LLFeePaymentPage() {
           </div>
 
           <h1 style={{ fontSize: '36px', fontWeight: 800, color: '#173b57', margin: '0 0 8px 0', letterSpacing: '-0.5px' }}>
-            Payment Successful
+            {t('llFlow.paymentSuccessTitle') || 'Payment Successful'}
           </h1>
           <p style={{ color: '#64748b', fontSize: '16px', maxWidth: '520px', margin: '0 auto', lineHeight: 1.5 }}>
             Your payment of <strong>₹220.00</strong> has been recorded. Your application is now moving to the next stage.
@@ -891,7 +898,7 @@ export function LLFeePaymentPage() {
       {/* Title Header & Badges */}
       <div style={{ marginBottom: '28px' }}>
         <h1 style={{ fontSize: '32px', fontWeight: 800, color: '#173b57', margin: '0 0 12px 0', letterSpacing: '-0.5px' }}>
-          Secure Payment
+          {t('llFlow.checkoutTitle') || 'Secure Payment'}
         </h1>
 
         <div style={{ display: 'flex', gap: '12px' }}>
@@ -1114,8 +1121,7 @@ export function LLFeePaymentPage() {
 // ----------------------------------------------------------------------
 export function LLAssessmentCockpitPage() {
   const navigate = useNavigate();
-  const { tr } = useContext(LanguageContext) || {};
-  const t = (key) => (tr ? tr(key) : key);
+  const { t } = useLanguage();
 
   return (
     <div className="page page-ll-cockpit cockpit-page-container">
@@ -1310,6 +1316,7 @@ export function LLAssessmentCockpitPage() {
 // ----------------------------------------------------------------------
 export function LLAssessmentLiveExamPage() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [selectedOpt, setSelectedOpt] = useState('C');
   const [answeredCount, setAnsweredCount] = useState(1);
 
@@ -1561,6 +1568,7 @@ export function LLAssessmentLiveExamPage() {
 // ----------------------------------------------------------------------
 export function LLAssessmentResultPage() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   return (
     <div className="page page-ll-result" style={{ width: 'min(1184px, calc(100% - 48px))', margin: '36px auto', fontFamily: 'Inter, system-ui, sans-serif' }}>
@@ -1576,7 +1584,7 @@ export function LLAssessmentResultPage() {
         </div>
 
         <h1 style={{ fontSize: '32px', fontWeight: 800, color: '#173b57', margin: '0 0 10px 0', letterSpacing: '-0.5px' }}>
-          Congratulations! You cleared the Learner Licence assessment.
+          {t('llFlow.resultTitle') || 'Congratulations! You cleared the Learner Licence assessment.'}
         </h1>
 
         <p style={{ color: '#64748b', fontSize: '15px', maxWidth: '600px', margin: '0 auto', lineHeight: 1.5 }}>
@@ -1766,6 +1774,7 @@ export function LLAssessmentResultPage() {
 // ----------------------------------------------------------------------
 export function LLVerifiedPage() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   return (
     <div className="page page-ll-verified" style={{ width: 'min(1184px, calc(100% - 48px))', margin: '36px auto', fontFamily: 'Inter, system-ui, sans-serif' }}>
@@ -1788,7 +1797,7 @@ export function LLVerifiedPage() {
         </div>
 
         <h1 style={{ fontSize: '30px', fontWeight: 800, color: '#173b57', margin: '0 0 8px 0', letterSpacing: '-0.5px' }}>
-          Your Learner Licence has been issued! 🥳
+          {t('llFlow.docsTitle') || 'Your Learner Licence has been issued! 🥳'}
         </h1>
 
         <p style={{ color: '#64748b', fontSize: '15px', margin: 0 }}>

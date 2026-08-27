@@ -4,9 +4,11 @@ import {
   Bell, Check, FileText, Calendar, CreditCard, Award, Laptop, CheckCircle2,
   AlertTriangle, ArrowRight, Download, RefreshCw
 } from 'lucide-react';
+import { useLanguage } from '../../main';
 
 export function NotificationsPage() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [activeFilter, setActiveFilter] = useState('all');
 
   const [notificationList, setNotificationList] = useState([
@@ -98,7 +100,7 @@ export function NotificationsPage() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div style={{ width: '4px', height: '38px', background: '#0f2942', borderRadius: '2px' }} />
             <h1 style={{ fontSize: '38px', fontWeight: 800, color: '#173b57', margin: 0, letterSpacing: '-0.8px' }}>
-              Notifications
+              {t('userFlow.notificationsTitle')}
             </h1>
           </div>
           <p style={{ color: '#64748b', fontSize: '15px', margin: '6px 0 0 16px' }}>

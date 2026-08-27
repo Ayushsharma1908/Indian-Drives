@@ -5,19 +5,20 @@ import {
   Upload, Clock, Sparkles, MapPin, CalendarDays, Search, HelpCircle, Check,
   Car, Shield, Award, Flag, User, CreditCard, Lock, AlertCircle, FileCheck, X
 } from 'lucide-react';
-import { StatusBadge } from '../../components/ui/StatusBadge';
 import { getStoredUserProfile } from '../../data/userProfileData';
+import { useLanguage } from '../../main';
 
 // ----------------------------------------------------------------------
 // 1. LICENCE SERVICES HUB PAGE (1:1 IMAGE 1 MATCH)
 // ----------------------------------------------------------------------
 export function LicenceServicesHubPage() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const services = [
     {
       id: 'renew',
-      title: 'Renew Driving Licence',
+      title: t('servicesFlow.renewalTitle'),
       desc: 'Renew your licence and continue driving legally.',
       buttonText: 'Renew Licence →',
       path: '/renew-licence',
@@ -131,6 +132,7 @@ export function LicenceServicesHubPage() {
 // ----------------------------------------------------------------------
 export function ManageDrivingLicencePage() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [dlNo, setDlNo] = useState('');
   const [dob, setDob] = useState('');
 
@@ -293,7 +295,7 @@ export function ManageDrivingLicencePage() {
 // ----------------------------------------------------------------------
 export function LicenceFoundPage() {
   const navigate = useNavigate();
-
+  const { t } = useLanguage();
   return (
     <div className="page page-licence-found" style={{ width: 'min(900px, calc(100% - 48px))', margin: '48px auto', fontFamily: 'Inter, system-ui, sans-serif' }}>
       
@@ -470,7 +472,7 @@ export function LicenceFoundPage() {
 // ----------------------------------------------------------------------
 export function RenewDrivingLicencePage() {
   const navigate = useNavigate();
-
+  const { t } = useLanguage();
   return (
     <div className="page page-renew-dl" style={{ width: 'min(1120px, calc(100% - 48px))', margin: '40px auto', fontFamily: 'Inter, system-ui, sans-serif' }}>
       
@@ -667,7 +669,7 @@ export function RenewDrivingLicencePage() {
 // ----------------------------------------------------------------------
 export function UpdateLicenceDetailsPage() {
   const navigate = useNavigate();
-
+  const { t } = useLanguage();
   // State for selected update categories
   const [selectedFields, setSelectedFields] = useState(['name', 'contact']);
   const profile = getStoredUserProfile();
@@ -1113,7 +1115,7 @@ export function UpdateLicenceDetailsPage() {
 // ----------------------------------------------------------------------
 export function DuplicateDrivingLicencePage() {
   const navigate = useNavigate();
-
+  const { t } = useLanguage();
   return (
     <div className="page page-duplicate-dl" style={{ width: 'min(900px, calc(100% - 48px))', margin: '40px auto', fontFamily: 'Inter, system-ui, sans-serif' }}>
       <div style={{ background: '#ffffff', padding: '40px', borderRadius: '24px', border: '1px solid #e2e8f0', boxShadow: '0 4px 20px rgba(0, 37, 66, 0.04)' }}>
@@ -1171,6 +1173,7 @@ export function DuplicateDrivingLicencePage() {
 // ----------------------------------------------------------------------
 export function LicenceServicePaymentCheckoutPage() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [searchParams] = useSearchParams();
 
   const serviceKey = searchParams.get('service') || 'renew';
@@ -1361,6 +1364,7 @@ export function LicenceServicePaymentCheckoutPage() {
 // ----------------------------------------------------------------------
 export function LicenceServicePaymentSuccessPage() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [searchParams] = useSearchParams();
 
   const serviceKey = searchParams.get('service') || 'renew';
@@ -1506,6 +1510,7 @@ export function LicenceServicePaymentSuccessPage() {
 // 6. My Journey Speedometer Dashboard (Figma Frame 65:4739)
 export function MyJourneyTimelinePage({ initialStage }) {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [searchParams] = useSearchParams();
   const queryStage = searchParams.get('stage');
 
@@ -1555,10 +1560,10 @@ export function MyJourneyTimelinePage({ initialStage }) {
       {/* Title Header */}
       <div>
         <h1 style={{ fontSize: '44px', fontWeight: 800, color: '#173b57', margin: '0 0 6px 0', letterSpacing: '-1.2px', textTransform: 'uppercase' }}>
-          YOUR DRIVING JOURNEY
+          {t('journey.title')}
         </h1>
         <p style={{ color: '#476179', fontSize: '16px', margin: 0 }}>
-          Real-time automotive speedometer dashboard & milestone tracker.
+          {t('journey.subtitle')}
         </p>
       </div>
 

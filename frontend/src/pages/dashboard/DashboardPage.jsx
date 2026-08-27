@@ -4,9 +4,11 @@ import { Calendar, ArrowRight, Car, FileText, Shield, Bell, CheckCircle2, Award,
 import { motion, AnimatePresence } from 'framer-motion';
 import { api } from '../../services/api';
 import { getStoredUserProfile } from '../../data/userProfileData';
+import { useLanguage } from '../../main';
 
 export function DashboardPage() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const profile = getStoredUserProfile();
   const [searchParams] = useSearchParams();
   const [upcomingVisit, setUpcomingVisit] = useState(null);
@@ -551,12 +553,12 @@ export function DashboardPage() {
           {/* Left Text */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <h1 style={{ fontSize: '54px', fontWeight: 700, color: '#173b57', margin: 0, lineHeight: 1.1, letterSpacing: '-1.5px' }}>
-              Namaste, {profile.firstName || 'Yanshi'} 🙏
+              {t('dashboard.title')}, {profile.firstName || 'Yanshi'} 🙏
             </h1>
             <div style={{ fontSize: '22px', color: '#173b57', fontWeight: 600, lineHeight: 1.4 }}>
               Welcome to Indian Drives.
               <div style={{ color: '#476179', fontWeight: 400, marginTop: '4px' }}>
-                {"We'll guide you every step of the way."}
+                {t('dashboard.subtitle')}
               </div>
             </div>
           </div>

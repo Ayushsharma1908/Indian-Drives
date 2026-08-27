@@ -315,7 +315,7 @@ function ProtectedApp() {
 }
 
 function Shell({ children }) {
-  const { language, setLanguage } = useContext(LanguageContext);
+  const { language, setLanguage, t } = useLanguage();
   const { user, logout } = useContext(AuthContext);
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -343,16 +343,16 @@ function Shell({ children }) {
 
         <nav className="navlinks desktop-only-nav" aria-label="Primary">
           <NavLink to="/dashboard" className={({ isActive }) => isActive ? "active" : ""}>
-            Dashboard
+            {t('nav.dashboard')}
           </NavLink>
           <NavLink to="/journey" className={({ isActive }) => isActive ? "active" : ""}>
-            My Journey
+            {t('nav.journey')}
           </NavLink>
           <NavLink to="/ask" className={({ isActive }) => isActive ? "active nav-ask-highlight" : "nav-ask-highlight"} style={({ isActive }) => ({ color: isActive ? '#e88a2d' : '#476179', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px' })}>
-            <span style={{ color: '#e88a2d', fontSize: '14px' }}>✦</span> Ask DriveSeva
+            <span style={{ color: '#e88a2d', fontSize: '14px' }}>✦</span> {t('nav.ask')}
           </NavLink>
           <NavLink to="/help" className={({ isActive }) => isActive ? "active" : ""}>
-            Help
+            {t('nav.help')}
           </NavLink>
         </nav>
 
@@ -390,16 +390,16 @@ function Shell({ children }) {
         {/* Mobile Slide Drawer */}
         <div className={`landing-mobile-drawer ${mobileMenuOpen ? 'open' : ''}`}>
           <NavLink to="/dashboard" className="landing-nav-link" onClick={() => setMobileMenuOpen(false)}>
-            Dashboard
+            {t('nav.dashboard')}
           </NavLink>
           <NavLink to="/journey" className="landing-nav-link" onClick={() => setMobileMenuOpen(false)}>
-            My Journey
+            {t('nav.journey')}
           </NavLink>
           <NavLink to="/ask" className="landing-ai-link" onClick={() => setMobileMenuOpen(false)}>
-            ✦ Ask DriveSeva
+            ✦ {t('nav.ask')}
           </NavLink>
           <NavLink to="/help" className="landing-nav-link" onClick={() => setMobileMenuOpen(false)}>
-            Help
+            {t('nav.help')}
           </NavLink>
         </div>
       </header>

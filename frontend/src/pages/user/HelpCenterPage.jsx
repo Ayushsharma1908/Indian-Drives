@@ -4,9 +4,11 @@ import {
   Search, ArrowRight, Bot, Sparkles, BookOpen, CreditCard, FolderCheck,
   Calendar, Car, ChevronDown, ChevronUp, FileText, CheckCircle2, ShieldCheck, X
 } from 'lucide-react';
+import { useLanguage } from '../../main';
 
 export function HelpCenterPage() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [openFaq, setOpenFaq] = useState(null); // Accordion state for FAQs
@@ -148,7 +150,7 @@ export function HelpCenterPage() {
         {/* 1. HERO SEARCH SECTION */}
         <div style={{ textAlign: 'center', maxWidth: '780px', margin: '0 auto' }}>
           <h1 className="page-main-heading" style={{ fontSize: '48px', fontWeight: 700, color: '#173b57', margin: '0 0 12px 0', letterSpacing: '-0.8px' }}>
-            How can we help?
+            {t('userFlow.helpTitle')}
           </h1>
           <p style={{ fontSize: '16px', color: '#476179', margin: '0 0 32px 0', lineHeight: 1.5 }}>
             Find clear, official answers about Indian Drives services, licensing, and procedures.
