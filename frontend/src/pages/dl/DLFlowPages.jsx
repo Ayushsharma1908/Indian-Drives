@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import {
   Car, ShieldCheck, CheckCircle2, CalendarDays, MapPin, CreditCard, Clock,
   ArrowRight, ArrowLeft, Download, Check, Truck, Award, Lock, Info, Calendar,
-  User, FileText, Home, ExternalLink, Shield, Sparkles, Building2, HelpCircle
+  User, FileText, Home, ExternalLink, Shield, Sparkles, Building2, HelpCircle,
+  Search, Navigation, Compass, LocateFixed, SlidersHorizontal, Settings
 } from 'lucide-react';
 import { StatusBadge } from '../../components/ui/StatusBadge';
 import { centralDataStore } from '../../data/centralDataStore';
@@ -439,17 +440,47 @@ export function DLConfirmAddressPage() {
   const [unchanged, setUnchanged] = useState(true);
 
   // Editable Address Form State
-  const [flatNo, setFlatNo] = useState('123, Sector 4, MG Road');
-  const [area, setArea] = useState('Indiranagar');
-  const [city, setCity] = useState('Bengaluru');
-  const [stateName, setStateName] = useState('Karnataka');
-  const [pincode, setPincode] = useState('560034');
+  const initialAddress = centralDataStore.getDraftForm('dl_address') || {
+    flatNo: '123, Sector 4, MG Road',
+    area: 'Indiranagar',
+    city: 'Bengaluru',
+    stateName: 'Karnataka',
+    pincode: '560034'
+  };
+
+  const [flatNo, setFlatNo] = useState(initialAddress.flatNo);
+  const [area, setArea] = useState(initialAddress.area);
+  const [city, setCity] = useState(initialAddress.city);
+  const [stateName, setStateName] = useState(initialAddress.stateName);
+  const [pincode, setPincode] = useState(initialAddress.pincode);
   const [docUploaded, setDocUploaded] = useState(true);
+
+  const handleConfirmAddress = () => {
+    centralDataStore.saveDraftForm('dl_address', {
+      flatNo,
+      area,
+      city,
+      stateName,
+      pincode,
+      fullAddress: `${flatNo}, ${area}, ${city}, ${stateName} ${pincode}`,
+      unchanged
+    });
+    navigate('/dl/documents');
+  };
 
   const handleSaveUpdatedAddress = (e) => {
     e.preventDefault();
     setUnchanged(false);
     setIsEditing(false);
+    centralDataStore.saveDraftForm('dl_address', {
+      flatNo,
+      area,
+      city,
+      stateName,
+      pincode,
+      fullAddress: `${flatNo}, ${area}, ${city}, ${stateName} ${pincode}`,
+      unchanged: false
+    });
     alert("Updated address saved successfully! Proceeding to document verification.");
     navigate('/dl/documents');
   };
@@ -472,6 +503,7 @@ export function DLConfirmAddressPage() {
             </h1>
 
             <p style={{ color: '#64748b', fontSize: '15px', lineHeight: 1.6, margin: '0' }}>
+              We've retrieved your address from your Learner Licence. Please review the details below to ensure they are still accurate before proceeding.
             </p>
           </div>
 
@@ -542,7 +574,7 @@ export function DLConfirmAddressPage() {
             {/* Action Buttons */}
             <div style={{ display: 'flex', gap: '16px', marginTop: '12px' }}>
               <button
-                onClick={() => navigate('/dl/documents')}
+                onClick={handleConfirmAddress}
                 style={{
                   background: '#002542',
                   color: '#ffffff',
@@ -1563,40 +1595,574 @@ export function DLPaymentCheckoutPage() {
 }
 
 // ----------------------------------------------------------------------
-// 7A. DL TEST CENTRE SELECTION PAGE (1:1 IMAGE 2 MATCH)
+// 7A. DL TEST CENTRE SELECTION PAGE (NATIONWIDE RTOs, PIN/CITY/STATE SEARCH & MAP SYNC)
 // ----------------------------------------------------------------------
 export function DLTestCenterSelectionPage() {
   const navigate = useNavigate();
   const { t } = useLanguage();
-  const [selectedCenter, setSelectedCenter] = useState('sarai');
-  const [searchQuery, setSearchQuery] = useState('');
+  
+  // Read confirmed registered address from Step 3 (DL Confirm Address) or profile
+  const [addressData, setAddressData] = useState(() => {
+    const draft = centralDataStore.getDraftForm('dl_address');
+    if (draft && (draft.city || draft.fullAddress)) return draft;
+    const profile = getStoredUserProfile();
+    if (profile && (profile.city || profile.streetAddress)) {
+      return {
+        flatNo: profile.streetAddress || 'Flat 402, Green Park Heights, Sakchi',
+        area: profile.district || 'Sakchi',
+        city: profile.city || 'Jamshedpur',
+        stateName: profile.state || 'Jharkhand',
+        pincode: profile.pincode || '831001',
+        fullAddress: profile.fullAddress || `${profile.streetAddress}, ${profile.city}, ${profile.state} - ${profile.pincode}`
+      };
+    }
+    return {
+      flatNo: '123, Sector 4, MG Road',
+      area: 'Indiranagar',
+      city: 'Bengaluru',
+      stateName: 'Karnataka',
+      pincode: '560034',
+      fullAddress: '123, Sector 4, MG Road, Indiranagar, Bengaluru, Karnataka 560034'
+    };
+  });
 
-  const centers = [
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showEditAddressModal, setShowEditAddressModal] = useState(false);
+
+  // Edit Address Form State
+  const [editFlat, setEditFlat] = useState(addressData.flatNo || '');
+  const [editArea, setEditArea] = useState(addressData.area || '');
+  const [editCity, setEditCity] = useState(addressData.city || 'Bengaluru');
+  const [editPin, setEditPin] = useState(addressData.pincode || '560034');
+
+  // Comprehensive Nationwide RTO Automated Driving Test Track (ADTT) Database
+  const NATIONWIDE_RTO_DATABASE = [
+    // --- KARNATAKA / BENGALURU ---
     {
-      id: 'sarai',
-      name: 'Sarai Kale Khan RTO',
-      distance: '3.2km away',
+      id: 'blr-indiranagar',
+      name: 'Indiranagar Automated Test Track (ADTT)',
+      rtoCode: 'KA-03',
+      area: 'Indiranagar, East Bengaluru',
+      city: 'Bengaluru',
+      state: 'Karnataka',
+      pin: '560038',
+      pinPrefix: '560',
+      address: '100 Feet Road, Near CMH Hospital, Indiranagar, Bengaluru, Karnataka 560038',
+      lat: 12.9784,
+      lng: 77.6408,
       slots: ['12 Oct', '14 Oct']
     },
     {
-      id: 'vasant',
-      name: 'Vasant Vihar Test Track',
-      distance: '5.8km away',
-      slots: ['Checking slots...']
+      id: 'blr-koramangala',
+      name: 'Koramangala RTO (KA-01)',
+      rtoCode: 'KA-01',
+      area: 'Koramangala, South-East Bengaluru',
+      city: 'Bengaluru',
+      state: 'Karnataka',
+      pin: '560034',
+      pinPrefix: '560',
+      address: '80 Feet Road, 3rd Block, Koramangala, Bengaluru, Karnataka 560034',
+      lat: 12.9345,
+      lng: 77.6266,
+      slots: ['15 Oct', '16 Oct']
     },
     {
-      id: 'dwarka',
-      name: 'Dwarka Sector 22',
-      distance: '12.4km away',
-      slots: ['18 Oct']
+      id: 'blr-jayanagar',
+      name: 'Jayanagar Automated Test Track (KA-05)',
+      rtoCode: 'KA-05',
+      area: 'Jayanagar, South Bengaluru',
+      city: 'Bengaluru',
+      state: 'Karnataka',
+      pin: '560011',
+      pinPrefix: '560',
+      address: '4th Block, 9th Main Road, Jayanagar, Bengaluru, Karnataka 560011',
+      lat: 12.9250,
+      lng: 77.5838,
+      slots: ['14 Oct', '17 Oct']
+    },
+    {
+      id: 'blr-yeshwanthpur',
+      name: 'Yeshwanthpur RTO Facility (KA-04)',
+      rtoCode: 'KA-04',
+      area: 'Yeshwanthpur, North-West Bengaluru',
+      city: 'Bengaluru',
+      state: 'Karnataka',
+      pin: '560022',
+      pinPrefix: '560',
+      address: 'Near Yeshwanthpur Metro Station, Tumkur Road, Bengaluru, Karnataka 560022',
+      lat: 13.0285,
+      lng: 77.5458,
+      slots: ['18 Oct', '20 Oct']
+    },
+    {
+      id: 'blr-ecity',
+      name: 'Electronic City Automated Track (KA-51)',
+      rtoCode: 'KA-51',
+      area: 'Electronic City, South Bengaluru',
+      city: 'Bengaluru',
+      state: 'Karnataka',
+      pin: '560100',
+      pinPrefix: '560',
+      address: 'Phase 1, Hosur Road, Electronic City, Bengaluru, Karnataka 560100',
+      lat: 12.8452,
+      lng: 77.6602,
+      slots: ['16 Oct', '19 Oct']
+    },
+
+    // --- DELHI NCR ---
+    {
+      id: 'dl-sarai',
+      name: 'Sarai Kale Khan RTO (ADTT)',
+      rtoCode: 'DL-06',
+      area: 'Sarai Kale Khan, South-East Delhi',
+      city: 'Delhi',
+      state: 'Delhi',
+      pin: '110013',
+      pinPrefix: '110',
+      address: 'Near ISBT Sarai Kale Khan, Ring Road, New Delhi, 110013',
+      lat: 28.5892,
+      lng: 77.2588,
+      slots: ['12 Oct', '14 Oct']
+    },
+    {
+      id: 'dl-vasant',
+      name: 'Vasant Vihar Automated Test Track',
+      rtoCode: 'DL-03',
+      area: 'Vasant Vihar, South Delhi',
+      city: 'Delhi',
+      state: 'Delhi',
+      pin: '110057',
+      pinPrefix: '110',
+      address: 'Sub-Divisional Complex, Outer Ring Rd, Vasant Vihar, New Delhi, 110057',
+      lat: 28.5583,
+      lng: 77.1637,
+      slots: ['15 Oct', '16 Oct']
+    },
+    {
+      id: 'dl-dwarka',
+      name: 'Dwarka Sector 22 RTO Track',
+      rtoCode: 'DL-09',
+      area: 'Dwarka Sector 22, South-West Delhi',
+      city: 'Delhi',
+      state: 'Delhi',
+      pin: '110075',
+      pinPrefix: '110',
+      address: 'Sector 22, Near Sector 21 Metro Station, Dwarka, New Delhi, 110075',
+      lat: 28.5562,
+      lng: 77.0544,
+      slots: ['18 Oct', '20 Oct']
+    },
+    {
+      id: 'dl-mayur',
+      name: 'Mayur Vihar Phase 1 ADTT',
+      rtoCode: 'DL-07',
+      area: 'Mayur Vihar, East Delhi',
+      city: 'Delhi',
+      state: 'Delhi',
+      pin: '110091',
+      pinPrefix: '110',
+      address: 'Mayur Vihar Phase 1, Near Pocket 1 Metro, New Delhi, 110091',
+      lat: 28.6089,
+      lng: 77.2942,
+      slots: ['15 Oct', '17 Oct']
+    },
+    {
+      id: 'dl-rohini',
+      name: 'Rohini Sector 16 Test Center',
+      rtoCode: 'DL-11',
+      area: 'Rohini, North-West Delhi',
+      city: 'Delhi',
+      state: 'Delhi',
+      pin: '110089',
+      pinPrefix: '110',
+      address: 'Sector 16, Institutional Area, Rohini, New Delhi, 110089',
+      lat: 28.7324,
+      lng: 77.1189,
+      slots: ['19 Oct', '21 Oct']
+    },
+    {
+      id: 'dl-janakpuri',
+      name: 'Janakpuri District Transport Office',
+      rtoCode: 'DL-04',
+      area: 'Janakpuri, West Delhi',
+      city: 'Delhi',
+      state: 'Delhi',
+      pin: '110058',
+      pinPrefix: '110',
+      address: 'Near District Centre, Janakpuri, New Delhi, 110058',
+      lat: 28.6219,
+      lng: 77.0878,
+      slots: ['14 Oct', '17 Oct']
+    },
+
+    // --- MAHARASHTRA / MUMBAI & PUNE ---
+    {
+      id: 'mum-andheri',
+      name: 'Andheri RTO Automated Track (MH-02)',
+      rtoCode: 'MH-02',
+      area: 'Andheri West, Western Suburbs',
+      city: 'Mumbai',
+      state: 'Maharashtra',
+      pin: '400053',
+      pinPrefix: '400',
+      address: 'D.N. Nagar, Link Road, Andheri West, Mumbai, Maharashtra 400053',
+      lat: 19.1197,
+      lng: 72.8464,
+      slots: ['14 Oct', '16 Oct']
+    },
+    {
+      id: 'mum-tardeo',
+      name: 'Tardeo Central RTO (MH-01)',
+      rtoCode: 'MH-01',
+      area: 'Tardeo, South Mumbai',
+      city: 'Mumbai',
+      state: 'Maharashtra',
+      pin: '400034',
+      pinPrefix: '400',
+      address: 'Old Bodyguard Lane, Tardeo, Mumbai, Maharashtra 400034',
+      lat: 18.9696,
+      lng: 72.8193,
+      slots: ['15 Oct', '17 Oct']
+    },
+    {
+      id: 'mum-wadala',
+      name: 'Wadala Automated RTO Facility (MH-03)',
+      rtoCode: 'MH-03',
+      area: 'Wadala, Central Mumbai',
+      city: 'Mumbai',
+      state: 'Maharashtra',
+      pin: '400037',
+      pinPrefix: '400',
+      address: 'Truck Terminal Road, Wadala, Mumbai, Maharashtra 400037',
+      lat: 19.0178,
+      lng: 72.8688,
+      slots: ['13 Oct', '16 Oct']
+    },
+    {
+      id: 'pune-sangamwadi',
+      name: 'Pune RTO Automated Track (MH-12)',
+      rtoCode: 'MH-12',
+      area: 'Sangamwadi, Pune',
+      city: 'Pune',
+      state: 'Maharashtra',
+      pin: '411001',
+      pinPrefix: '411',
+      address: 'Dr. Ambedkar Road, Near Sangam Bridge, Pune, Maharashtra 411001',
+      lat: 18.5304,
+      lng: 73.8647,
+      slots: ['14 Oct', '18 Oct']
+    },
+
+    // --- JHARKHAND ---
+    {
+      id: 'jsr-sakchi',
+      name: 'Jamshedpur Sakchi RTO (JH-05)',
+      rtoCode: 'JH-05',
+      area: 'Sakchi, Jamshedpur',
+      city: 'Jamshedpur',
+      state: 'Jharkhand',
+      pin: '831001',
+      pinPrefix: '831',
+      address: 'Near Old Court, Sakchi, Jamshedpur, Jharkhand 831001',
+      lat: 22.8046,
+      lng: 86.2029,
+      slots: ['13 Oct', '15 Oct']
+    },
+    {
+      id: 'ranchi-dhurwa',
+      name: 'Ranchi Dhurwa Automated Track (JH-01)',
+      rtoCode: 'JH-01',
+      area: 'Dhurwa, Ranchi',
+      city: 'Ranchi',
+      state: 'Jharkhand',
+      pin: '834004',
+      pinPrefix: '834',
+      address: 'Sector 4, HEC Township, Dhurwa, Ranchi, Jharkhand 834004',
+      lat: 23.3105,
+      lng: 85.2894,
+      slots: ['16 Oct', '19 Oct']
+    },
+
+    // --- TELANGANA / HYDERABAD ---
+    {
+      id: 'hyd-kondapur',
+      name: 'Kondapur RTO Automated Track (TS-09)',
+      rtoCode: 'TS-09',
+      area: 'Kondapur, Hitec City, Hyderabad',
+      city: 'Hyderabad',
+      state: 'Telangana',
+      pin: '500084',
+      pinPrefix: '500',
+      address: 'Near Botanical Garden Road, Kondapur, Hyderabad, Telangana 500084',
+      lat: 17.4645,
+      lng: 78.3582,
+      slots: ['15 Oct', '18 Oct']
+    },
+
+    // --- TAMIL NADU / CHENNAI ---
+    {
+      id: 'chn-annanagar',
+      name: 'Anna Nagar RTO Test Track (TN-02)',
+      rtoCode: 'TN-02',
+      area: 'Anna Nagar, Chennai',
+      city: 'Chennai',
+      state: 'Tamil Nadu',
+      pin: '600040',
+      pinPrefix: '600',
+      address: '2nd Avenue, Anna Nagar West, Chennai, Tamil Nadu 600040',
+      lat: 13.0850,
+      lng: 80.2101,
+      slots: ['14 Oct', '17 Oct']
+    },
+
+    // --- WEST BENGAL / KOLKATA ---
+    {
+      id: 'kol-saltlake',
+      name: 'Salt Lake Automated Test Facility (WB-08)',
+      rtoCode: 'WB-08',
+      area: 'Salt Lake Sector 5, Kolkata',
+      city: 'Kolkata',
+      state: 'West Bengal',
+      pin: '700091',
+      pinPrefix: '700',
+      address: 'Salt Lake Sector V, Bidhannagar, Kolkata, West Bengal 700091',
+      lat: 22.5804,
+      lng: 88.4378,
+      slots: ['15 Oct', '19 Oct']
+    },
+
+    // --- UTTAR PRADESH ---
+    {
+      id: 'up-noida',
+      name: 'Noida Sector 32 Transport Office (UP-16)',
+      rtoCode: 'UP-16',
+      area: 'Sector 32, Noida',
+      city: 'Noida',
+      state: 'Uttar Pradesh',
+      pin: '201301',
+      pinPrefix: '201',
+      address: 'Near City Center Metro, Sector 32, Noida, Uttar Pradesh 201301',
+      lat: 28.5744,
+      lng: 77.3560,
+      slots: ['13 Oct', '16 Oct']
+    },
+    {
+      id: 'up-lucknow',
+      name: 'Lucknow Transport Nagar ADTT (UP-32)',
+      rtoCode: 'UP-32',
+      area: 'Transport Nagar, Lucknow',
+      city: 'Lucknow',
+      state: 'Uttar Pradesh',
+      pin: '226012',
+      pinPrefix: '226',
+      address: 'Kanpur Road, Transport Nagar, Lucknow, Uttar Pradesh 226012',
+      lat: 26.7825,
+      lng: 80.8920,
+      slots: ['16 Oct', '18 Oct']
+    },
+
+    // --- RAJASTHAN ---
+    {
+      id: 'rj-jaipur',
+      name: 'Jaipur Jagatpura Automated Track (RJ-14)',
+      rtoCode: 'RJ-14',
+      area: 'Jagatpura, Jaipur',
+      city: 'Jaipur',
+      state: 'Rajasthan',
+      pin: '302017',
+      pinPrefix: '302',
+      address: 'Jhalana Institutional Area, Jagatpura, Jaipur, Rajasthan 302017',
+      lat: 26.8335,
+      lng: 75.8239,
+      slots: ['15 Oct', '18 Oct']
     }
   ];
+
+  // Helper: Get user's reference coordinates based on address
+  const getUserCoordinates = (addr) => {
+    const text = `${addr.area || ''} ${addr.city || ''} ${addr.flatNo || ''} ${addr.pincode || ''}`.toLowerCase();
+    
+    // Locality specific
+    if (text.includes('indiranagar')) return { lat: 12.9784, lng: 77.6408 };
+    if (text.includes('koramangala')) return { lat: 12.9352, lng: 77.6245 };
+    if (text.includes('jayanagar')) return { lat: 12.9308, lng: 77.5838 };
+    if (text.includes('yeshwanthpur')) return { lat: 13.0285, lng: 77.5458 };
+    if (text.includes('electronic city')) return { lat: 12.8452, lng: 77.6602 };
+    if (text.includes('dwarka')) return { lat: 28.5921, lng: 77.0460 };
+    if (text.includes('sarai') || text.includes('south delhi')) return { lat: 28.5892, lng: 77.2588 };
+    if (text.includes('rohini')) return { lat: 28.7041, lng: 77.1025 };
+    if (text.includes('vasant')) return { lat: 28.5583, lng: 77.1637 };
+    if (text.includes('andheri')) return { lat: 19.1136, lng: 72.8697 };
+    if (text.includes('tardeo')) return { lat: 18.9696, lng: 72.8193 };
+    if (text.includes('sakchi')) return { lat: 22.8046, lng: 86.2029 };
+
+    // City / State specific
+    if (text.includes('bengaluru') || text.includes('bangalore') || text.startsWith('560')) return { lat: 12.9716, lng: 77.5946 };
+    if (text.includes('delhi') || text.startsWith('110')) return { lat: 28.6139, lng: 77.2090 };
+    if (text.includes('mumbai') || text.startsWith('400')) return { lat: 19.0760, lng: 72.8777 };
+    if (text.includes('pune') || text.startsWith('411')) return { lat: 18.5204, lng: 73.8567 };
+    if (text.includes('jamshedpur') || text.startsWith('831')) return { lat: 22.8046, lng: 86.2029 };
+    if (text.includes('ranchi') || text.startsWith('834')) return { lat: 23.3441, lng: 85.3096 };
+    if (text.includes('hyderabad') || text.startsWith('500')) return { lat: 17.3850, lng: 78.4867 };
+    if (text.includes('chennai') || text.startsWith('600')) return { lat: 13.0827, lng: 80.2707 };
+    if (text.includes('kolkata') || text.startsWith('700')) return { lat: 22.5726, lng: 88.3639 };
+    if (text.includes('noida') || text.startsWith('201')) return { lat: 28.5744, lng: 77.3560 };
+    if (text.includes('lucknow') || text.startsWith('226')) return { lat: 26.8467, lng: 80.9462 };
+    if (text.includes('jaipur') || text.startsWith('302')) return { lat: 26.9124, lng: 75.7873 };
+
+    return { lat: 12.9716, lng: 77.5946 };
+  };
+
+  // Helper: Haversine distance in KM
+  const calculateDistance = (lat1, lon1, lat2, lon2) => {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return parseFloat((R * c).toFixed(1));
+  };
+
+  // Get active user address coordinates
+  const userCoords = getUserCoordinates(addressData);
+
+  // Compute distance for all centers and prepare list
+  const centersWithDistances = NATIONWIDE_RTO_DATABASE.map((c) => {
+    const dist = calculateDistance(userCoords.lat, userCoords.lng, c.lat, c.lng);
+    return {
+      ...c,
+      distanceNum: dist,
+      distance: `${dist}km away`
+    };
+  }).sort((a, b) => a.distanceNum - b.distanceNum);
+
+  // Filter centers based on User Address & Search Query
+  const getDisplayCenters = () => {
+    const q = searchQuery.toLowerCase().trim();
+
+    // 1. IF SEARCH QUERY IS TYPED: Perform deep logical match across PIN, City, State, Area, RTO Code, Name
+    if (q) {
+      const searched = centersWithDistances.filter((c) => {
+        const matchPin = c.pin.includes(q) || c.pinPrefix.includes(q);
+        const matchCity = c.city.toLowerCase().includes(q);
+        const matchState = c.state.toLowerCase().includes(q);
+        const matchArea = c.area.toLowerCase().includes(q);
+        const matchRtoCode = c.rtoCode.toLowerCase().replace('-', '').includes(q.replace('-', ''));
+        const matchName = c.name.toLowerCase().includes(q);
+        const matchAddress = c.address.toLowerCase().includes(q);
+
+        return matchPin || matchCity || matchState || matchArea || matchRtoCode || matchName || matchAddress;
+      });
+
+      if (searched.length > 0) {
+        return searched;
+      }
+
+      // If user typed a custom city or PIN not explicitly listed, dynamically generate a matching RTO!
+      const isPinQuery = /^\d{3,6}$/.test(q);
+      return [
+        {
+          id: `custom-rto-${q.replace(/\s+/g, '-')}`,
+          name: isPinQuery ? `PIN ${q} Regional Transport Track` : `${q.toUpperCase()} Automated Driving Test Track`,
+          rtoCode: isPinQuery ? `PIN-${q.slice(0, 3)}` : 'RTO-ADTT',
+          area: isPinQuery ? `Pin Code ${q} Zone` : `${q} Division`,
+          city: isPinQuery ? 'Local Region' : q,
+          state: addressData.stateName || 'State Transport Division',
+          pin: isPinQuery ? q : 'Nearest Zone',
+          address: isPinQuery ? `Automated Driving Test Track, Near PIN ${q} Post Office` : `Central RTO Test Facility, Main Bypass Road, ${q}`,
+          lat: userCoords.lat + 0.02,
+          lng: userCoords.lng + 0.02,
+          distanceNum: 2.4,
+          distance: '2.4km away',
+          slots: ['14 Oct', '16 Oct']
+        }
+      ];
+    }
+
+    // 2. IF NO SEARCH QUERY: Filter primarily for the user's city/state
+    const userCity = (addressData.city || '').toLowerCase().trim();
+    const userState = (addressData.stateName || '').toLowerCase().trim();
+    const userPin = (addressData.pincode || '').trim();
+
+    // Priority 1: Centers in user's exact city
+    const sameCityCenters = centersWithDistances.filter(c => {
+      const matchCity = c.city.toLowerCase().includes(userCity) || (userCity && userCity.includes(c.city.toLowerCase()));
+      const matchPin = userPin && (c.pin.startsWith(userPin.slice(0, 3)) || c.pin === userPin);
+      return matchCity || matchPin;
+    });
+
+    if (sameCityCenters.length > 0) {
+      return sameCityCenters;
+    }
+
+    // Priority 2: Centers in user's state
+    const sameStateCenters = centersWithDistances.filter(c => {
+      return userState && (c.state.toLowerCase().includes(userState) || userState.includes(c.state.toLowerCase()));
+    });
+
+    if (sameStateCenters.length > 0) {
+      return sameStateCenters;
+    }
+
+    // Priority 3: Fallback - generate local RTO for user's entered city (never dump nationwide centers)
+    return [
+      {
+        id: `local-rto-${(addressData.city || 'local').toLowerCase().replace(/\s+/g, '-')}`,
+        name: `${addressData.city || 'Regional'} Automated Test Track (ADTT)`,
+        rtoCode: 'RTO-ADTT',
+        area: `${addressData.area || 'Central'}, ${addressData.city || 'District'}`,
+        city: addressData.city || 'City',
+        state: addressData.stateName || 'State Transport Division',
+        pin: addressData.pincode || 'Local Zone',
+        address: `Automated Driving Track, Near Transport Office, ${addressData.city || ''}, ${addressData.stateName || ''} ${addressData.pincode || ''}`,
+        lat: userCoords.lat,
+        lng: userCoords.lng,
+        distanceNum: 1.8,
+        distance: '1.8km away',
+        slots: ['12 Oct', '14 Oct']
+      }
+    ];
+  };
+
+  const displayCenters = getDisplayCenters();
+
+  // Selected center defaults to the closest/nearest displayed RTO
+  const [selectedCenter, setSelectedCenter] = useState(displayCenters[0]?.id);
+
+  // Sync selected center if displayed list changes (e.g. on search or address update)
+  useEffect(() => {
+    if (displayCenters.length > 0 && !displayCenters.some(c => c.id === selectedCenter)) {
+      setSelectedCenter(displayCenters[0].id);
+    }
+  }, [displayCenters, selectedCenter]);
+
+  // Handle in-place address update & automatically find nearest RTO center
+  const handleSaveInlineAddress = (e) => {
+    e.preventDefault();
+    const updated = {
+      flatNo: editFlat,
+      area: editArea,
+      city: editCity,
+      stateName: addressData.stateName || '',
+      pincode: editPin,
+      fullAddress: `${editFlat}, ${editArea}, ${editCity} – ${editPin}`
+    };
+    
+    setAddressData(updated);
+    centralDataStore.saveDraftForm('dl_address', updated);
+    setShowEditAddressModal(false);
+  };
+
+  const activeCenter = displayCenters.find(c => c.id === selectedCenter) || displayCenters[0] || NATIONWIDE_RTO_DATABASE[0];
 
   return (
     <div className="page page-dl-center-select" style={{ width: 'min(1120px, calc(100% - 48px))', margin: '36px auto', fontFamily: 'Inter, system-ui, sans-serif' }}>
       
-      {/* Header Section */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '28px' }}>
+      {/* Header Section (1:1 Reference Match) */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
         <div>
           <div style={{ fontSize: '11px', fontWeight: 800, color: '#e88a2d', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '8px' }}>
             LOCATION SELECTION
@@ -1606,47 +2172,122 @@ export function DLTestCenterSelectionPage() {
           </h1>
         </div>
         
-        <p style={{ color: '#64748b', fontSize: '15px', maxWidth: '420px', margin: 0, textAlign: 'right', lineHeight: 1.5 }}>
+        <p style={{ color: '#64748b', fontSize: '14.5px', maxWidth: '380px', margin: 0, textAlign: 'right', lineHeight: 1.5 }}>
           Find the most convenient location for your practical driving test. Availability is updated in real-time.
         </p>
       </div>
 
-      {/* Main 2-Column Grid (Left: List, Right: Map Preview) */}
+      {/* DIRECT VISIBLE ADDRESS BAR WITH 1-CLICK CHANGE ADDRESS */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        background: '#ffffff',
+        padding: '14px 20px',
+        borderRadius: '16px',
+        border: '1px solid #e2e8f0',
+        boxShadow: '0 2px 8px rgba(0, 37, 66, 0.03)',
+        marginBottom: '24px',
+        gap: '12px',
+        flexWrap: 'wrap'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#fff7ed', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <MapPin size={18} color="#e88a2d" />
+          </div>
+          <div>
+            <div style={{ fontSize: '11px', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
+              YOUR SELECTED ADDRESS
+            </div>
+            <div style={{ fontSize: '14px', fontWeight: 700, color: '#173b57' }}>
+              {addressData.fullAddress || `${addressData.flatNo}, ${addressData.area}, ${addressData.city} – ${addressData.pincode}`}
+            </div>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => {
+            setEditFlat(addressData.flatNo || '');
+            setEditArea(addressData.area || '');
+            setEditCity(addressData.city || '');
+            setEditPin(addressData.pincode || '');
+            setShowEditAddressModal(true);
+          }}
+          style={{
+            background: '#002542',
+            border: 'none',
+            color: '#ffffff',
+            padding: '8px 18px',
+            borderRadius: '10px',
+            fontSize: '13px',
+            fontWeight: 800,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            boxShadow: '0 2px 6px rgba(0, 37, 66, 0.15)',
+            transition: 'all 0.15s ease'
+          }}
+        >
+          Change Address ✏️
+        </button>
+      </div>
+
+      {/* Main 2-Column Grid */}
       <div className="responsive-split-grid grid-2col" style={{ display: 'grid', gridTemplateColumns: '440px 1fr', gap: '32px', alignItems: 'start' }}>
         
         {/* Left Column: Search & Test Center Cards */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           
-          {/* Search Bar */}
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-            <div style={{ flex: 1, position: 'relative' }}>
-              <input
-                type="text"
-                placeholder="Search by area or pin code"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '14px 16px 14px 42px',
-                  borderRadius: '12px',
-                  border: '1px solid #cbd5e1',
-                  fontSize: '14px',
-                  color: '#173b57',
-                  boxSizing: 'border-box',
-                  background: '#ffffff'
-                }}
-              />
-              <span style={{ position: 'absolute', left: '14px', top: '14px', color: '#94a3b8' }}>🔍</span>
-            </div>
-            
-            <button style={{ background: '#f1f5f9', border: '1px solid #cbd5e1', padding: '14px', borderRadius: '12px', color: '#173b57', cursor: 'pointer' }}>
-              ⚙️
-            </button>
+          {/* Intelligent Search Bar (Searches Pin, City, State, Area & Code) */}
+          <div style={{ position: 'relative' }}>
+            <input
+              type="text"
+              placeholder="Search by PIN, city, state, area or RTO code"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '13px 38px 13px 40px',
+                borderRadius: '12px',
+                border: '1px solid #cbd5e1',
+                fontSize: '14px',
+                color: '#173b57',
+                boxSizing: 'border-box',
+                background: '#ffffff'
+              }}
+            />
+            <span style={{ position: 'absolute', left: '13px', top: '13px', color: '#94a3b8', display: 'flex', alignItems: 'center' }}>
+              <Search size={17} />
+            </span>
+
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                style={{ position: 'absolute', right: '12px', top: '12px', background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: '14px' }}
+              >
+                ✕
+              </button>
+            )}
           </div>
 
-          {/* Test Center Cards Stack */}
-          {centers.map((c) => {
+          {/* Quick Context Summary */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '12px', color: '#64748b', fontWeight: 600, padding: '0 4px' }}>
+            <span>
+              {searchQuery ? `Search results for "${searchQuery}" (${displayCenters.length})` : `Available RTO Tracks near ${addressData.city || 'you'} (${displayCenters.length})`}
+            </span>
+            <span style={{ color: '#16a34a', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <Check size={13} strokeWidth={3} /> Auto-sorted by proximity
+            </span>
+          </div>
+
+          {/* Test Center Cards Stack (Sorted Closest to Farthest) */}
+          {displayCenters.map((c, index) => {
             const isSelected = selectedCenter === c.id;
+            const isNearest = index === 0;
+
             return (
               <div
                 key={c.id}
@@ -1659,25 +2300,34 @@ export function DLTestCenterSelectionPage() {
                   boxShadow: isSelected ? '0 6px 20px rgba(0, 37, 66, 0.08)' : '0 2px 10px rgba(0, 37, 66, 0.02)',
                   position: 'relative',
                   cursor: 'pointer',
-                  transition: 'all 0.2s ease'
+                  transition: 'all 0.18s ease'
                 }}
               >
-                {isSelected && (
-                  <span style={{ position: 'absolute', top: '16px', right: '16px', background: '#002542', color: '#ffffff', fontSize: '10px', fontWeight: 800, padding: '4px 10px', borderRadius: '12px', letterSpacing: '0.5px' }}>
-                    Selected
-                  </span>
-                )}
+                <div style={{ position: 'absolute', top: '18px', right: '18px', display: 'flex', gap: '6px' }}>
+                  {isNearest && (
+                    <span style={{ background: '#f0fdf4', color: '#16a34a', border: '1px solid #bbf7d0', fontSize: '10px', fontWeight: 800, padding: '3px 8px', borderRadius: '12px', letterSpacing: '0.4px' }}>
+                      ⚡ NEAREST
+                    </span>
+                  )}
+                  {isSelected && (
+                    <span style={{ background: '#002542', color: '#ffffff', fontSize: '10px', fontWeight: 800, padding: '3px 10px', borderRadius: '12px', letterSpacing: '0.5px' }}>
+                      Selected
+                    </span>
+                  )}
+                </div>
 
-                <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#173b57', margin: '0 0 6px 0' }}>
-                  {c.name}
-                </h3>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+                  <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#173b57', margin: 0, paddingRight: '80px' }}>
+                    {c.name}
+                  </h3>
+                </div>
 
                 <div style={{ fontSize: '13px', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '16px' }}>
-                  <MapPin size={14} color="#002542" /> {c.distance}
+                  <MapPin size={14} color="#002542" /> <span style={{ fontWeight: 700, color: '#002542' }}>{c.distance}</span> · {c.area} ({c.pin})
                 </div>
 
                 <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>
-                  Earliest Availability
+                  EARLIEST AVAILABILITY
                 </div>
 
                 <div style={{ display: 'flex', gap: '8px', marginBottom: isSelected ? '20px' : '0' }}>
@@ -1720,76 +2370,141 @@ export function DLTestCenterSelectionPage() {
 
         </div>
 
-        {/* Right Column: High-Res Map Preview Card (Image 2) */}
+        {/* Right Column: Clean Live Map View (Auto-synced with Active Selection) */}
         <div style={{
           background: '#ffffff',
           borderRadius: '24px',
           overflow: 'hidden',
           border: '1px solid #e2e8f0',
           boxShadow: '0 6px 24px rgba(0, 37, 66, 0.05)',
-          height: '540px',
-          position: 'relative'
+          height: '520px',
+          position: 'sticky',
+          top: '24px'
         }}>
-          {/* Simulated Map Canvas */}
-          <div style={{
-            width: '100%',
-            height: '100%',
-            background: '#eef2f6',
-            backgroundImage: 'radial-gradient(#cbd5e1 1.5px, transparent 1.5px)',
-            backgroundSize: '24px 24px',
-            position: 'relative',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}>
-            {/* Map Road Vectors */}
-            <svg width="100%" height="100%" style={{ position: 'absolute', inset: 0, opacity: 0.7 }}>
-              <path d="M 0 120 Q 300 200 600 80" stroke="#ffffff" strokeWidth="24" fill="none" />
-              <path d="M 180 0 Q 220 300 350 540" stroke="#ffffff" strokeWidth="20" fill="none" />
-              <path d="M 0 380 Q 250 350 600 420" stroke="#ffffff" strokeWidth="16" fill="none" />
-            </svg>
-
-            {/* Selected Location Pin */}
-            <div style={{
-              position: 'absolute',
-              top: '40%',
-              left: '48%',
-              transform: 'translate(-50%, -50%)',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              zIndex: 10
-            }}>
-              <div style={{
-                background: '#002542',
-                color: '#ffffff',
-                padding: '8px 16px',
-                borderRadius: '20px',
-                fontSize: '12px',
-                fontWeight: 800,
-                boxShadow: '0 4px 14px rgba(0, 37, 66, 0.3)',
-                whiteSpace: 'nowrap',
-                marginBottom: '6px'
-              }}>
-                📍 {centers.find(c => c.id === selectedCenter)?.name || 'Sarai Kale Khan RTO'}
-              </div>
-              <div style={{ width: '16px', height: '16px', borderRadius: '50%', background: '#e88a2d', border: '3px solid #ffffff', boxShadow: '0 0 0 4px rgba(232, 138, 45, 0.4)' }} />
-            </div>
-
-            {/* Other RTO Pins */}
-            <div style={{ position: 'absolute', top: '25%', left: '20%', transform: 'translate(-50%, -50%)', opacity: 0.6 }}>
-              <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#002542', border: '2px solid #ffffff' }} />
-              <span style={{ fontSize: '10px', fontWeight: 700, color: '#476179' }}>Vasant Vihar</span>
-            </div>
-
-            <div style={{ position: 'absolute', top: '70%', left: '75%', transform: 'translate(-50%, -50%)', opacity: 0.6 }}>
-              <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#002542', border: '2px solid #ffffff' }} />
-              <span style={{ fontSize: '10px', fontWeight: 700, color: '#476179' }}>Dwarka Sec 22</span>
-            </div>
-          </div>
+          <iframe
+            key={activeCenter.id}
+            title="Live Test Center Map"
+            src={`https://maps.google.com/maps?q=${encodeURIComponent(activeCenter.name + ' ' + activeCenter.address)}&t=&z=14&ie=UTF8&iwloc=&output=embed`}
+            width="100%"
+            height="100%"
+            frameBorder="0"
+            style={{ border: 0, display: 'block', width: '100%', height: '100%' }}
+            allowFullScreen
+            loading="lazy"
+          />
         </div>
 
       </div>
+
+      {/* Inline Quick Edit Address Modal */}
+      {showEditAddressModal && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(0, 37, 66, 0.45)',
+          backdropFilter: 'blur(4px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          padding: '20px'
+        }}>
+          <div style={{
+            background: '#ffffff',
+            borderRadius: '20px',
+            padding: '28px 32px',
+            maxWidth: '480px',
+            width: '100%',
+            boxShadow: '0 20px 40px rgba(0, 37, 66, 0.15)',
+            border: '1px solid #e2e8f0'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#173b57', margin: 0 }}>
+                ✏️ Change Address
+              </h3>
+              <button
+                type="button"
+                onClick={() => setShowEditAddressModal(false)}
+                style={{ background: 'none', border: 'none', color: '#94a3b8', fontSize: '16px', cursor: 'pointer' }}
+              >
+                ✕
+              </button>
+            </div>
+
+            <p style={{ fontSize: '13px', color: '#64748b', margin: '0 0 20px 0', lineHeight: 1.4 }}>
+              Enter your address below. The system will automatically fetch all RTO test centres in your region and highlight the nearest one.
+            </p>
+
+            <form onSubmit={handleSaveInlineAddress} style={{ display: 'grid', gap: '14px' }}>
+              <div>
+                <label style={{ fontSize: '11px', fontWeight: 800, color: '#476179', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>Flat / House & Building</label>
+                <input
+                  type="text"
+                  value={editFlat}
+                  onChange={(e) => setEditFlat(e.target.value)}
+                  placeholder="e.g. Flat 402, Green Heights"
+                  required
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13.5px', boxSizing: 'border-box' }}
+                />
+              </div>
+
+              <div>
+                <label style={{ fontSize: '11px', fontWeight: 800, color: '#476179', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>Area / Locality</label>
+                <input
+                  type="text"
+                  value={editArea}
+                  onChange={(e) => setEditArea(e.target.value)}
+                  placeholder="e.g. Indiranagar, Dwarka, Andheri, Sakchi"
+                  required
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13.5px', boxSizing: 'border-box' }}
+                />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div>
+                  <label style={{ fontSize: '11px', fontWeight: 800, color: '#476179', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>City</label>
+                  <input
+                    type="text"
+                    value={editCity}
+                    onChange={(e) => setEditCity(e.target.value)}
+                    placeholder="e.g. Bengaluru, Delhi, Mumbai, Pune"
+                    required
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13.5px', boxSizing: 'border-box' }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ fontSize: '11px', fontWeight: 800, color: '#476179', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>Pin Code</label>
+                  <input
+                    type="text"
+                    value={editPin}
+                    onChange={(e) => setEditPin(e.target.value)}
+                    placeholder="e.g. 560034, 110013, 400053"
+                    required
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13.5px', boxSizing: 'border-box' }}
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '12px' }}>
+                <button
+                  type="button"
+                  onClick={() => setShowEditAddressModal(false)}
+                  style={{ background: '#f1f5f9', border: 'none', padding: '10px 16px', borderRadius: '8px', fontSize: '13px', fontWeight: 700, color: '#476179', cursor: 'pointer' }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  style={{ background: '#002542', border: 'none', padding: '10px 20px', borderRadius: '8px', fontSize: '13px', fontWeight: 800, color: '#ffffff', cursor: 'pointer' }}
+                >
+                  Save & Fetch RTOs
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
     </div>
   );
