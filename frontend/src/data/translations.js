@@ -4,7 +4,7 @@ const en = {
   nav: {
     dashboard: "Dashboard",
     journey: "My Journey",
-    ask: "Ask DriveSeva",
+    ask: "Ask Indian Drives",
     help: "Help",
     notifications: "Notifications",
     profile: "Profile",
@@ -46,7 +46,7 @@ const en = {
     slotBookingDesc: "Car-Seat Visual Selection",
     pathsTag: "TRANSPARENT & GUIDED CITIZEN WORKFLOW",
     pathsTitle: "Never Get Misguided Again. One Portal, 3 Streamlined Paths.",
-    pathsDesc: "Unlike legacy portals with confusing menus, DriveSeva dynamically detects where you are in your driving journey and shows only what you need to process next.",
+    pathsDesc: "Unlike legacy portals with confusing menus, Indian Drives dynamically detects where you are in your driving journey and shows only what you need to process next.",
     path1Tag: "PATH 1",
     path1Title: "Learner Licence (LL)",
     path1Desc: "Apply online with Aadhaar details, upload identity proof, pay standard RTO fees, and take the 15-minute proctored road safety test right from home.",
@@ -81,12 +81,12 @@ const en = {
     feat4Desc: "Selectively update Name, Address, or Contact details with dynamic live fee calculation and instant doc uploads.",
     feat5Title: "Verified Digital Licence Wallet",
     feat5Desc: "Access your official QR-verified digital driving licence anytime on mobile or desktop for instant verification.",
-    feat6Title: "Ask DriveSeva 24/7 AI Assistant",
+    feat6Title: "Ask Indian Drives 24/7 AI Assistant",
     feat6Desc: "Get instant, accurate answers about RTO rules, required documents, fee structures, and application queries.",
     ctaTitle: "Ready to Experience Misguidance-Free Driving Licence Services?",
-    ctaDesc: "Join thousands of citizens managing their driving licences effortlessly on DriveSeva.",
+    ctaDesc: "Join thousands of citizens managing their driving licences effortlessly on Indian Drives.",
     ctaBtn: "Start Your Journey",
-    footerText: "Indian Drives (DriveSeva) — Official Citizen Driving Licence Portal Concept.",
+    footerText: "Indian Drives (Indian Drives) — Official Citizen Driving Licence Portal Concept.",
     loginTitle: "Citizen Portal Login",
     loginSub: "Enter your mobile number or Aadhaar to securely sign in.",
     mobileTab: "Mobile Number",
@@ -220,7 +220,7 @@ const en = {
     greeting: "Ask me what to do next, which documents you need, or how renewal works.",
     sample: "What do I need to do next?",
     sources: "Sources",
-    placeholder: "Ask DriveSeva"
+    placeholder: "Ask Indian Drives"
   },
   help: {
     subtitle: "Search common licence questions and continue into the right workflow.",
@@ -376,7 +376,7 @@ const en = {
     nextHint: "Select a driving test slot at an available RTO test centre."
   },
   footer: {
-    line: "Indian Drives (DriveSeva) — Official Citizen Driving Licence Portal Concept."
+    line: "Indian Drives (Indian Drives) — Official Citizen Driving Licence Portal Concept."
   }
 };
 
@@ -1027,7 +1027,7 @@ export const translations = {
     dashboard: { title: "प्रणाम", subtitle: "हम सब प्रत्येक कदम पर अहाँक मार्गदर्शन करब।" }
   }, en),
   sat: fill({
-    nav: { dashboard: "ᱰᱮᱥᱵᱳᱨᱰ", journey: "ᱤᱧᱟᱜ ᱰᱟᱦᱟᱨ", ask: "DriveSeva ᱠᱩᱞᱤᱭᱮᱢ", help: "ᱜᱚᱲᱚ", notifications: "ᱵᱟᱰᱟᱭ", profile: "ᱯᱨᱳᱯᱷᱟᱭᱤᱞ", startJourney: "ᱟᱢᱟᱜ ᱰᱟᱦᱟᱨ ᱮᱦᱚᱵᱽ ᱢᱮ", applyLL: "LL ᱞᱟᱹᱜᱤᱫ ᱟᱯᱞᱟᱭ ᱢᱮ", bookTest: "ᱴᱮᱥᱴ ᱵᱩᱠ ᱢᱮ", manageLicence: "ᱞᱟᱭᱥᱮᱱᱥ ᱥᱟᱢᱵᱽᱲᱟᱣ ᱢᱮ" },
+    nav: { dashboard: "ᱰᱮᱥᱵᱳᱨᱰ", journey: "ᱤᱧᱟᱜ ᱰᱟᱦᱟᱨ", ask: "Indian Drives ᱠᱩᱞᱤᱭᱮᱢ", help: "ᱜᱚᱲᱚ", notifications: "ᱵᱟᱰᱟᱭ", profile: "ᱯᱨᱳᱯᱷᱟᱭᱤᱞ", startJourney: "ᱟᱢᱟᱜ ᱰᱟᱦᱟᱨ ᱮᱦᱚᱵᱽ ᱢᱮ", applyLL: "LL ᱞᱟᱹᱜᱤᱫ ᱟᱯᱞᱟᱭ ᱢᱮ", bookTest: "ᱴᱮᱥᱴ ᱵᱩᱠ ᱢᱮ", manageLicence: "ᱞᱟᱭᱥᱮᱱᱥ ᱥᱟᱢᱵᱽᱲᱟᱣ ᱢᱮ" },
     common: { login: "ᱞᱚᱜᱤᱱ", logout: "ᱞᱚᱜᱽᱟᱣᱩᱴ", language: "ᱯᱟᱹᱨᱥᱤ", continue: "ᱞᱟᱦᱟᱜ ᱢᱮ", back: "ᱛᱟᱭᱚᱢ", next: "ᱤᱱᱟᱹ ᱛᱟᱭᱚᱢ", send: "ᱠᱩᱞ", status: "ᱥᱴᱮᱴᱟᱥ ᱧᱮᱞ" },
     landing: { badge: "ᱱᱟᱣᱟ ᱰᱨᱟᱭᱵᱷᱤᱝ ᱞᱟᱭᱥᱮᱱᱥ ᱥᱮᱵᱟ", title: "ᱰᱨᱟᱭᱵᱷᱤᱝ ᱞᱟᱭᱥᱮᱱᱥ ᱥᱮᱵᱟ,", titleHighlight: "ᱟᱞᱜᱟ ᱟᱨ ᱥᱟᱹᱨᱤ।", subtitle: "ᱤᱱᱰᱤᱭᱟ ᱨᱮᱱᱟᱜ ᱥᱚᱨᱮᱥ ᱰᱨᱟᱭᱵᱷᱤᱝ ᱞᱟᱭᱥᱮᱱᱥ ᱯᱳᱨᱴᱟᱞ।", startJourney: "ᱟᱢᱟᱜ ᱰᱟᱦᱟᱨ ᱮᱦᱚᱵᱽ ᱢᱮ", trustAadhaar: "᱑᱐᱐% ᱟᱫᱷᱟᱨ ᱥᱟᱹᱨᱤ", trustRemote: "ᱚᱱᱞᱟᱭᱤᱱ ᱴᱮᱥᱴ", trustTracking: "ᱞᱟᱭᱵᱷ ᱴᱨᱮᱠᱤᱝ", pathsTitle: "ᱟᱞᱚᱢ ᱵᱷᱟᱹᱵᱤᱛᱚᱜᱼᱟ। ᱢᱤᱫ ᱯᱳᱨᱴᱟᱞ, ᱓ ᱰᱟᱦᱟᱨ।", featTitle: "ᱟᱢᱟᱜ ᱞᱟᱭᱥᱮᱱᱥ ᱥᱟᱢᱵᱽᱲᱟᱣ ᱞᱟᱹᱜᱤᱫ ᱡᱚᱛᱚᱣᱟᱜ", ctaTitle: "ᱟᱢ ᱱᱟᱣᱟ ᱥᱮᱵᱟ ᱦᱟᱛᱟᱣ ᱞᱟᱹᱜᱤᱫ ᱛᱮᱭᱟᱨ ᱢᱮᱱᱟᱢᱟ?", ctaBtn: "ᱟᱢᱟᱜ ᱰᱟᱦᱟᱨ ᱮᱦᱚᱵᱽ ᱢᱮ" },
     cockpit: { nextCheckpoint: "ᱤᱱᱟᱹ ᱛᱟᱭᱚᱢ ᱪᱮᱠᱯᱳᱭᱮᱱᱴ", title: "ᱞᱟᱨᱱᱚᱨ ᱞᱟᱭᱥᱮᱱᱥ ᱴᱮᱥᱴ", subtitle: "ᱜᱟᱹᱰᱤ ᱪᱟᱞᱟᱣ ᱢᱟᱲᱟᱝ ᱥᱚᱲᱚᱠ ᱵᱟᱰᱟᱭ ᱴᱮᱥᱴ ᱮᱢ ᱢᱮ।", prototypeTag: "🧪 ᱚᱱᱞᱟᱭᱤᱱ ᱴᱮᱥᱴ", routeTag: "🔀 ᱴᱮᱥᱴ ᱰᱟᱦᱟᱨ", appStep: "ᱟᱯᱞᱟᱭ", docsStep: "ᱠᱟᱜᱚᱡᱽ", payStep: "ᱴᱟᱠᱟ ᱮᱢ", llStep: "LL ᱴᱮᱥᱴ", dlStep: "ᱰᱨᱟᱭᱵᱷᱤᱝ ᱴᱮᱥᱴ", licenceStep: "ᱞᱟᱭᱥᱮᱱᱥ", knowledgeTitle: "ᱥᱚᱲᱚᱠ ᱵᱟᱰᱟᱭ ᱴᱮᱥᱴ", knowledgeSub: "ᱜᱟᱹᱰᱤ ᱪᱟᱞᱟᱣ ᱢᱟᱲᱟᱝ ᱥᱚᱲᱚᱠ ᱱᱤᱭᱚᱢ ᱵᱟᱰᱟᱭ ᱴᱮᱥᱴ ᱢᱮ।", trafficSignals: "ᱴᱨᱟᱯᱷᱤᱠ ᱥᱤᱜᱽᱱᱮᱞ", roadSigns: "ᱥᱚᱲᱚᱠ ᱪᱤᱱᱦᱟᱹ", roadRules: "ᱥᱚᱲᱚᱠ ᱱᱤᱭᱚᱢ", safeDriving: "ᱥᱩᱨᱚᱠᱷᱤᱛ ᱪᱟᱞᱟᱣ", practiceBtn: "❓ ᱢᱤᱫᱴᱟᱝ ᱴᱮᱥᱴ ᱠᱩᱞᱤ ᱮᱢ ᱢᱮ", readinessTitle: "ᱴᱮᱥᱴ ᱛᱮᱭᱟᱨᱤ", readinessSub: "ᱟᱢᱟᱜ ᱠᱮᱢᱮᱨᱟ ᱪᱟᱹᱞᱩ ᱢᱮᱱᱟᱜᱼᱟ ᱱᱚᱣᱟ ᱧᱮᱞ ᱢᱮ।", totalQs: "ᱡᱚᱛᱚ", totalVal: "᱑᱕ ᱠᱩᱠᱞᱤ", duration: "ᱚᱠᱛᱚ", durationVal: "᱑᱕ ᱢᱤᱱᱤᱴ", passingScore: "ᱯᱟᱥ ᱱᱚᱢᱵᱚᱨ", passingVal: "᱙ / ᱑᱕", completeText: "ᱯᱩᱨᱟᱹᱣ", startBtn: "ᱴᱮᱥᱴ ᱮᱦᱚᱵᱽ ᱢᱮ", proctorNotice: "ᱮᱦᱚᱵ ᱠᱟᱛᱮ ᱟᱢ ᱱᱤᱭᱚᱢ ᱮᱢ ᱥᱟᱹᱨᱤᱭᱮᱫᱼᱟ।" },
@@ -1069,14 +1069,14 @@ export const translations = {
     dashboard: { title: "नमस्ते", subtitle: "अस्स हर कदमै पर तुंदा मार्गदर्शन करङे।" }
   }, en),
   brx: fill({
-    nav: { dashboard: "डेशबोर्ड", journey: "आंनि दावबायनाय", ask: "DriveSeva खौ सों", help: "हेफाजाब", notifications: "खौरां", profile: "प्रफाइल", startJourney: "नोंनि दावबायनाय जागाय", applyLL: "LL नि थाखाय आरज हो", bookTest: "आनजाद बुक खालाम", manageLicence: "लाइसेन्स सामलाय" },
+    nav: { dashboard: "डेशबोर्ड", journey: "आंनि दावबायनाय", ask: "Indian Drives खौ सों", help: "हेफाजाब", notifications: "खौरां", profile: "प्रफाइल", startJourney: "नोंनि दावबायनाय जागाय", applyLL: "LL नि थाखाय आरज हो", bookTest: "आनजाद बुक खालाम", manageLicence: "लाइसेन्स सामलाय" },
     common: { login: "लगइन", logout: "लगआउत", language: "राव", continue: "थांसाय", back: "उनाव", next: "उनाव", send: "हर", status: "थासारि नाय" },
     landing: { badge: "गोदान ड्राइभिं लाइसेन्स सिबिथाय", title: "ड्राइभिं लाइसेन्स सिबिथाय,", titleHighlight: "गोरलै आरो गोरोन्थि गैयै।", subtitle: "भारतनि बयनिख्रुइबो गियानि ड्राइभिं लाइसेन्स पोर्टल।", startJourney: "नोंनि दावबायनाय जागाय", trustAadhaar: "१००% आधार आनजाद", trustRemote: "अनलाइन् आनजाद", trustTracking: "लाइभ ट्रेकिं", pathsTitle: "गोरोन्थि दा जा। मोनसे पोर्टल, ३ लामा।", featTitle: "गावनि लाइसेन्स सामलायनो गासैबो", ctaTitle: "नों मोजां सिबिथाय लानो थियारि ना?", ctaBtn: "नोंनि दावबायनाय जागाय" },
     cockpit: { nextCheckpoint: "उनाव आनजाद", title: "सोलोंग्रा लाइसेन्स आनजाद", subtitle: "गाडि सालायनायनि सिगां लामानि मिथिनायखौ आनजाद नाय।", prototypeTag: "🧪 अनलाइन् आनजाद", routeTag: "🔀 आनजाद लामा", appStep: "आरज", docsStep: "लेखायाय", payStep: "रां होनाय", llStep: "LL आनजाद", dlStep: "ड्राइभिं आनजाद", licenceStep: "लाइसेन्स", knowledgeTitle: "लामानि मिथिनाय आनजाद", knowledgeSub: "गाडि सालायनायनि सिगां लामानि खानथिखौ नाय।", trafficSignals: "सिग्नेल", roadSigns: "लामियाय निसान", roadRules: "लामानि खानथि", safeDriving: "रैखा ड्राइभिं", practiceBtn: "❓ मोनसे सोंनाय नायाब", readinessTitle: "आनजाद थियारि", readinessSub: "नोंनि கேमेरा सालायनाय था।", totalQs: "गासै", totalVal: "१५ सोंनाय", duration: "सम", durationVal: "१५ मिनिट", passingScore: "उथ्रिनाय नम्बर", passingVal: "९ / १५", completeText: "जोबबाय", startBtn: "आनजाद जागाय", proctorNotice: "जागायनायजों नों खानथिफोरखौ गनायना लय।" },
     dashboard: { title: "खुलुमबाय", subtitle: "जों नोंथांखौ गासैबो बिथिंआव हेफाजाब होगोन।" }
   }, en),
   mni: fill({
-    nav: { dashboard: "দ্যাশবোর্ড", journey: "ঐগী খোঙচৎ", ask: "DriveSeva দা হংগদবনি", help: "মতেং", notifications: "পাউতাক", profile: "প্রোফাইল", startJourney: "নহাকগী খোঙচৎ হৌগদবনি", applyLL: "LL গীদমক দরখাস থাবীয়ু", bookTest: "টেস্ট বুক তৌবীয়ু", manageLicence: "লাইসেন্স শেন্নবীয়ু" },
+    nav: { dashboard: "দ্যাশবোর্ড", journey: "ঐগী খোঙচৎ", ask: "Indian Drives দা হংগদবনি", help: "মতেং", notifications: "পাউতাক", profile: "প্রোফাইল", startJourney: "নহাকগী খোঙচৎ হৌগদবনি", applyLL: "LL গীদমক দরখাস থাবীয়ু", bookTest: "টেস্ট বুক তৌবীয়ু", manageLicence: "লাইসেন্স শেন্নবীয়ু" },
     common: { login: "লগইন", logout: "লগআউৎ", language: "লোন", continue: "মখাতানা চৎথবা", back: "তুংদা", next: "মথংগী", send: "থাবা", status: "য়েন্থোকপা" },
     landing: { badge: "অনৌবা দ্রাইভিং লাইসেন্স সর্বিসেস", title: "দ্রাইভিং লাইসেন্স সর্বিসেস,", titleHighlight: "লাইবা অমসুং অয়েট-অপন লৈতবা।", subtitle: "ইন্দিয়াগী খ্বাইদগী চাউবা দ্রাইভিং লাইসেন্স পোর্তেল।", startJourney: "নহাকগী খোঙচৎ হৌগদবনি", trustAadhaar: "১০০% আধার চেক তৌবা", trustRemote: "অনলাইন টেস্ট", trustTracking: "লাইভ ট্র্যাকিং", pathsTitle: "অমুক হন্না অরানবা লাইওদানু। অমখক পোর্তেল, ৩ খোঙচৎ।", featTitle: "লাইসেন্স শেন্ননবগীদমক দরকার লৈবা পুম্নমক", ctaTitle: "নহাক সর্বিসেস লৌনবগীদমক শেম-শারেব্রা?", ctaBtn: "নহাকগী খোঙচৎ হৌগদবনি" },
     cockpit: { nextCheckpoint: "মথংগী চেকপোইন্ত", title: "লর্নার লাইসেন্স টেস্ট", subtitle: "গাড়ী থৌদ্রিঙেদা লম্বীগী খঙ-হৈবা টেস্ট তৌবীয়ু।", prototypeTag: "🧪 অনলাইন টেস্ট", routeTag: "🔀 টেস্ট খোঙচৎ", appStep: "দরখাস", docsStep: "চে-চাং", payStep: "শেল থীবা", llStep: "LL টেস্ট", dlStep: "দ্রাইভিং টেস্ট", licenceStep: "লাইসেন্স", knowledgeTitle: "লম্বীগী খঙ-হৈবা চেকিং", knowledgeSub: "গাড়ী থৌদ্রিঙেদা ইন্দিয়াগী লম্বীগী নিয়ম খঙবীয়ু।", trafficSignals: "ট্রাফিক সিগনেল", roadSigns: "লম্বীগী চিহ্ন", roadRules: "লম্বীগী নিয়ম", safeDriving: "চেকশিনবা ড্রাইভ", practiceBtn: "❓ প্রেক্টিস ৱাহং অমা হংবীয়ু", readinessTitle: "টেস্ট শেম-샤বা", readinessSub: "ক্যামেরা লৈব্রা য়েংবীয়ু।", totalQs: "পুম্নমক", totalVal: "১৫ ৱাহং", duration: "মতৌ", durationVal: "১৫ মিনিট", passingScore: "পাস নম্বর", passingVal: "৯ / ১৫", completeText: "লোইরে", startBtn: "টেস্ট হৌগদবনি", proctorNotice: "হৌবদগী রুলশিং য়াবনি।" },
