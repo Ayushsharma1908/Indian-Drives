@@ -439,32 +439,35 @@ export function DLConfirmAddressPage() {
   const [isEditing, setIsEditing] = useState(false);
   const [unchanged, setUnchanged] = useState(true);
 
-  // Editable Address Form State
+  // Editable Current Address Form State
   const initialAddress = centralDataStore.getDraftForm('dl_address') || {
-    flatNo: '123, Sector 4, MG Road',
-    area: 'Indiranagar',
-    city: 'Bengaluru',
-    stateName: 'Karnataka',
-    pincode: '560034'
+    flatNo: '28-A Royal Enclave',
+    area: 'Gautam Nagar',
+    city: 'Kashipur',
+    stateName: 'Uttarakhand',
+    pincode: '244713',
+    fullAddress: '28-A Royal Enclave, Gautam Nagar, Kashipur, Uttarakhand 244713'
   };
 
-  const [flatNo, setFlatNo] = useState(initialAddress.flatNo);
-  const [area, setArea] = useState(initialAddress.area);
-  const [city, setCity] = useState(initialAddress.city);
-  const [stateName, setStateName] = useState(initialAddress.stateName);
-  const [pincode, setPincode] = useState(initialAddress.pincode);
-  const [docUploaded, setDocUploaded] = useState(true);
+  const [flatNo, setFlatNo] = useState(initialAddress.flatNo || '28-A Royal Enclave');
+  const [area, setArea] = useState(initialAddress.area || 'Gautam Nagar');
+  const [city, setCity] = useState(initialAddress.city || 'Kashipur');
+  const [stateName, setStateName] = useState(initialAddress.stateName || 'Uttarakhand');
+  const [pincode, setPincode] = useState(initialAddress.pincode || '244713');
+
+  const getFullAddressObj = () => ({
+    flatNo,
+    area,
+    city,
+    stateName,
+    pincode,
+    fullAddress: `${flatNo}, ${area}, ${city}, ${stateName} – ${pincode}`,
+    unchanged
+  });
 
   const handleConfirmAddress = () => {
-    centralDataStore.saveDraftForm('dl_address', {
-      flatNo,
-      area,
-      city,
-      stateName,
-      pincode,
-      fullAddress: `${flatNo}, ${area}, ${city}, ${stateName} ${pincode}`,
-      unchanged
-    });
+    const chosenAddress = getFullAddressObj();
+    centralDataStore.saveDraftForm('dl_address', chosenAddress);
     navigate('/dl/documents');
   };
 
@@ -472,16 +475,17 @@ export function DLConfirmAddressPage() {
     e.preventDefault();
     setUnchanged(false);
     setIsEditing(false);
-    centralDataStore.saveDraftForm('dl_address', {
+    const updated = {
       flatNo,
       area,
       city,
       stateName,
       pincode,
-      fullAddress: `${flatNo}, ${area}, ${city}, ${stateName} ${pincode}`,
+      fullAddress: `${flatNo}, ${area}, ${city}, ${stateName} – ${pincode}`,
       unchanged: false
-    });
-    alert("Updated address saved successfully! Proceeding to document verification.");
+    };
+    centralDataStore.saveDraftForm('dl_address', updated);
+    alert("Address updated successfully! Proceeding to document verification.");
     navigate('/dl/documents');
   };
 
@@ -489,7 +493,7 @@ export function DLConfirmAddressPage() {
     <div className="page page-dl-address" style={{ width: 'min(1080px, calc(100% - 48px))', margin: '36px auto', fontFamily: 'Inter, system-ui, sans-serif' }}>
       
       {!isEditing ? (
-        /* NORMAL CONFIRM ADDRESS VIEW (IMAGE 4) */
+        /* NORMAL CONFIRM ADDRESS VIEW: ONE CLEAN VERIFIED ADDRESS CARD */
         <div className="responsive-split-grid grid-2col" style={{ display: 'grid', gridTemplateColumns: '380px 1fr', gap: '48px', alignItems: 'start', marginBottom: '40px' }}>
           
           {/* Left Column: Heading & Subtext */}
@@ -503,56 +507,47 @@ export function DLConfirmAddressPage() {
             </h1>
 
             <p style={{ color: '#64748b', fontSize: '15px', lineHeight: 1.6, margin: '0' }}>
-              We've retrieved your address from your Learner Licence. Please review the details below to ensure they are still accurate before proceeding.
+              We've retrieved your registered address from your Learner Licence. Please review the details below before booking your Driving Test.
             </p>
           </div>
 
-          {/* Right Column: Address Cards & Actions */}
+          {/* Right Column: Address Card & Actions */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             
-            {/* Current Address Card */}
+            {/* Single Verified Address Card */}
             <div style={{
               background: '#ffffff',
               borderRadius: '20px',
-              padding: '24px 28px',
-              border: '1px solid #e2e8f0',
-              boxShadow: '0 4px 16px rgba(0, 37, 66, 0.03)'
+              padding: '28px 32px',
+              border: '2px solid #002542',
+              boxShadow: '0 6px 24px rgba(0, 37, 66, 0.05)',
+              position: 'relative'
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '18px', fontWeight: 800, color: '#173b57' }}>
-                  <MapPin size={20} color="#002542" /> Current Address
+                  <MapPin size={22} color="#e88a2d" /> Registered Address
                 </div>
-                {!unchanged && (
-                  <span style={{ background: '#fff7ed', color: '#e88a2d', fontSize: '11px', fontWeight: 800, padding: '4px 10px', borderRadius: '12px' }}>
-                    Updated Address
-                  </span>
-                )}
-              </div>
-              <p style={{ margin: 0, fontSize: '15px', color: '#476179', lineHeight: 1.6, paddingLeft: '30px' }}>
-                {flatNo}, {area},<br />
-                {city}, {stateName} {pincode}
-              </p>
-            </div>
 
-            {/* Permanent Address Card */}
-            <div style={{
-              background: '#ffffff',
-              borderRadius: '20px',
-              padding: '24px 28px',
-              border: '1px solid #e2e8f0',
-              boxShadow: '0 4px 16px rgba(0, 37, 66, 0.03)'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '18px', fontWeight: 800, color: '#173b57', marginBottom: '12px' }}>
-                <Home size={20} color="#002542" /> Permanent Address
+                <span style={{ background: '#f0fdf4', color: '#16a34a', border: '1px solid #bbf7d0', fontSize: '11px', fontWeight: 800, padding: '4px 12px', borderRadius: '14px', letterSpacing: '0.4px' }}>
+                  ● Verified from LL Record
+                </span>
               </div>
-              <p style={{ margin: 0, fontSize: '15px', color: '#476179', lineHeight: 1.6, paddingLeft: '30px' }}>
-                45, Model Town, Civil Lines,<br />
-                New Delhi, Delhi 110009
-              </p>
+
+              <div style={{ paddingLeft: '32px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <div style={{ fontSize: '16px', fontWeight: 700, color: '#173b57' }}>
+                  {flatNo}, {area}
+                </div>
+                <div style={{ fontSize: '15px', color: '#476179', fontWeight: 600 }}>
+                  {city}, {stateName} – {pincode}
+                </div>
+                <div style={{ fontSize: '13px', color: '#94a3b8', marginTop: '4px' }}>
+                  District: Udham Singh Nagar · Kumaon Division
+                </div>
+              </div>
             </div>
 
             {/* Unchanged Checkbox */}
-            <label style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', margin: '8px 0', select: 'none' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', margin: '4px 0', userSelect: 'none' }}>
               <div style={{
                 width: '20px',
                 height: '20px',
@@ -572,7 +567,7 @@ export function DLConfirmAddressPage() {
             </label>
 
             {/* Action Buttons */}
-            <div style={{ display: 'flex', gap: '16px', marginTop: '12px' }}>
+            <div style={{ display: 'flex', gap: '16px', marginTop: '8px' }}>
               <button
                 onClick={handleConfirmAddress}
                 style={{
@@ -1608,21 +1603,21 @@ export function DLTestCenterSelectionPage() {
     const profile = getStoredUserProfile();
     if (profile && (profile.city || profile.streetAddress)) {
       return {
-        flatNo: profile.streetAddress || 'Flat 402, Green Park Heights, Sakchi',
-        area: profile.district || 'Sakchi',
-        city: profile.city || 'Jamshedpur',
-        stateName: profile.state || 'Jharkhand',
-        pincode: profile.pincode || '831001',
-        fullAddress: profile.fullAddress || `${profile.streetAddress}, ${profile.city}, ${profile.state} - ${profile.pincode}`
+        flatNo: profile.streetAddress || '28-A ROYAL ENCLAVE',
+        area: profile.district || 'KASHIPUR',
+        city: profile.city || 'Kashipur',
+        stateName: profile.state || 'Uttarakhand',
+        pincode: profile.pincode || '244713',
+        fullAddress: profile.fullAddress || `28-A ROYAL ENCLAVE, KASHIPUR, UTTARAKHAND 244713`
       };
     }
     return {
-      flatNo: '123, Sector 4, MG Road',
-      area: 'Indiranagar',
-      city: 'Bengaluru',
-      stateName: 'Karnataka',
-      pincode: '560034',
-      fullAddress: '123, Sector 4, MG Road, Indiranagar, Bengaluru, Karnataka 560034'
+      flatNo: '28-A ROYAL ENCLAVE',
+      area: 'KASHIPUR',
+      city: 'Kashipur',
+      stateName: 'Uttarakhand',
+      pincode: '244713',
+      fullAddress: '28-A ROYAL ENCLAVE , KASHIPUR , UTTARAKHAND , 244713'
     };
   });
 
@@ -1632,11 +1627,97 @@ export function DLTestCenterSelectionPage() {
   // Edit Address Form State
   const [editFlat, setEditFlat] = useState(addressData.flatNo || '');
   const [editArea, setEditArea] = useState(addressData.area || '');
-  const [editCity, setEditCity] = useState(addressData.city || 'Bengaluru');
-  const [editPin, setEditPin] = useState(addressData.pincode || '560034');
+  const [editCity, setEditCity] = useState(addressData.city || 'Kashipur');
+  const [editPin, setEditPin] = useState(addressData.pincode || '244713');
 
   // Comprehensive Nationwide RTO Automated Driving Test Track (ADTT) Database
   const NATIONWIDE_RTO_DATABASE = [
+    // --- UTTARAKHAND / KASHIPUR & REGIONAL TEST TRACKS ---
+    {
+      id: 'uk-kashipur',
+      name: 'ARTO Kashipur Driving Test Track (UK-18)',
+      rtoCode: 'UK-18',
+      area: 'Ramnagar Road, Kashipur',
+      city: 'Kashipur',
+      state: 'Uttarakhand',
+      pin: '244713',
+      pinPrefix: '244',
+      address: 'ARTO Office & Testing Ground, Near Mandi Samiti, Ramnagar Road, Kashipur, Udham Singh Nagar, Uttarakhand 244713',
+      lat: 29.2245,
+      lng: 78.9690,
+      slots: ['12 Oct', '14 Oct']
+    },
+    {
+      id: 'uk-ramnagar',
+      name: 'ARTO Ramnagar Test Track (UK-19)',
+      rtoCode: 'UK-19',
+      area: 'Kashipur-Ramnagar Highway, Ramnagar',
+      city: 'Ramnagar',
+      state: 'Uttarakhand',
+      pin: '244715',
+      pinPrefix: '244',
+      address: 'ARTO Office, Near Degree College, Ramnagar, Nainital, Uttarakhand 244715',
+      lat: 29.3950,
+      lng: 79.1260,
+      slots: ['13 Oct', '15 Oct']
+    },
+    {
+      id: 'up-moradabad',
+      name: 'RTO Moradabad Automated Track (UP-21)',
+      rtoCode: 'UP-21',
+      area: 'Majhola, Delhi Road, Moradabad',
+      city: 'Moradabad',
+      state: 'Uttar Pradesh',
+      pin: '244001',
+      pinPrefix: '244',
+      address: 'Regional Transport Office, Transport Nagar, Majhola, Moradabad, Uttar Pradesh 244001',
+      lat: 28.8386,
+      lng: 78.7733,
+      slots: ['14 Oct', '16 Oct']
+    },
+    {
+      id: 'uk-rudrapur',
+      name: 'RTO Rudrapur Automated Facility (UK-06)',
+      rtoCode: 'UK-06',
+      area: 'Kichha Bypass Road, Rudrapur',
+      city: 'Rudrapur',
+      state: 'Uttarakhand',
+      pin: '263153',
+      pinPrefix: '263',
+      address: 'District Transport Office, Kichha Bypass Road, Rudrapur, Uttarakhand 263153',
+      lat: 28.9800,
+      lng: 79.4000,
+      slots: ['15 Oct', '16 Oct']
+    },
+    {
+      id: 'uk-haldwani',
+      name: 'ARTO Haldwani Automated Track (UK-04)',
+      rtoCode: 'UK-04',
+      area: 'Transport Nagar, Haldwani',
+      city: 'Haldwani',
+      state: 'Uttarakhand',
+      pin: '263139',
+      pinPrefix: '263',
+      address: 'Sub-Regional Transport Office, Bareilly Road, Haldwani, Uttarakhand 263139',
+      lat: 29.2183,
+      lng: 79.5130,
+      slots: ['14 Oct', '17 Oct']
+    },
+    {
+      id: 'uk-dehradun',
+      name: 'RTO Dehradun Central Track (UK-07)',
+      rtoCode: 'UK-07',
+      area: 'Transport Nagar, Dehradun',
+      city: 'Dehradun',
+      state: 'Uttarakhand',
+      pin: '248001',
+      pinPrefix: '248',
+      address: 'Transport Nagar, Saharanpur Road, Dehradun, Uttarakhand 248001',
+      lat: 30.2925,
+      lng: 77.9930,
+      slots: ['16 Oct', '19 Oct']
+    },
+
     // --- KARNATAKA / BENGALURU ---
     {
       id: 'blr-indiranagar',
@@ -1980,9 +2061,15 @@ export function DLTestCenterSelectionPage() {
 
   // Helper: Get user's reference coordinates based on address
   const getUserCoordinates = (addr) => {
-    const text = `${addr.area || ''} ${addr.city || ''} ${addr.flatNo || ''} ${addr.pincode || ''}`.toLowerCase();
+    const text = `${addr.area || ''} ${addr.city || ''} ${addr.flatNo || ''} ${addr.stateName || ''} ${addr.pincode || ''}`.toLowerCase();
     
     // Locality specific
+    if (text.includes('gautam nagar') || text.includes('royal enclave') || text.includes('kashipur')) return { lat: 29.2085, lng: 78.9580 };
+    if (text.includes('ramnagar')) return { lat: 29.3900, lng: 79.1200 };
+    if (text.includes('moradabad') || text.startsWith('2440')) return { lat: 28.8300, lng: 78.7700 };
+    if (text.includes('rudrapur')) return { lat: 28.9800, lng: 79.4000 };
+    if (text.includes('haldwani')) return { lat: 29.2183, lng: 79.5130 };
+    if (text.includes('dehradun') || text.includes('uttarakhand')) return { lat: 30.3165, lng: 78.0322 };
     if (text.includes('indiranagar')) return { lat: 12.9784, lng: 77.6408 };
     if (text.includes('koramangala')) return { lat: 12.9352, lng: 77.6245 };
     if (text.includes('jayanagar')) return { lat: 12.9308, lng: 77.5838 };
@@ -1990,7 +2077,7 @@ export function DLTestCenterSelectionPage() {
     if (text.includes('electronic city')) return { lat: 12.8452, lng: 77.6602 };
     if (text.includes('dwarka')) return { lat: 28.5921, lng: 77.0460 };
     if (text.includes('sarai') || text.includes('south delhi')) return { lat: 28.5892, lng: 77.2588 };
-    if (text.includes('rohini')) return { lat: 28.7041, lng: 77.1025 };
+    if (text.includes('rohini') || text.includes('civil lines') || text.includes('model town')) return { lat: 28.7041, lng: 77.1025 };
     if (text.includes('vasant')) return { lat: 28.5583, lng: 77.1637 };
     if (text.includes('andheri')) return { lat: 19.1136, lng: 72.8697 };
     if (text.includes('tardeo')) return { lat: 18.9696, lng: 72.8193 };
@@ -2010,10 +2097,10 @@ export function DLTestCenterSelectionPage() {
     if (text.includes('lucknow') || text.startsWith('226')) return { lat: 26.8467, lng: 80.9462 };
     if (text.includes('jaipur') || text.startsWith('302')) return { lat: 26.9124, lng: 75.7873 };
 
-    return { lat: 12.9716, lng: 77.5946 };
+    return { lat: 29.2085, lng: 78.9580 };
   };
 
-  // Helper: Haversine distance in KM
+  // Helper: Haversine distance in KM with realistic road routing factor
   const calculateDistance = (lat1, lon1, lat2, lon2) => {
     const R = 6371;
     const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -2023,7 +2110,8 @@ export function DLTestCenterSelectionPage() {
       Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
       Math.sin(dLon / 2) * Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return parseFloat((R * c).toFixed(1));
+    const dist = parseFloat((R * c * 1.25).toFixed(1));
+    return Math.max(2.4, dist);
   };
 
   // Get active user address coordinates
@@ -2087,7 +2175,7 @@ export function DLTestCenterSelectionPage() {
     const userState = (addressData.stateName || '').toLowerCase().trim();
     const userPin = (addressData.pincode || '').trim();
 
-    // Priority 1: Centers in user's exact city
+    // Priority 1: Centers in user's city or nearby surrounding district tracks (within 80km)
     const sameCityCenters = centersWithDistances.filter(c => {
       const matchCity = c.city.toLowerCase().includes(userCity) || (userCity && userCity.includes(c.city.toLowerCase()));
       const matchPin = userPin && (c.pin.startsWith(userPin.slice(0, 3)) || c.pin === userPin);
@@ -2095,7 +2183,13 @@ export function DLTestCenterSelectionPage() {
     });
 
     if (sameCityCenters.length > 0) {
-      return sameCityCenters;
+      // Include nearby regional centers in the same state/division (under 80km)
+      const nearbyRegional = centersWithDistances.filter(c => {
+        const isSameState = userState && (c.state.toLowerCase().includes(userState) || userState.includes(c.state.toLowerCase()));
+        const isNear = c.distanceNum <= 80;
+        return isSameState && isNear;
+      });
+      return nearbyRegional.length > 0 ? nearbyRegional : sameCityCenters;
     }
 
     // Priority 2: Centers in user's state
@@ -2120,8 +2214,8 @@ export function DLTestCenterSelectionPage() {
         address: `Automated Driving Track, Near Transport Office, ${addressData.city || ''}, ${addressData.stateName || ''} ${addressData.pincode || ''}`,
         lat: userCoords.lat,
         lng: userCoords.lng,
-        distanceNum: 1.8,
-        distance: '1.8km away',
+        distanceNum: 2.4,
+        distance: '2.4km away',
         slots: ['12 Oct', '14 Oct']
       }
     ];
@@ -2303,23 +2397,22 @@ export function DLTestCenterSelectionPage() {
                   transition: 'all 0.18s ease'
                 }}
               >
-                <div style={{ position: 'absolute', top: '18px', right: '18px', display: 'flex', gap: '6px' }}>
-                  {isNearest && (
-                    <span style={{ background: '#f0fdf4', color: '#16a34a', border: '1px solid #bbf7d0', fontSize: '10px', fontWeight: 800, padding: '3px 8px', borderRadius: '12px', letterSpacing: '0.4px' }}>
-                      ⚡ NEAREST
-                    </span>
-                  )}
-                  {isSelected && (
-                    <span style={{ background: '#002542', color: '#ffffff', fontSize: '10px', fontWeight: 800, padding: '3px 10px', borderRadius: '12px', letterSpacing: '0.5px' }}>
-                      Selected
-                    </span>
-                  )}
-                </div>
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
-                  <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#173b57', margin: 0, paddingRight: '80px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px', marginBottom: '8px' }}>
+                  <h3 style={{ fontSize: '17px', fontWeight: 800, color: '#173b57', margin: 0, lineHeight: 1.3, flex: 1 }}>
                     {c.name}
                   </h3>
+                  <div style={{ display: 'flex', gap: '6px', flexShrink: 0 }}>
+                    {isNearest && (
+                      <span style={{ background: '#f0fdf4', color: '#16a34a', border: '1px solid #bbf7d0', fontSize: '10px', fontWeight: 800, padding: '3px 8px', borderRadius: '12px', letterSpacing: '0.4px', whiteSpace: 'nowrap' }}>
+                        ⚡ NEAREST
+                      </span>
+                    )}
+                    {isSelected && (
+                      <span style={{ background: '#002542', color: '#ffffff', fontSize: '10px', fontWeight: 800, padding: '3px 10px', borderRadius: '12px', letterSpacing: '0.5px', whiteSpace: 'nowrap' }}>
+                        Selected
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 <div style={{ fontSize: '13px', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '16px' }}>
