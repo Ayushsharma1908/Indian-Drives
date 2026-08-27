@@ -5,7 +5,7 @@ import {
   ArrowRight, ArrowLeft, Download, Check, Truck, Award, Lock, Info, Calendar,
   User, FileText, Home, ExternalLink, Shield, Sparkles, Building2, HelpCircle,
   Search, Navigation, Compass, LocateFixed, SlidersHorizontal, Settings,
-  Smartphone
+  Smartphone,
   Edit3, AlertCircle, X, ChevronRight, Filter, CheckCircle
 } from 'lucide-react';
 import { StatusBadge } from '../../components/ui/StatusBadge';
