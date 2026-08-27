@@ -4,12 +4,9 @@ import {
   Car, ShieldCheck, CheckCircle2, CalendarDays, MapPin, CreditCard, Clock,
   ArrowRight, ArrowLeft, Download, Check, Truck, Award, Lock, Info, Calendar,
   User, FileText, Home, ExternalLink, Shield, Sparkles, Building2, HelpCircle,
-<<<<<<< HEAD
   Search, Navigation, Compass, LocateFixed, SlidersHorizontal, Settings,
   Smartphone
-=======
   Edit3, AlertCircle, X, ChevronRight, Filter, CheckCircle
->>>>>>> a55e610 (updated flow)
 } from 'lucide-react';
 import { StatusBadge } from '../../components/ui/StatusBadge';
 import { centralDataStore } from '../../data/centralDataStore';
@@ -446,39 +443,6 @@ export function DLConfirmAddressPage() {
   const [isEditing, setIsEditing] = useState(false);
   const [unchanged, setUnchanged] = useState(true);
 
-<<<<<<< HEAD
-  // Editable Current Address Form State
-  const initialAddress = centralDataStore.getDraftForm('dl_address') || {
-    flatNo: '28-A Royal Enclave',
-    area: 'Gautam Nagar',
-    city: 'Kashipur',
-    stateName: 'Uttarakhand',
-    pincode: '244713',
-    fullAddress: '28-A Royal Enclave, Gautam Nagar, Kashipur, Uttarakhand 244713'
-  };
-
-  const [flatNo, setFlatNo] = useState(initialAddress.flatNo || '28-A Royal Enclave');
-  const [area, setArea] = useState(initialAddress.area || 'Gautam Nagar');
-  const [city, setCity] = useState(initialAddress.city || 'Kashipur');
-  const [stateName, setStateName] = useState(initialAddress.stateName || 'Uttarakhand');
-  const [pincode, setPincode] = useState(initialAddress.pincode || '244713');
-
-  const getFullAddressObj = () => ({
-    flatNo,
-    area,
-    city,
-    stateName,
-    pincode,
-    fullAddress: `${flatNo}, ${area}, ${city}, ${stateName} – ${pincode}`,
-    unchanged
-  });
-
-  const handleConfirmAddress = () => {
-    const chosenAddress = getFullAddressObj();
-    centralDataStore.saveDraftForm('dl_address', chosenAddress);
-    navigate('/dl/documents');
-  };
-=======
   // Editable Address Form State
   const [flatNo, setFlatNo] = useState(savedDraft.flatNo || profile.streetAddress || 'Flat 402, Green Park Heights');
   const [area, setArea] = useState(savedDraft.area || profile.district || 'Sakchi');
@@ -486,30 +450,18 @@ export function DLConfirmAddressPage() {
   const [stateName, setStateName] = useState(savedDraft.stateName || profile.state || 'Jharkhand');
   const [pincode, setPincode] = useState(savedDraft.pincode || profile.pincode || '831001');
   const [docUploaded, setDocUploaded] = useState(true);
->>>>>>> a55e610 (updated flow)
 
   const handleSaveUpdatedAddress = (e) => {
     e.preventDefault();
     setUnchanged(false);
     setIsEditing(false);
-<<<<<<< HEAD
-    const updated = {
-=======
     const fullAddr = `${flatNo}, ${area}, ${city}, ${stateName} - ${pincode}`;
     const addressObj = {
->>>>>>> a55e610 (updated flow)
       flatNo,
       area,
       city,
       stateName,
       pincode,
-<<<<<<< HEAD
-      fullAddress: `${flatNo}, ${area}, ${city}, ${stateName} – ${pincode}`,
-      unchanged: false
-    };
-    centralDataStore.saveDraftForm('dl_address', updated);
-    alert("Address updated successfully! Proceeding to document verification.");
-=======
       fullAddress: fullAddr,
       type: 'Updated Dispatch Address',
       recipientName: profile.name || 'Yanshi Chauhan',
@@ -540,7 +492,6 @@ export function DLConfirmAddressPage() {
       mobile: profile.mobile || '+91 98765 43210'
     };
     centralDataStore.saveDraftForm('dl_address', addressObj);
->>>>>>> a55e610 (updated flow)
     navigate('/dl/documents');
   };
 
@@ -2099,7 +2050,6 @@ export function DLPaymentCheckoutPage() {
 export function DLTestCenterSelectionPage() {
   const navigate = useNavigate();
   const { t } = useLanguage();
-<<<<<<< HEAD
   
   // Read confirmed registered address from Step 3 (DL Confirm Address) or profile
   const [addressData, setAddressData] = useState(() => {
@@ -2125,8 +2075,6 @@ export function DLTestCenterSelectionPage() {
       fullAddress: '28-A ROYAL ENCLAVE , KASHIPUR , UTTARAKHAND , 244713'
     };
   });
-=======
->>>>>>> a55e610 (updated flow)
 
   const [searchQuery, setSearchQuery] = useState('');
   const [showEditAddressModal, setShowEditAddressModal] = useState(false);
@@ -2141,7 +2089,6 @@ export function DLTestCenterSelectionPage() {
   const NATIONWIDE_RTO_DATABASE = [
     // --- UTTARAKHAND / KASHIPUR & REGIONAL TEST TRACKS ---
     {
-<<<<<<< HEAD
       id: 'uk-kashipur',
       name: 'ARTO Kashipur Driving Test Track (UK-18)',
       rtoCode: 'UK-18',
@@ -2759,74 +2706,6 @@ export function DLTestCenterSelectionPage() {
   };
 
   const activeCenter = displayCenters.find(c => c.id === selectedCenter) || displayCenters[0] || NATIONWIDE_RTO_DATABASE[0];
-=======
-      id: 'sarai',
-      name: 'Sarai Kale Khan Automated RTO Track',
-      shortName: 'Sarai Kale Khan RTO',
-      code: 'DL-04',
-      address: 'Ring Road, ISBT Sarai Kale Khan, Sakchi, New Delhi - 110013',
-      city: 'New Delhi',
-      state: 'Delhi',
-      pincode: '110013',
-      distance: '3.2 km away',
-      driveTime: '10 mins drive',
-      slots: ['12 Oct', '14 Oct'],
-      tech: 'Automated Overhead Sensors & 360° Cameras'
-    },
-    {
-      id: 'jamshedpur',
-      name: 'Jamshedpur RTO Automated Test Track',
-      shortName: 'Jamshedpur RTO (Sakchi)',
-      code: 'JH-05',
-      address: 'Sakchi RTO Complex, Near Jubilee Park, Jamshedpur, Jharkhand - 831001',
-      city: 'Jamshedpur',
-      state: 'Jharkhand',
-      pincode: '831001',
-      distance: '3.8 km away',
-      driveTime: '12 mins drive',
-      slots: ['24 Oct', '28 Oct'],
-      tech: 'Sensor-Based Automated Track Bay'
-    },
-    {
-      id: 'vasant',
-      name: 'Vasant Vihar Automated Driving Test Track',
-      shortName: 'Vasant Vihar Test Track',
-      code: 'DL-09',
-      address: 'Sector 4, Vasant Vihar, Opposite DDA Park, New Delhi - 110057',
-      city: 'New Delhi',
-      state: 'Delhi',
-      pincode: '110057',
-      distance: '5.8 km away',
-      driveTime: '18 mins drive',
-      slots: ['29 Oct', '02 Nov'],
-      tech: 'Video-Analytics Automated Track'
-    },
-    {
-      id: 'dwarka',
-      name: 'Dwarka Sector 22 Automated RTO Test Track',
-      shortName: 'Dwarka Sec 22 RTO',
-      code: 'DL-11',
-      address: 'Sector 22, Near Metro Station, Dwarka, New Delhi - 110077',
-      city: 'New Delhi',
-      state: 'Delhi',
-      pincode: '110077',
-      distance: '12.4 km away',
-      driveTime: '28 mins drive',
-      slots: ['18 Oct', '30 Oct'],
-      tech: 'RFID & Radar Sensor Track'
-    }
-  ];
-
-  const savedDraftCenter = centralDataStore.getDraftForm('dl_test_center');
-  const [selectedCenter, setSelectedCenter] = useState(() => savedDraftCenter?.id || 'sarai');
-  const [searchQuery, setSearchQuery] = useState('');
-
-  const filteredCenters = centers.filter(c => 
-    c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    c.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    c.pincode.includes(searchQuery)
-  );
->>>>>>> a55e610 (updated flow)
 
   return (
     <div className="page page-dl-center-select" style={{ width: 'min(1120px, calc(100% - 48px))', margin: '36px auto', fontFamily: 'Inter, system-ui, sans-serif' }}>
@@ -2910,7 +2789,6 @@ export function DLTestCenterSelectionPage() {
         {/* Left Column: Search & Test Center Cards */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           
-<<<<<<< HEAD
           {/* Intelligent Search Bar (Searches Pin, City, State, Area & Code) */}
           <div style={{ position: 'relative' }}>
             <input
@@ -2956,33 +2834,6 @@ export function DLTestCenterSelectionPage() {
 
           {/* Test Center Cards Stack (Sorted Closest to Farthest) */}
           {displayCenters.map((c, index) => {
-=======
-          {/* Search Bar */}
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-            <div style={{ flex: 1, position: 'relative' }}>
-              <input
-                type="text"
-                placeholder="Search by RTO name, area or pin code..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '14px 16px 14px 42px',
-                  borderRadius: '12px',
-                  border: '1px solid #cbd5e1',
-                  fontSize: '14px',
-                  color: '#173b57',
-                  boxSizing: 'border-box',
-                  background: '#ffffff'
-                }}
-              />
-              <span style={{ position: 'absolute', left: '14px', top: '14px', color: '#94a3b8' }}>🔍</span>
-            </div>
-          </div>
-
-          {/* Test Center Cards Stack */}
-          {filteredCenters.map((c) => {
->>>>>>> a55e610 (updated flow)
             const isSelected = selectedCenter === c.id;
             const isNearest = index === 0;
 
@@ -3004,7 +2855,6 @@ export function DLTestCenterSelectionPage() {
                   transition: 'all 0.18s ease'
                 }}
               >
-<<<<<<< HEAD
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px', marginBottom: '8px' }}>
                   <h3 style={{ fontSize: '17px', fontWeight: 800, color: '#173b57', margin: 0, lineHeight: 1.3, flex: 1 }}>
                     {c.name}
@@ -3025,24 +2875,6 @@ export function DLTestCenterSelectionPage() {
 
                 <div style={{ fontSize: '13px', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '16px' }}>
                   <MapPin size={14} color="#002542" /> <span style={{ fontWeight: 700, color: '#002542' }}>{c.distance}</span> · {c.area} ({c.pin})
-=======
-                {isSelected && (
-                  <span style={{ position: 'absolute', top: '16px', right: '16px', background: '#002542', color: '#ffffff', fontSize: '10px', fontWeight: 800, padding: '4px 10px', borderRadius: '12px', letterSpacing: '0.5px' }}>
-                    Selected
-                  </span>
-                )}
-
-                <h3 style={{ fontSize: '17px', fontWeight: 800, color: '#173b57', margin: '0 0 4px 0' }}>
-                  {c.name}
-                </h3>
-
-                <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '8px' }}>
-                  📍 {c.address}
-                </div>
-
-                <div style={{ fontSize: '13px', color: '#0369a1', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '14px' }}>
-                  <MapPin size={14} color="#002542" /> {c.distance} ({c.driveTime})
->>>>>>> a55e610 (updated flow)
                 </div>
 
                 <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>
