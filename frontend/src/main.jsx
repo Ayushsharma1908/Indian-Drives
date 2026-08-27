@@ -37,7 +37,7 @@ export const JourneyContext = createContext(null);
 export function useLanguage() {
   const context = useContext(LanguageContext);
   if (!context) {
-    const fallbackTr = (key) => key.split(".").reduce((v, p) => v?.[p], translations.en) || key;
+    const fallbackTr = (key) => key.split(".").reduce((v, p) => v?.[p], translations.en) || '';
     return { language: 'en', setLanguage: () => {}, tr: fallbackTr, t: fallbackTr };
   }
   return context;
@@ -54,7 +54,7 @@ const languages = [
   { code: "kn", label: "ಕನ್ನಡ (Kannada)" },
   { code: "ml", label: "മലയാളം (Malayalam)" },
   { code: "pa", label: "ਪੰਜਾਬੀ (Punjabi)" },
-  { code: "or", label: "ଓଡ଼િଆ (Odia)" },
+  { code: "or", label: "ଓଡ଼ିଆ (Odia)" },
   { code: "as", label: "অসমীয়া (Assamese)" },
   { code: "ur", label: "اردو (Urdu)" },
   { code: "sa", label: "संस्कृतम् (Sanskrit)" },
@@ -79,7 +79,7 @@ const fadeUp = {
 function App() {
   const [language, setLanguage] = useState(localStorage.getItem("indian-drives-language") || "en");
   const copy = translations[language] || translations.en;
-  const tr = (key) => key.split(".").reduce((value, part) => value?.[part], copy) || key.split(".").reduce((value, part) => value?.[part], translations.en) || key;
+  const tr = (key) => key.split(".").reduce((value, part) => value?.[part], copy) || key.split(".").reduce((value, part) => value?.[part], translations.en) || '';
   const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [journey, setJourney] = useState(null);
