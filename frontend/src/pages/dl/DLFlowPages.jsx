@@ -1255,7 +1255,7 @@ export function DLPaymentCheckoutPage() {
                     GOVERNMENT OF INDIA · MINISTRY OF ROAD TRANSPORT & HIGHWAYS
                   </div>
                   <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#002542', margin: '4px 0 0 0' }}>
-                    Official e-Challan & Fee Receipt (Form 7)
+                    Official Payment & Fee Receipt (Form 7)
                   </h2>
                 </div>
                 <button onClick={() => setShowPrintModal(false)} style={{ background: 'none', border: 'none', fontSize: '20px', color: '#64748b', cursor: 'pointer' }}>✕</button>
@@ -1577,7 +1577,7 @@ export function DLPaymentCheckoutPage() {
                 Verifying with State Treasury...
               </h3>
               <p style={{ fontSize: '13.5px', color: '#64748b', margin: 0 }}>
-                Confirming transaction settlement with RBI Bharat BillPay & issuing government e-Challan.
+                Confirming transaction settlement with RBI Bharat BillPay & issuing official receipt.
               </p>
             </div>
           )}
