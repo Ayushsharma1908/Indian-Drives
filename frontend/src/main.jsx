@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { Link, NavLink, Navigate, Route, BrowserRouter as Router, Routes, useLocation, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
+import { getStoredUserProfile } from "./data/userProfileData";
 import {
   Bell,
   CalendarDays,
@@ -87,7 +88,8 @@ function App() {
       .then(setUser)
       .catch(() => {
         if (localStorage.getItem("indian-drives-authenticated") === "true") {
-          setUser({ name: 'Rahul Sharma', email: 'rahul.sharma@example.in', avatar: 'RS' });
+          const profile = getStoredUserProfile();
+          setUser({ name: profile.fullName, email: profile.email, avatar: profile.avatar });
         } else {
           localStorage.removeItem("indian-drives-token");
         }
@@ -114,7 +116,8 @@ function App() {
       } catch (e) {
         localStorage.setItem("indian-drives-token", "demo-token-" + Date.now());
         localStorage.setItem("indian-drives-authenticated", "true");
-        const mockUser = { name: 'Rahul Sharma', email: 'rahul.sharma@example.in', avatar: 'RS' };
+        const profile = getStoredUserProfile();
+        const mockUser = { name: profile.fullName, email: profile.email, avatar: profile.avatar };
         setUser(mockUser);
         return mockUser;
       }
@@ -122,7 +125,7 @@ function App() {
     logout: async () => {
       try {
         await api.logout();
-      } catch (e) {}
+      } catch (e) { }
       localStorage.removeItem("indian-drives-token");
       setUser(null);
     }
@@ -320,7 +323,7 @@ function Shell({ children }) {
         <Link to="/dashboard" className="brand" aria-label="Indian Drives Home">
           <img src="/indian-drives-logo.png" alt="Indian Drives Logo" className="brand-logo-img" onError={(e) => { e.target.style.display = 'none'; }} />
         </Link>
-        
+
         <nav className="navlinks" aria-label="Primary">
           <NavLink to="/dashboard" className={({ isActive }) => isActive ? "active" : ""}>
             Dashboard
@@ -370,17 +373,9 @@ function Shell({ children }) {
 
 function Footer() {
   return (
-    <footer style={{ background: '#ffffff', borderTop: '1px solid #e2e8f0', padding: '20px 48px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px', fontSize: '13px', color: '#476179' }}>
+    <footer className="app-footer" style={{ background: '#ffffff', borderTop: '1px solid #e2e8f0', padding: '20px 48px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px', fontSize: '13px', color: '#476179' }}>
       <div>
         Indian Drives — A citizen experience concept for driving licence services.
-      </div>
-      <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
-        <Link to="/help" style={{ color: '#476179' }}>Privacy</Link>
-        <Link to="/help" style={{ color: '#476179' }}>Terms</Link>
-        <Link to="/help" style={{ color: '#476179' }}>Accessibility</Link>
-        <Link to="/help" style={{ color: '#476179' }}>Help</Link>
-        <Link to="/help" style={{ color: '#476179' }}>Contact</Link>
-        <Link to="/help" style={{ color: '#476179' }}>Feedback</Link>
       </div>
     </footer>
   );
@@ -423,7 +418,7 @@ function Login() {
   const { login } = useContext(AuthContext);
   const { tr } = useContext(LanguageContext);
   const navigate = useNavigate();
-  const [form, setForm] = useState({ email: "ayush@example.com", password: "demo123" });
+  const [form, setForm] = useState({ email: "yanshi.chauhan@example.com", password: "demo123" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -587,7 +582,7 @@ function ApplicationForm({ type }) {
   const { tr } = useContext(LanguageContext);
   const navigate = useNavigate();
   const { refreshJourney } = useContext(JourneyContext);
-  const [form, setForm] = useState({ type, applicantName: "Ayush Kumar", vehicleClass: "LMV", rto: "Jamshedpur RTO" });
+  const [form, setForm] = useState({ type, applicantName: "Yanshi Chauhan", vehicleClass: "LMV", rto: "Jamshedpur RTO" });
   const [loading, setLoading] = useState(false);
 
   async function submit(event) {

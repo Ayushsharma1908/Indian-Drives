@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Calendar, ArrowRight, Car, FileText, Shield, Bell, CheckCircle2, Award } from 'lucide-react';
+import { Calendar, ArrowRight, Car, FileText, Shield, Bell, CheckCircle2, Award, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { api } from '../../services/api';
+import { getStoredUserProfile } from '../../data/userProfileData';
 
 export function DashboardPage() {
   const navigate = useNavigate();
+  const profile = getStoredUserProfile();
   const [searchParams] = useSearchParams();
   const [upcomingVisit, setUpcomingVisit] = useState(null);
   const [importantNotice, setImportantNotice] = useState(null);
@@ -13,6 +15,16 @@ export function DashboardPage() {
   const [activeFlow, setActiveFlow] = useState(null);
   const [flowTitle, setFlowTitle] = useState('');
   const [flowFee, setFlowFee] = useState('250');
+
+  const dismissNotification = () => {
+    setShowProcessedNotification(false);
+    if (activeFlow) {
+      sessionStorage.setItem(`seen_${activeFlow}`, 'true');
+    }
+    localStorage.removeItem('last_processed_flow');
+    localStorage.removeItem('last_processed_title');
+    localStorage.removeItem('last_processed_fee');
+  };
 
   useEffect(() => {
     // Determine currently processed flow
@@ -24,23 +36,41 @@ export function DashboardPage() {
     const fee = localStorage.getItem('last_processed_fee') || '250';
 
     if (flow) {
+      // Check if this notification was ALREADY shown in this session
+      if (sessionStorage.getItem(`seen_${flow}`) === 'true') {
+        localStorage.removeItem('last_processed_flow');
+        localStorage.removeItem('last_processed_title');
+        localStorage.removeItem('last_processed_fee');
+        if (paramFlow) {
+          navigate('/dashboard', { replace: true });
+        }
+        return;
+      }
+
       setActiveFlow(flow);
       setFlowTitle(title);
       setFlowFee(fee);
 
-      // 2-Second Delay before popping in notification on Dashboard
+      // Mark as seen immediately in sessionStorage so it NEVER triggers a 2nd time
+      sessionStorage.setItem(`seen_${flow}`, 'true');
+
+      // 1.5-Second Delay before popping in notification on Dashboard
       const timer = setTimeout(() => {
         setShowProcessedNotification(true);
 
-        // ✅ Clear so the notification ONLY shows once — not on every revisit
+        // ✅ Clear so the notification ONLY shows once
         localStorage.removeItem('last_processed_flow');
         localStorage.removeItem('last_processed_title');
         localStorage.removeItem('last_processed_fee');
-      }, 2000);
+
+        if (paramFlow) {
+          navigate('/dashboard', { replace: true });
+        }
+      }, 1500);
 
       return () => clearTimeout(timer);
     }
-  }, [searchParams]);
+  }, [searchParams, navigate]);
 
 
   useEffect(() => {
@@ -145,26 +175,38 @@ export function DashboardPage() {
                   </div>
                 </div>
 
-                <button
-                  onClick={() => navigate('/dl/test-result')}
-                  style={{
-                    background: '#002542',
-                    color: '#ffffff',
-                    fontSize: '14px',
-                    fontWeight: 800,
-                    cursor: 'pointer',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    padding: '12px 22px',
-                    borderRadius: '12px',
-                    border: 'none',
-                    boxShadow: '0 4px 14px rgba(0, 37, 66, 0.2)',
-                    flexShrink: 0
-                  }}
-                >
-                  View Test Result <ArrowRight size={16} />
-                </button>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
+                  <button
+                    onClick={() => {
+                      dismissNotification();
+                      navigate('/dl/test-result');
+                    }}
+                    style={{
+                      background: '#002542',
+                      color: '#ffffff',
+                      fontSize: '14px',
+                      fontWeight: 800,
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '12px 22px',
+                      borderRadius: '12px',
+                      border: 'none',
+                      boxShadow: '0 4px 14px rgba(0, 37, 66, 0.2)'
+                    }}
+                  >
+                    View Test Result <ArrowRight size={16} />
+                  </button>
+
+                  <button
+                    onClick={dismissNotification}
+                    title="Dismiss"
+                    style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#94a3b8', padding: '6px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
               </div>
             </motion.div>
           )}
@@ -231,26 +273,38 @@ export function DashboardPage() {
                   </div>
                 </div>
 
-                <button
-                  onClick={() => navigate('/manage-licence')}
-                  style={{
-                    background: '#002542',
-                    color: '#ffffff',
-                    fontSize: '14px',
-                    fontWeight: 800,
-                    cursor: 'pointer',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    padding: '12px 22px',
-                    borderRadius: '12px',
-                    border: 'none',
-                    boxShadow: '0 4px 14px rgba(0, 37, 66, 0.2)',
-                    flexShrink: 0
-                  }}
-                >
-                  View Licence Wallet <ArrowRight size={16} />
-                </button>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
+                  <button
+                    onClick={() => {
+                      dismissNotification();
+                      navigate('/manage-licence');
+                    }}
+                    style={{
+                      background: '#002542',
+                      color: '#ffffff',
+                      fontSize: '14px',
+                      fontWeight: 800,
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '12px 22px',
+                      borderRadius: '12px',
+                      border: 'none',
+                      boxShadow: '0 4px 14px rgba(0, 37, 66, 0.2)'
+                    }}
+                  >
+                    View Licence Wallet <ArrowRight size={16} />
+                  </button>
+
+                  <button
+                    onClick={dismissNotification}
+                    title="Dismiss"
+                    style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#94a3b8', padding: '6px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
               </div>
             </motion.div>
           )}
@@ -306,26 +360,38 @@ export function DashboardPage() {
                   </div>
                 </div>
 
-                <button
-                  onClick={() => navigate('/dl/appointment-fixed')}
-                  style={{
-                    background: '#002542',
-                    color: '#ffffff',
-                    fontSize: '14px',
-                    fontWeight: 800,
-                    cursor: 'pointer',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    padding: '12px 22px',
-                    borderRadius: '12px',
-                    border: 'none',
-                    boxShadow: '0 4px 14px rgba(0, 37, 66, 0.2)',
-                    flexShrink: 0
-                  }}
-                >
-                  View Appointment <ArrowRight size={16} />
-                </button>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
+                  <button
+                    onClick={() => {
+                      dismissNotification();
+                      navigate('/dl/appointment-fixed');
+                    }}
+                    style={{
+                      background: '#002542',
+                      color: '#ffffff',
+                      fontSize: '14px',
+                      fontWeight: 800,
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '12px 22px',
+                      borderRadius: '12px',
+                      border: 'none',
+                      boxShadow: '0 4px 14px rgba(0, 37, 66, 0.2)'
+                    }}
+                  >
+                    View Appointment <ArrowRight size={16} />
+                  </button>
+
+                  <button
+                    onClick={dismissNotification}
+                    title="Dismiss"
+                    style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#94a3b8', padding: '6px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
               </div>
             </motion.div>
           )}
@@ -381,26 +447,38 @@ export function DashboardPage() {
                   </div>
                 </div>
 
-                <button
-                  onClick={() => navigate('/journey?stage=dl')}
-                  style={{
-                    background: '#002542',
-                    color: '#ffffff',
-                    fontSize: '14px',
-                    fontWeight: 800,
-                    cursor: 'pointer',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    padding: '12px 22px',
-                    borderRadius: '12px',
-                    border: 'none',
-                    boxShadow: '0 4px 14px rgba(0, 37, 66, 0.2)',
-                    flexShrink: 0
-                  }}
-                >
-                  Continue to DL <ArrowRight size={16} />
-                </button>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
+                  <button
+                    onClick={() => {
+                      dismissNotification();
+                      navigate('/journey?stage=dl');
+                    }}
+                    style={{
+                      background: '#002542',
+                      color: '#ffffff',
+                      fontSize: '14px',
+                      fontWeight: 800,
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '12px 22px',
+                      borderRadius: '12px',
+                      border: 'none',
+                      boxShadow: '0 4px 14px rgba(0, 37, 66, 0.2)'
+                    }}
+                  >
+                    Continue to DL <ArrowRight size={16} />
+                  </button>
+
+                  <button
+                    onClick={dismissNotification}
+                    title="Dismiss"
+                    style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#94a3b8', padding: '6px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
               </div>
             </motion.div>
           )}
@@ -468,12 +546,12 @@ export function DashboardPage() {
         </AnimatePresence>
 
         {/* 2. HERO SECTION ("Namaste, Yanshi 👋") */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(360px, 480px)', gap: '40px', alignItems: 'center', padding: '20px 0' }}>
+        <div className="hero-section-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(360px, 480px)', gap: '40px', alignItems: 'center', padding: '20px 0' }}>
 
           {/* Left Text */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <h1 style={{ fontSize: '54px', fontWeight: 700, color: '#173b57', margin: 0, lineHeight: 1.1, letterSpacing: '-1.5px' }}>
-              Namaste, Yanshi 🙏
+              Namaste, {profile.firstName || 'Yanshi'} 🙏
             </h1>
             <div style={{ fontSize: '22px', color: '#173b57', fontWeight: 600, lineHeight: 1.4 }}>
               Welcome to Indian Drives.

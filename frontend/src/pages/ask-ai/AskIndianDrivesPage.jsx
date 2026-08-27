@@ -355,7 +355,7 @@ Book a Test: Schedule a slot for your practical driving test at your RTO.`,
         </div>
 
         {/* 2-COLUMN MAIN LAYOUT */}
-        <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: '24px', alignItems: 'start' }}>
+        <div className="ask-ai-grid" style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: '24px', alignItems: 'start' }}>
 
           {/* LEFT SIDEBAR */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>

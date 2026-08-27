@@ -3,15 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import {
   Car, ShieldCheck, CheckCircle2, ArrowRight, Sparkles, Laptop, Calendar,
   CreditCard, Truck, Award, HelpCircle, Lock, User, FileText, Search, Phone,
-  Check, X, Zap, ChevronRight, MapPin, Eye, Info
+  Check, X, Zap, ChevronRight, MapPin, Eye, Info, Menu
 } from 'lucide-react';
 import { AuthContext } from '../../main';
+import './LandingPage.css';
 
 export function LandingPage() {
   const navigate = useNavigate();
   const auth = useContext(AuthContext);
 
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loginMethod, setLoginMethod] = useState('phone'); // 'phone' or 'aadhaar'
   const [phoneNum, setPhoneNum] = useState('');
   const [aadhaarNum, setAadhaarNum] = useState('');
@@ -19,6 +21,7 @@ export function LandingPage() {
   const [otpCode, setOtpCode] = useState('');
 
   const handleStartJourney = () => {
+    setMobileMenuOpen(false);
     const isAuth = localStorage.getItem('indian-drives-authenticated') === 'true' || localStorage.getItem('indian-drives-token');
     if (isAuth) {
       navigate('/dashboard');
@@ -32,7 +35,7 @@ export function LandingPage() {
     localStorage.setItem('indian-drives-authenticated', 'true');
     localStorage.setItem('indian-drives-token', 'demo-token-' + Date.now());
     if (auth && auth.login) {
-      auth.login({ email: 'rahul.sharma@example.in' }).catch(() => {});
+      auth.login({ email: 'yanshi.chauhan@example.com' }).catch(() => {});
     }
     setShowLoginModal(false);
     navigate('/dashboard');
@@ -43,161 +46,105 @@ export function LandingPage() {
   };
 
   return (
-    <div className="landing-page-root" style={{ background: '#f8fafc', color: '#173b57', fontFamily: 'Inter, system-ui, sans-serif', minHeight: '100vh' }}>
+    <div className="landing-page-root">
       
       {/* 1. TOP PUBLIC NAVIGATION BAR */}
-      <header style={{
-        background: '#ffffff',
-        borderBottom: '1px solid #e2e8f0',
-        padding: '16px 48px',
-        position: 'sticky',
-        top: 0,
-        zIndex: 100,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        boxShadow: '0 2px 10px rgba(0, 37, 66, 0.03)'
-      }}>
+      <header className="landing-header">
         {/* Brand Logo */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }} onClick={() => navigate('/')}>
+        <div className="landing-brand" onClick={() => navigate('/')}>
           <img src="/indian-drives-logo.png" alt="Indian Drives Logo" className="brand-logo-img" style={{ height: '42px', width: 'auto' }} />
         </div>
 
-        {/* Center Nav Links */}
-        <nav style={{ display: 'flex', alignItems: 'center', gap: '32px', fontSize: '14px', fontWeight: 700 }}>
-          <a href="#how-it-works" style={{ color: '#476179', textDecoration: 'none' }}>How It Works</a>
-          <a href="#features" style={{ color: '#476179', textDecoration: 'none' }}>Key Features</a>
-          <a href="#paths" style={{ color: '#476179', textDecoration: 'none' }}>Citizen Journeys</a>
-          <a href="#ask-ai" onClick={(e) => { e.preventDefault(); navigate('/ask'); }} style={{ color: '#e88a2d', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
+        {/* Center Desktop Nav Links */}
+        <nav className="landing-desktop-nav">
+          <a href="#how-it-works" className="landing-nav-link">How It Works</a>
+          <a href="#features" className="landing-nav-link">Key Features</a>
+          <a href="#paths" className="landing-nav-link">Citizen Journeys</a>
+          <a
+            href="#ask-ai"
+            onClick={(e) => { e.preventDefault(); navigate('/ask'); }}
+            className="landing-ai-link"
+          >
             ✦ Ask DriveSeva AI
           </a>
         </nav>
 
-        {/* Right CTA Actions */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        {/* Right CTA Actions & Mobile Toggle */}
+        <div className="landing-nav-actions">
+          <button onClick={handleStartJourney} className="landing-start-btn">
+            Start Your Journey <ArrowRight size={16} />
+          </button>
+          
           <button
-            onClick={handleStartJourney}
-            style={{
-              background: '#0a2540',
-              color: '#ffffff',
-              border: 'none',
-              padding: '10px 22px',
-              borderRadius: '10px',
-              fontWeight: 800,
-              fontSize: '14px',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              boxShadow: '0 4px 12px rgba(10, 37, 64, 0.15)'
-            }}
+            className="landing-mobile-toggle"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle Navigation Menu"
           >
+            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
+
+        {/* Mobile Slide-Down Menu Drawer */}
+        <div className={`landing-mobile-drawer ${mobileMenuOpen ? 'open' : ''}`}>
+          <a href="#how-it-works" className="landing-nav-link" onClick={() => setMobileMenuOpen(false)}>How It Works</a>
+          <a href="#features" className="landing-nav-link" onClick={() => setMobileMenuOpen(false)}>Key Features</a>
+          <a href="#paths" className="landing-nav-link" onClick={() => setMobileMenuOpen(false)}>Citizen Journeys</a>
+          <a
+            href="#ask-ai"
+            onClick={(e) => { e.preventDefault(); setMobileMenuOpen(false); navigate('/ask'); }}
+            className="landing-ai-link"
+          >
+            ✦ Ask DriveSeva AI
+          </a>
+          <button onClick={handleStartJourney} className="landing-start-btn" style={{ width: '100%', justifyContent: 'center', marginTop: '8px' }}>
             Start Your Journey <ArrowRight size={16} />
           </button>
         </div>
       </header>
 
       {/* 2. HERO SECTION */}
-      <section style={{
-        padding: '80px 48px 60px 48px',
-        maxWidth: '1240px',
-        margin: '0 auto',
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
-        gap: '48px',
-        alignItems: 'center'
-      }}>
+      <section className="landing-hero-container">
         {/* Left Column Text */}
         <div>
-          <div style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
-            background: '#eef6ff',
-            border: '1px solid #bae6fd',
-            color: '#0369a1',
-            padding: '6px 14px',
-            borderRadius: '20px',
-            fontSize: '12px',
-            fontWeight: 800,
-            marginBottom: '20px'
-          }}>
+          <div className="landing-hero-badge">
             <Sparkles size={14} color="#f97316" /> RE-IMAGINING CITIZEN DRIVING LICENCE SERVICES
           </div>
 
-          <h1 style={{
-            fontSize: '52px',
-            fontWeight: 900,
-            color: '#0a2540',
-            lineHeight: 1.1,
-            letterSpacing: '-1.5px',
-            margin: '0 0 20px 0'
-          }}>
+          <h1 className="landing-hero-title">
             Driving Licence Services, <span style={{ color: '#e88a2d' }}>Simplified & Misguidance-Free.</span>
           </h1>
 
-          <p style={{
-            fontSize: '18px',
-            color: '#476179',
-            lineHeight: 1.6,
-            margin: '0 0 32px 0',
-            maxWidth: '540px'
-          }}>
+          <p className="landing-hero-subtitle">
             Experience India’s smartest driving licence portal. No long queues, no middlemen, and zero misguidance. Clear step-by-step guidance for Learner Licence, Practical Tests, and Smartcard Maintenance.
           </p>
 
           {/* Action Buttons */}
-          <div style={{ display: 'flex', gap: '16px', marginBottom: '40px', flexWrap: 'wrap' }}>
-            <button
-              onClick={handleStartJourney}
-              style={{
-                background: '#0a2540',
-                color: '#ffffff',
-                border: 'none',
-                padding: '16px 32px',
-                borderRadius: '12px',
-                fontWeight: 800,
-                fontSize: '16px',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
-                boxShadow: '0 4px 16px rgba(10, 37, 64, 0.2)'
-              }}
-            >
+          <div className="landing-hero-actions">
+            <button onClick={handleStartJourney} className="landing-hero-btn-primary">
               Start Your Journey <ArrowRight size={18} />
             </button>
           </div>
 
           {/* Trust Badges Bar */}
-          <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', fontSize: '13px', fontWeight: 700, color: '#64748b' }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <div className="landing-trust-badges">
+            <span className="landing-trust-item">
               <ShieldCheck size={16} color="#16a34a" /> 100% Aadhaar Verified
             </span>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span className="landing-trust-item">
               <Laptop size={16} color="#0369a1" /> Remote Proctored Exam
             </span>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span className="landing-trust-item">
               <Truck size={16} color="#e88a2d" /> Live Smartcard Tracking
             </span>
           </div>
         </div>
 
         {/* Right Column Hero Mockup Graphic */}
-        <div style={{ position: 'relative' }}>
-          
+        <div className="landing-hero-mockup-wrapper">
           {/* Card Mockup Showcase */}
-          <div style={{
-            background: '#ffffff',
-            borderRadius: '24px',
-            padding: '32px',
-            border: '1px solid #e2e8f0',
-            boxShadow: '0 20px 40px rgba(0, 37, 66, 0.08)',
-            position: 'relative',
-            zIndex: 2
-          }}>
+          <div className="landing-hero-mockup-card">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#ef4444' }} />
                 <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#f59e0b' }} />
                 <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#10b981' }} />
@@ -208,11 +155,11 @@ export function LandingPage() {
             </div>
 
             {/* Dashboard Speedometer Track Preview */}
-            <div style={{ background: '#0a2540', borderRadius: '16px', padding: '24px', color: '#ffffff', marginBottom: '20px' }}>
+            <div className="landing-speedometer-preview">
               <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', letterSpacing: '0.8px', textTransform: 'uppercase', marginBottom: '8px' }}>
                 SPEEDOMETER ROADMAP TRACKER
               </div>
-              <div style={{ fontSize: '18px', fontWeight: 800, color: '#ffffff', marginBottom: '12px' }}>
+              <div style={{ fontSize: '16px', fontWeight: 800, color: '#ffffff', marginBottom: '12px' }}>
                 Learner Licence Active → DL Exam Ready
               </div>
 
@@ -221,7 +168,7 @@ export function LandingPage() {
                 <div style={{ width: '65%', height: '100%', background: '#f97316', borderRadius: '3px' }} />
               </div>
 
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '12px', fontSize: '12px', fontWeight: 700 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '12px', fontSize: '11px', fontWeight: 700, flexWrap: 'wrap', gap: '6px' }}>
                 <span style={{ color: '#10b981' }}>✓ LL Issued</span>
                 <span style={{ color: '#f97316' }}>⏱ Test Scheduled</span>
                 <span style={{ color: '#94a3b8' }}>Smartcard Dispatch</span>
@@ -229,7 +176,7 @@ export function LandingPage() {
             </div>
 
             {/* Quick Cards Stack */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <div className="landing-quick-cards-grid">
               <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
                 <div style={{ fontSize: '11px', fontWeight: 800, color: '#0369a1', marginBottom: '4px' }}>ONLINE LL TEST</div>
                 <div style={{ fontSize: '13px', fontWeight: 800, color: '#0a2540' }}>15 Min Remote Assessment</div>
@@ -240,55 +187,34 @@ export function LandingPage() {
                 <div style={{ fontSize: '13px', fontWeight: 800, color: '#0a2540' }}>Car-Seat Visual Selection</div>
               </div>
             </div>
-
           </div>
 
           {/* Floating Backdrop Decorative Accent */}
-          <div style={{
-            position: 'absolute',
-            top: '-20px',
-            right: '-20px',
-            bottom: '-20px',
-            left: '-20px',
-            background: 'linear-gradient(135deg, rgba(232, 138, 45, 0.15) 0%, rgba(3, 105, 161, 0.15) 100%)',
-            borderRadius: '32px',
-            zIndex: 1,
-            filter: 'blur(20px)'
-          }} />
-
+          <div className="landing-backdrop-blur" />
         </div>
       </section>
 
       {/* 3. "HOW IT MANAGES USER FLOW EFFICIENTLY (ZERO MISGUIDANCE)" SECTION */}
-      <section id="how-it-works" style={{ background: '#ffffff', borderTop: '1px solid #e2e8f0', borderBottom: '1px solid #e2e8f0', padding: '80px 48px' }}>
+      <section id="how-it-works" className="landing-section-white">
         <div style={{ maxWidth: '1240px', margin: '0 auto' }}>
           
-          <div style={{ textAlign: 'center', maxWidth: '720px', margin: '0 auto 56px auto' }}>
-            <span style={{ fontSize: '12px', fontWeight: 800, color: '#e88a2d', letterSpacing: '1px', textTransform: 'uppercase' }}>
+          <div className="landing-section-header">
+            <span className="landing-section-tag">
               TRANSPARENT & GUIDED CITIZEN WORKFLOW
             </span>
-            <h2 style={{ fontSize: '38px', fontWeight: 900, color: '#0a2540', margin: '10px 0 16px 0', letterSpacing: '-0.8px' }}>
+            <h2 className="landing-section-title">
               Never Get Misguided Again. One Portal, 3 Streamlined Paths.
             </h2>
-            <p style={{ fontSize: '16px', color: '#64748b', margin: 0, lineHeight: 1.6 }}>
+            <p className="landing-section-desc">
               Unlike legacy portals with confusing menus, DriveSeva dynamically detects where you are in your driving journey and shows only what you need to process next.
             </p>
           </div>
 
           {/* 3 Citizen Paths Cards */}
-          <div id="paths" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '32px' }}>
+          <div id="paths" className="landing-paths-grid">
             
             {/* Path 1: Learner Licence */}
-            <div style={{
-              background: '#f8fafc',
-              borderRadius: '20px',
-              padding: '32px',
-              border: '1px solid #e2e8f0',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              position: 'relative'
-            }}>
+            <div className="landing-path-card">
               <div>
                 <div style={{
                   width: '48px',
@@ -323,40 +249,13 @@ export function LandingPage() {
                 </div>
               </div>
 
-              <button
-                onClick={handleDemoLogin}
-                style={{
-                  marginTop: '32px',
-                  background: '#ffffff',
-                  color: '#0a2540',
-                  border: '1px solid #cbd5e1',
-                  padding: '12px',
-                  borderRadius: '10px',
-                  fontWeight: 800,
-                  fontSize: '14px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px'
-                }}
-              >
+              <button onClick={handleDemoLogin} className="landing-path-card-btn-outlined">
                 Apply for LL <ArrowRight size={16} />
               </button>
             </div>
 
             {/* Path 2: Driving Licence */}
-            <div style={{
-              background: '#f8fafc',
-              borderRadius: '20px',
-              padding: '32px',
-              border: '1px solid #bae6fd',
-              boxShadow: '0 4px 20px rgba(3, 105, 161, 0.06)',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              position: 'relative'
-            }}>
+            <div className="landing-path-card" style={{ border: '1px solid #bae6fd', boxShadow: '0 4px 20px rgba(3, 105, 161, 0.06)' }}>
               <div>
                 <div style={{
                   width: '48px',
@@ -391,39 +290,13 @@ export function LandingPage() {
                 </div>
               </div>
 
-              <button
-                onClick={handleDemoLogin}
-                style={{
-                  marginTop: '32px',
-                  background: '#0a2540',
-                  color: '#ffffff',
-                  border: 'none',
-                  padding: '12px',
-                  borderRadius: '10px',
-                  fontWeight: 800,
-                  fontSize: '14px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px'
-                }}
-              >
+              <button onClick={handleDemoLogin} className="landing-path-card-btn-filled">
                 Book Practical Test <ArrowRight size={16} />
               </button>
             </div>
 
             {/* Path 3: Licence Maintenance */}
-            <div style={{
-              background: '#f8fafc',
-              borderRadius: '20px',
-              padding: '32px',
-              border: '1px solid #e2e8f0',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              position: 'relative'
-            }}>
+            <div className="landing-path-card">
               <div>
                 <div style={{
                   width: '48px',
@@ -458,24 +331,7 @@ export function LandingPage() {
                 </div>
               </div>
 
-              <button
-                onClick={handleDemoLogin}
-                style={{
-                  marginTop: '32px',
-                  background: '#ffffff',
-                  color: '#0a2540',
-                  border: '1px solid #cbd5e1',
-                  padding: '12px',
-                  borderRadius: '10px',
-                  fontWeight: 800,
-                  fontSize: '14px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px'
-                }}
-              >
+              <button onClick={handleDemoLogin} className="landing-path-card-btn-outlined">
                 Manage Licence <ArrowRight size={16} />
               </button>
             </div>
@@ -486,21 +342,20 @@ export function LandingPage() {
       </section>
 
       {/* 4. COMPREHENSIVE FEATURES GRID SECTION */}
-      <section id="features" style={{ padding: '80px 48px', maxWidth: '1240px', margin: '0 auto' }}>
-        <div style={{ textAlign: 'center', maxWidth: '680px', margin: '0 auto 56px auto' }}>
-          <span style={{ fontSize: '12px', fontWeight: 800, color: '#e88a2d', letterSpacing: '1px', textTransform: 'uppercase' }}>
+      <section id="features" className="landing-section-alt">
+        <div className="landing-section-header">
+          <span className="landing-section-tag">
             ENGINEERED FOR CITIZENS
           </span>
-          <h2 style={{ fontSize: '38px', fontWeight: 900, color: '#0a2540', margin: '10px 0 16px 0', letterSpacing: '-0.8px' }}>
+          <h2 className="landing-section-title">
             Everything You Need to Manage Your Driving Licence
           </h2>
-          <p style={{ fontSize: '16px', color: '#64748b', margin: 0, lineHeight: 1.6 }}>
+          <p className="landing-section-desc">
             Designed with state-of-the-art UI, transparent fee breakdowns, and real-time status tracking.
           </p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '28px' }}>
-          
+        <div className="landing-features-grid">
           {[
             {
               icon: Laptop,
@@ -547,19 +402,7 @@ export function LandingPage() {
           ].map((feat, idx) => {
             const Icon = feat.icon;
             return (
-              <div
-                key={idx}
-                style={{
-                  background: '#ffffff',
-                  borderRadius: '20px',
-                  padding: '28px',
-                  border: '1px solid #e2e8f0',
-                  boxShadow: '0 4px 16px rgba(0, 37, 66, 0.03)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '16px'
-                }}
-              >
+              <div key={idx} className="landing-feature-card">
                 <div style={{
                   width: '44px',
                   height: '44px',
@@ -589,33 +432,17 @@ export function LandingPage() {
       </section>
 
       {/* 5. CALL TO ACTION BANNER */}
-      <section style={{ background: '#0a2540', padding: '64px 48px', color: '#ffffff', textAlign: 'center' }}>
+      <section className="landing-cta-banner">
         <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-          <h2 style={{ fontSize: '36px', fontWeight: 900, margin: '0 0 16px 0', letterSpacing: '-0.8px' }}>
+          <h2 className="landing-cta-title">
             Ready to Experience Misguidance-Free Driving Licence Services?
           </h2>
-          <p style={{ fontSize: '17px', color: '#cbd5e1', lineHeight: 1.6, margin: '0 0 32px 0' }}>
+          <p className="landing-cta-desc">
             Join thousands of citizens managing their driving licences effortlessly on DriveSeva.
           </p>
 
           <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
-            <button
-              onClick={handleStartJourney}
-              style={{
-                background: '#f97316',
-                color: '#ffffff',
-                border: 'none',
-                padding: '16px 32px',
-                borderRadius: '12px',
-                fontWeight: 800,
-                fontSize: '16px',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                boxShadow: '0 4px 16px rgba(249, 115, 22, 0.3)'
-              }}
-            >
+            <button onClick={handleStartJourney} className="landing-cta-btn">
               Start Your Journey <ArrowRight size={18} />
             </button>
           </div>
@@ -623,13 +450,13 @@ export function LandingPage() {
       </section>
 
       {/* 6. PUBLIC FOOTER */}
-      <footer style={{ background: '#071829', color: '#94a3b8', padding: '40px 48px', fontSize: '13px', borderTop: '1px solid #1e293b' }}>
-        <div style={{ maxWidth: '1240px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '20px' }}>
+      <footer className="landing-footer">
+        <div className="landing-footer-container">
           <div>
             <strong style={{ color: '#ffffff' }}>Indian Drives (DriveSeva)</strong> — Official Citizen Driving Licence Portal Concept.
           </div>
 
-          <div style={{ display: 'flex', gap: '24px' }}>
+          <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
             <span style={{ cursor: 'pointer' }} onClick={() => navigate('/help')}>Help & Support</span>
             <span style={{ cursor: 'pointer' }} onClick={handleStartJourney}>Start Your Journey</span>
           </div>
@@ -638,29 +465,8 @@ export function LandingPage() {
 
       {/* 7. INTERACTIVE LOGIN / SIGN IN MODAL */}
       {showLoginModal && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'rgba(7, 24, 41, 0.7)',
-          backdropFilter: 'blur(6px)',
-          zIndex: 999,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '24px'
-        }}>
-          <div style={{
-            background: '#ffffff',
-            borderRadius: '24px',
-            padding: '36px',
-            width: '100%',
-            maxWidth: '480px',
-            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.25)',
-            position: 'relative'
-          }}>
+        <div className="landing-modal-overlay">
+          <div className="landing-modal-card">
             {/* Close Icon */}
             <button
               onClick={() => setShowLoginModal(false)}
@@ -862,7 +668,7 @@ export function LandingPage() {
                 gap: '8px'
               }}
             >
-              ⚡ Instant Demo Citizen Login (Rahul Sharma)
+              ⚡ Instant Demo Citizen Login (Yanshi Chauhan)
             </button>
 
           </div>

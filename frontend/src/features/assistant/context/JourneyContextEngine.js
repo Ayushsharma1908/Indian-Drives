@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { api } from '../../../services/api';
+import { getStoredUserProfile } from '../../../data/userProfileData';
 
 /**
  * Creates a normalized central user-journey context object
  * for the Ask Indian Drives assistant.
  */
 export async function fetchUserJourneyContext(activeUser = null) {
-  const userName = activeUser?.name || 'Yanshi';
+  const profile = getStoredUserProfile();
+  const userName = activeUser?.name || profile.fullName;
   const localLLCompleted = localStorage.getItem('ll_completed') === 'true';
 
   let journeyData = null;

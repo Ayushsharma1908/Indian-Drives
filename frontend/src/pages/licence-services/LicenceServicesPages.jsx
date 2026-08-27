@@ -6,6 +6,7 @@ import {
   Car, Shield, Award, Flag, User, CreditCard, Lock, AlertCircle, FileCheck, X
 } from 'lucide-react';
 import { StatusBadge } from '../../components/ui/StatusBadge';
+import { getStoredUserProfile } from '../../data/userProfileData';
 
 // ----------------------------------------------------------------------
 // 1. LICENCE SERVICES HUB PAGE (1:1 IMAGE 1 MATCH)
@@ -489,7 +490,7 @@ export function RenewDrivingLicencePage() {
       </div>
 
       {/* Main 2-Column Grid (1:1 Image 4) */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: '32px', alignItems: 'start' }}>
+      <div className="grid-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: '32px', alignItems: 'start' }}>
         
         {/* Left Column Stack */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -510,7 +511,7 @@ export function RenewDrivingLicencePage() {
                 <User size={18} color="#002542" /> Current Licence Details
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px 36px' }}>
+              <div className="form-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px 36px' }}>
                 <div>
                   <div style={{ fontSize: '11px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase' }}>Licence Number</div>
                   <div style={{ fontSize: '15px', fontWeight: 800, color: '#173b57', marginTop: '4px' }}>KA-01-2023004</div>
@@ -669,13 +670,14 @@ export function UpdateLicenceDetailsPage() {
 
   // State for selected update categories
   const [selectedFields, setSelectedFields] = useState(['name', 'contact']);
+  const profile = getStoredUserProfile();
 
   // State for form inputs
-  const [fullName, setFullName] = useState('Arjun Sharma');
-  const [streetAddress, setStreetAddress] = useState('#42, 5th Main, HSR Layout Sector 1');
-  const [pincode, setPincode] = useState('560102');
-  const [phone, setPhone] = useState('+91 91234 56789');
-  const [email, setEmail] = useState('arjun.sharma@newemail.com');
+  const [fullName, setFullName] = useState(profile.fullName);
+  const [streetAddress, setStreetAddress] = useState(profile.streetAddress);
+  const [pincode, setPincode] = useState(profile.pincode);
+  const [phone, setPhone] = useState(profile.mobile);
+  const [email, setEmail] = useState(profile.email);
   const [uploadedFile, setUploadedFile] = useState('Aadhar_Card_Updated.pdf');
 
   // Toggle category selection
@@ -718,7 +720,7 @@ export function UpdateLicenceDetailsPage() {
       </div>
 
       {/* Main 2-Column Layout */}
-      <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: '32px', alignItems: 'start' }}>
+      <form onSubmit={handleSubmit} className="grid-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: '32px', alignItems: 'start' }}>
         
         {/* Left Column Stack */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
@@ -740,7 +742,7 @@ export function UpdateLicenceDetailsPage() {
               </h3>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
+            <div className="grid-4col-to-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
               {/* Option 1: Name */}
               <div
                 onClick={() => toggleField('name')}
@@ -1203,7 +1205,7 @@ export function LicenceServicePaymentCheckoutPage() {
         </p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: '32px', alignItems: 'start' }}>
+      <div className="grid-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: '32px', alignItems: 'start' }}>
         
         {/* Left Column: Payment Options */}
         <div style={{ background: '#ffffff', borderRadius: '24px', padding: '36px', border: '1px solid #e2e8f0', boxShadow: '0 4px 20px rgba(0, 37, 66, 0.03)' }}>
@@ -1212,7 +1214,7 @@ export function LicenceServicePaymentCheckoutPage() {
           </h3>
 
           {/* Payment Method Tabs */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '14px', marginBottom: '28px' }}>
+          <div className="grid-4col-to-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '14px', marginBottom: '28px' }}>
             {[
               { id: 'upi', label: 'UPI / GPay', icon: '⚡' },
               { id: 'card', label: 'Debit / Credit Card', icon: '💳' },

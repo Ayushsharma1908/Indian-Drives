@@ -6,27 +6,27 @@ import {
   Laptop, Check, Info, HeartPulse, CreditCard, Edit3, User, Eye, Save, Lock
 } from 'lucide-react';
 import { StatusBadge } from '../../components/ui/StatusBadge';
+import { getStoredUserProfile } from '../../data/userProfileData';
+import { UnifiedStageStepper } from '../../components/ui/UnifiedStageStepper';
 
 // ----------------------------------------------------------------------
 // CONSISTENT 5-STEP HORIZONTAL STEPPER DESIGN FLOW
 // ----------------------------------------------------------------------
 const LL_FLOW_STEPS = [
-  { id: 'applicant', label: 'Personal', path: '/ll/applicant' },
-  { id: 'address', label: 'Address', path: '/ll/address' },
-  { id: 'vehicle', label: 'Vehicle', path: '/ll/vehicle' },
-  { id: 'documents', label: 'Documents', path: '/ll/documents' },
-  { id: 'review', label: 'Review', path: '/ll/review' }
+  { id: 'applicant', title: 'Personal Details', label: 'Personal', icon: User, path: '/ll/applicant' },
+  { id: 'address', title: 'Address Details', label: 'Address', icon: MapPin, path: '/ll/address' },
+  { id: 'vehicle', title: 'Vehicle Class', label: 'Vehicle', icon: Car, path: '/ll/vehicle' },
+  { id: 'documents', title: 'Documents Upload', label: 'Documents', icon: FileText, path: '/ll/documents' },
+  { id: 'review', title: 'Application Review', label: 'Review', icon: CheckCircle2, path: '/ll/review' }
 ];
 
 // Reusable Top Horizontal Stepper Layout Matching User Reference Image
 function LLFlowLayout({ currentStepIndex, title, children }) {
-  const navigate = useNavigate();
-
   return (
-    <div className="page page-ll-flow" style={{ width: 'min(1184px, calc(100% - 48px))', margin: '32px auto', fontFamily: 'Inter, system-ui, sans-serif' }}>
+    <div className="page page-ll-flow" style={{ width: 'min(1184px, calc(100% - 32px))', margin: '32px auto', fontFamily: 'Inter, system-ui, sans-serif' }}>
       
       {/* Top Header Title & Application ID */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '12px' }}>
         <h1 style={{ fontSize: '32px', fontWeight: 800, color: '#173b57', margin: 0, letterSpacing: '-0.5px' }}>
           {title}
         </h1>
@@ -35,60 +35,12 @@ function LLFlowLayout({ currentStepIndex, title, children }) {
         </span>
       </div>
 
-      {/* Top Horizontal Stepper Header Bar */}
-      <div style={{ background: '#ffffff', borderRadius: '16px', padding: '24px 48px', border: '1px solid #e2e8f0', boxShadow: '0 4px 16px rgba(0, 37, 66, 0.03)', marginBottom: '32px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' }}>
-          
-          {/* Connecting Track Line */}
-          <div style={{ position: 'absolute', top: '16px', left: '40px', right: '40px', height: '3px', background: '#cbd5e1', zIndex: 0 }} />
-          
-          {/* Filled Progress Line */}
-          <div style={{
-            position: 'absolute',
-            top: '16px',
-            left: '40px',
-            width: `${(currentStepIndex / (LL_FLOW_STEPS.length - 1)) * 100}%`,
-            height: '3px',
-            background: '#173b57',
-            transition: 'width 0.4s ease',
-            zIndex: 1
-          }} />
-
-          {LL_FLOW_STEPS.map((step, idx) => {
-            const isCompleted = idx < currentStepIndex;
-            const isActive = idx === currentStepIndex;
-
-            return (
-              <div
-                key={step.id}
-                onClick={() => navigate(step.path)}
-                style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', zIndex: 2, cursor: 'pointer' }}
-              >
-                <div style={{
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: '50%',
-                  background: isCompleted || isActive ? '#173b57' : '#ffffff',
-                  color: isCompleted || isActive ? '#ffffff' : '#64748b',
-                  border: isCompleted || isActive ? 'none' : '2px solid #94a3b8',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontWeight: 800,
-                  fontSize: '13px',
-                  boxShadow: isActive ? '0 0 0 4px #ffffff, 0 0 0 6px #173b57' : 'none',
-                  transition: 'all 0.3s ease'
-                }}>
-                  {isCompleted ? <Check size={16} strokeWidth={3} /> : isActive ? <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#ffffff' }} /> : idx + 1}
-                </div>
-                <span style={{ fontSize: '13px', fontWeight: isActive || isCompleted ? 800 : 600, color: isActive || isCompleted ? '#173b57' : '#94a3b8' }}>
-                  {step.label}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
+      {/* Top Standardized Responsive Stepper Header Bar */}
+      <UnifiedStageStepper
+        steps={LL_FLOW_STEPS}
+        currentStepIndex={currentStepIndex}
+        flowName="LEARNER LICENCE FLOW"
+      />
 
       {/* Main Content Area */}
       {children}
@@ -195,6 +147,7 @@ export function LLApplicationIntroPage() {
 // ----------------------------------------------------------------------
 export function LLApplicantDetailsPage() {
   const navigate = useNavigate();
+  const profile = getStoredUserProfile();
 
   return (
     <LLFlowLayout currentStepIndex={0} title="Personal Details">
@@ -211,7 +164,7 @@ export function LLApplicantDetailsPage() {
             <label style={{ fontSize: '13px', fontWeight: 700, color: '#173b57', display: 'block', marginBottom: '6px' }}>
               Full Name (as per Aadhaar) <span style={{ color: '#ef4444' }}>*</span>
             </label>
-            <input className="input-field" defaultValue="Rajesh Kumar Sharma" style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid #e2e8f0', fontSize: '15px' }} />
+            <input className="input-field" defaultValue={profile.fullName} placeholder={profile.fullName} style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid #e2e8f0', fontSize: '15px' }} />
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
@@ -219,13 +172,13 @@ export function LLApplicantDetailsPage() {
               <label style={{ fontSize: '13px', fontWeight: 700, color: '#173b57', display: 'block', marginBottom: '6px' }}>
                 Date of Birth <span style={{ color: '#ef4444' }}>*</span>
               </label>
-              <input type="date" className="input-field" defaultValue="1992-08-14" style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid #e2e8f0', fontSize: '15px' }} />
+              <input type="text" className="input-field" defaultValue={profile.dob} placeholder={profile.dob} style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid #e2e8f0', fontSize: '15px' }} />
             </div>
             <div>
               <label style={{ fontSize: '13px', fontWeight: 700, color: '#173b57', display: 'block', marginBottom: '6px' }}>
                 Gender <span style={{ color: '#ef4444' }}>*</span>
               </label>
-              <select className="input-field" defaultValue="Male" style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid #e2e8f0', fontSize: '15px' }}>
+              <select className="input-field" defaultValue={profile.gender || "Male"} style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid #e2e8f0', fontSize: '15px' }}>
                 <option value="Male">Male</option>
                 <option value="Female">Female</option>
               </select>
@@ -237,17 +190,17 @@ export function LLApplicantDetailsPage() {
               <label style={{ fontSize: '13px', fontWeight: 700, color: '#173b57', display: 'block', marginBottom: '6px' }}>
                 Blood Group
               </label>
-              <select className="input-field" defaultValue="O+" style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid #e2e8f0', fontSize: '15px' }}>
-                <option value="O+">O+</option>
-                <option value="A+">A+</option>
-                <option value="B+">B+</option>
+              <select className="input-field" defaultValue={profile.bloodGroup || "O+ve"} style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid #e2e8f0', fontSize: '15px' }}>
+                <option value="O+ve">O+ve</option>
+                <option value="A+ve">A+ve</option>
+                <option value="B+ve">B+ve</option>
               </select>
             </div>
             <div>
               <label style={{ fontSize: '13px', fontWeight: 700, color: '#173b57', display: 'block', marginBottom: '6px' }}>
                 Mobile Number <span style={{ color: '#ef4444' }}>*</span>
               </label>
-              <input className="input-field" defaultValue="+91 98765 43210" style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid #e2e8f0', fontSize: '15px' }} />
+              <input className="input-field" defaultValue={profile.mobile} placeholder={profile.mobile} style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid #e2e8f0', fontSize: '15px' }} />
             </div>
           </div>
 
@@ -255,7 +208,7 @@ export function LLApplicantDetailsPage() {
             <label style={{ fontSize: '13px', fontWeight: 700, color: '#173b57', display: 'block', marginBottom: '6px' }}>
               Email Address
             </label>
-            <input className="input-field" defaultValue="rajesh.sharma@example.com" style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid #e2e8f0', fontSize: '15px' }} />
+            <input className="input-field" defaultValue={profile.email} placeholder={profile.email} style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid #e2e8f0', fontSize: '15px' }} />
           </div>
         </div>
 
@@ -277,6 +230,7 @@ export function LLApplicantDetailsPage() {
 // ----------------------------------------------------------------------
 export function LLAddressDetailsPage() {
   const navigate = useNavigate();
+  const profile = getStoredUserProfile();
 
   return (
     <LLFlowLayout currentStepIndex={1} title="Address Details">
@@ -291,17 +245,17 @@ export function LLAddressDetailsPage() {
         <div style={{ display: 'grid', gap: '20px', marginBottom: '32px' }}>
           <div>
             <label style={{ fontSize: '13px', fontWeight: 700, color: '#173b57', display: 'block', marginBottom: '6px' }}>Street Address / Flat No.</label>
-            <input className="input-field" defaultValue="Flat 4B, Surya Apartments, 12th Cross Road, Indiranagar, Near BDA Complex" style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid #e2e8f0', fontSize: '15px' }} />
+            <input className="input-field" defaultValue={profile.streetAddress} placeholder={profile.streetAddress} style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid #e2e8f0', fontSize: '15px' }} />
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
             <div>
               <label style={{ fontSize: '13px', fontWeight: 700, color: '#173b57', display: 'block', marginBottom: '6px' }}>City / District</label>
-              <input className="input-field" defaultValue="Bengaluru Urban" style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid #e2e8f0', fontSize: '15px' }} />
+              <input className="input-field" defaultValue={profile.city} placeholder={profile.city} style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid #e2e8f0', fontSize: '15px' }} />
             </div>
             <div>
               <label style={{ fontSize: '13px', fontWeight: 700, color: '#173b57', display: 'block', marginBottom: '6px' }}>State & Pincode</label>
-              <input className="input-field" defaultValue="Karnataka - 560038" style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid #e2e8f0', fontSize: '15px' }} />
+              <input className="input-field" defaultValue={`${profile.state} - ${profile.pincode}`} placeholder={`${profile.state} - ${profile.pincode}`} style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid #e2e8f0', fontSize: '15px' }} />
             </div>
           </div>
         </div>
@@ -469,6 +423,7 @@ export function LLDocumentRequirementsPage() {
 export function LLApplicationReviewPage() {
   const navigate = useNavigate();
   const [confirmed, setConfirmed] = useState(false);
+  const profile = getStoredUserProfile();
 
   return (
     <LLFlowLayout currentStepIndex={4} title="Application Review">
@@ -514,32 +469,32 @@ export function LLApplicationReviewPage() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', fontSize: '14px' }}>
               <div>
                 <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>FULL NAME</div>
-                <div style={{ fontWeight: 800, color: '#173b57', fontSize: '15px' }}>Rajesh Kumar Sharma</div>
+                <div style={{ fontWeight: 800, color: '#173b57', fontSize: '15px' }}>{profile.fullName}</div>
               </div>
 
               <div>
                 <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>DATE OF BIRTH</div>
-                <div style={{ fontWeight: 800, color: '#173b57', fontSize: '15px' }}>14 August 1992 <span style={{ color: '#94a3b8', fontWeight: 500, fontSize: '13px' }}>(31 yrs)</span></div>
+                <div style={{ fontWeight: 800, color: '#173b57', fontSize: '15px' }}>{profile.dob}</div>
               </div>
 
               <div>
                 <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>GENDER</div>
-                <div style={{ fontWeight: 800, color: '#173b57', fontSize: '15px' }}>Male</div>
+                <div style={{ fontWeight: 800, color: '#173b57', fontSize: '15px' }}>{profile.gender || 'Male'}</div>
               </div>
 
               <div>
                 <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>BLOOD GROUP</div>
-                <div style={{ fontWeight: 800, color: '#173b57', fontSize: '15px' }}>O+</div>
+                <div style={{ fontWeight: 800, color: '#173b57', fontSize: '15px' }}>{profile.bloodGroup || 'O+ve'}</div>
               </div>
 
               <div>
                 <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>MOBILE NUMBER</div>
-                <div style={{ fontWeight: 800, color: '#173b57', fontSize: '15px' }}>+91 98765 43210</div>
+                <div style={{ fontWeight: 800, color: '#173b57', fontSize: '15px' }}>{profile.mobile}</div>
               </div>
 
               <div>
                 <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>EMAIL ADDRESS</div>
-                <div style={{ fontWeight: 800, color: '#173b57', fontSize: '15px' }}>rajesh.sharma@example.com</div>
+                <div style={{ fontWeight: 800, color: '#173b57', fontSize: '15px' }}>{profile.email}</div>
               </div>
             </div>
           </div>
@@ -565,19 +520,19 @@ export function LLApplicationReviewPage() {
               <div>
                 <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>PRESENT ADDRESS</div>
                 <div style={{ fontWeight: 800, color: '#173b57', fontSize: '15px', lineHeight: 1.5 }}>
-                  Flat 4B, Surya Apartments, 12th Cross Road Indiranagar, Near BDA Complex
+                  {profile.streetAddress}
                 </div>
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                 <div>
                   <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>CITY/DISTRICT</div>
-                  <div style={{ fontWeight: 800, color: '#173b57', fontSize: '15px' }}>Bengaluru Urban</div>
+                  <div style={{ fontWeight: 800, color: '#173b57', fontSize: '15px' }}>{profile.city}</div>
                 </div>
 
                 <div>
                   <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>STATE & PINCODE</div>
-                  <div style={{ fontWeight: 800, color: '#173b57', fontSize: '15px' }}>Karnataka - 560038</div>
+                  <div style={{ fontWeight: 800, color: '#173b57', fontSize: '15px' }}>{profile.state} - {profile.pincode}</div>
                 </div>
               </div>
             </div>
@@ -949,7 +904,7 @@ export function LLFeePaymentPage() {
       </div>
 
       {/* 2-Column Split Layout */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '28px', alignItems: 'start', marginBottom: '36px' }}>
+      <div className="grid-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '28px', alignItems: 'start', marginBottom: '36px' }}>
         
         {/* Left Column: Select Payment Method */}
         <div style={{ background: '#ffffff', borderRadius: '20px', padding: '32px', border: '1px solid #e2e8f0', boxShadow: '0 4px 16px rgba(0, 37, 66, 0.03)' }}>
@@ -971,7 +926,7 @@ export function LLFeePaymentPage() {
             <div style={{ padding: '20px' }}>
               
               {/* 3 App Cards */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '14px', marginBottom: '20px' }}>
+              <div className="grid-4col-to-2col" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '14px', marginBottom: '20px' }}>
                 
                 {/* GPay */}
                 <div
@@ -1182,43 +1137,70 @@ export function LLAssessmentCockpitPage() {
       </div>
 
       {/* 2-Column Main Layout */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: '28px', alignItems: 'start' }}>
+      <div className="grid-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: '28px', alignItems: 'start' }}>
         
         {/* Left Column Stack */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           
           {/* Assessment Route Card */}
-          <div style={{ background: '#ffffff', borderRadius: '20px', padding: '24px 32px', border: '1px solid #e2e8f0', boxShadow: '0 4px 16px rgba(0,37,66,0.03)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', fontWeight: 800, color: '#173b57', letterSpacing: '0.5px', marginBottom: '20px' }}>
+          <div style={{ background: '#ffffff', borderRadius: '20px', padding: '24px', border: '1px solid #e2e8f0', boxShadow: '0 4px 16px rgba(0,37,66,0.03)', overflow: 'hidden' }}>
+            <div style={{ fontSize: '13px', fontWeight: 800, color: '#173b57', letterSpacing: '0.5px', marginBottom: '20px' }}>
               🔀 ASSESSMENT ROUTE
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' }}>
-              <div style={{ position: 'absolute', top: '14px', left: '30px', right: '30px', height: '3px', background: '#e2e8f0', zIndex: 0 }} />
-              <div style={{ position: 'absolute', top: '14px', left: '30px', width: '56%', height: '3px', background: '#173b57', zIndex: 1 }} />
+            {/* Checkpoint Track with Smooth Touch Landscape Scroll */}
+            <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none', msOverflowStyle: 'none', paddingBottom: '6px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative', minWidth: '540px', padding: '4px 12px' }}>
+                {/* Gray Base Track Line */}
+                <div style={{ position: 'absolute', top: '16px', left: '28px', right: '28px', height: '3px', background: '#e2e8f0', zIndex: 0, borderRadius: '9999px' }} />
+                
+                {/* Active Green Completed Progress Line */}
+                <div style={{ position: 'absolute', top: '16px', left: '28px', width: '58%', height: '3px', background: 'linear-gradient(90deg, #16a34a 0%, #173b57 70%, #e88a2d 100%)', zIndex: 1, borderRadius: '9999px' }} />
 
-              {[
-                { label: 'APPLICATION', done: true },
-                { label: 'DOCUMENTS', done: true },
-                { label: 'PAYMENT', done: true },
-                { label: 'LL ASSESSMENT', active: true },
-                { label: 'DRIVING TEST', done: false },
-                { label: 'LICENCE', done: false }
-              ].map((rt, idx) => (
-                <div key={idx} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', zIndex: 2 }}>
-                  <div style={{
-                    width: '28px',
-                    height: '28px',
-                    borderRadius: '50%',
-                    background: rt.active ? '#e88a2d' : rt.done ? '#cbd5e1' : '#ffffff',
-                    border: rt.active ? 'none' : rt.done ? 'none' : '2px solid #cbd5e1',
-                    boxShadow: rt.active ? '0 0 0 4px #fff7ed, 0 0 0 6px #e88a2d' : 'none'
-                  }} />
-                  <span style={{ fontSize: '10px', fontWeight: rt.active ? 800 : 700, color: rt.active ? '#173b57' : '#94a3b8' }}>
-                    {rt.label}
-                  </span>
-                </div>
-              ))}
+                {[
+                  { label: 'APPLICATION', done: true, icon: FileText },
+                  { label: 'DOCUMENTS', done: true, icon: FileCheck2 },
+                  { label: 'PAYMENT', done: true, icon: CreditCard },
+                  { label: 'LL ASSESSMENT', active: true, icon: Laptop },
+                  { label: 'DRIVING TEST', done: false, icon: Car },
+                  { label: 'LICENCE', done: false, icon: ShieldCheck }
+                ].map((rt, idx) => {
+                  const IconComp = rt.icon;
+
+                  return (
+                    <div key={idx} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', zIndex: 2, flexShrink: 0, padding: '0 6px' }}>
+                      <div style={{
+                        width: '32px',
+                        height: '32px',
+                        borderRadius: '50%',
+                        background: rt.active ? '#e88a2d' : rt.done ? '#16a34a' : '#ffffff',
+                        color: rt.active || rt.done ? '#ffffff' : '#64748b',
+                        border: rt.active ? 'none' : rt.done ? 'none' : '2px solid #cbd5e1',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        boxShadow: rt.active ? '0 0 0 3px #fff7ed, 0 0 0 5px #e88a2d' : rt.done ? '0 2px 8px rgba(22, 163, 74, 0.25)' : 'none',
+                        transition: 'all 0.3s ease'
+                      }}>
+                        {rt.done ? (
+                          <Check size={16} strokeWidth={3} />
+                        ) : (
+                          <IconComp size={16} />
+                        )}
+                      </div>
+                      <span style={{
+                        fontSize: '10px',
+                        fontWeight: rt.active ? 800 : rt.done ? 800 : 700,
+                        color: rt.active ? '#173b57' : rt.done ? '#16a34a' : '#94a3b8',
+                        whiteSpace: 'nowrap',
+                        letterSpacing: '0.2px'
+                      }}>
+                        {rt.label}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
 
@@ -1231,7 +1213,7 @@ export function LLAssessmentCockpitPage() {
               Before you get behind the wheel, let's check your understanding of India's road rules.
             </p>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
+            <div className="grid-4col-to-2col" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
               <div style={{ background: '#f3e8ff', padding: '20px 12px', borderRadius: '16px', textAlign: 'center' }}>
                 <div style={{ fontSize: '24px', marginBottom: '8px' }}>🚥</div>
                 <span style={{ fontSize: '13px', fontWeight: 800, color: '#173b57' }}>Traffic Signals</span>
@@ -1387,7 +1369,7 @@ export function LLAssessmentLiveExamPage() {
       </div>
 
       {/* Main 2-Column Exam Interface */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '28px', alignItems: 'start' }}>
+      <div className="grid-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '28px', alignItems: 'start' }}>
         
         {/* Left Section: Question & Choices Card */}
         <div style={{ background: '#ffffff', borderRadius: '24px', padding: '36px', border: '1px solid #e2e8f0', boxShadow: '0 4px 20px rgba(0,37,66,0.04)', position: 'relative', overflow: 'hidden' }}>
@@ -1428,7 +1410,7 @@ export function LLAssessmentLiveExamPage() {
             </div>
 
             {/* 4 Choices Grid (2x2) */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '32px' }}>
+            <div className="form-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '32px' }}>
               {[
                 { key: 'A', text: 'Speed limit is 50 km/h' },
                 { key: 'B', text: 'No stopping or standing' },
@@ -1658,7 +1640,7 @@ export function LLAssessmentResultPage() {
       </div>
 
       {/* 2-Column Results Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: '380px 1fr', gap: '28px', alignItems: 'start', marginBottom: '32px' }}>
+      <div className="grid-2col" style={{ display: 'grid', gridTemplateColumns: '380px 1fr', gap: '28px', alignItems: 'start', marginBottom: '32px' }}>
         
         {/* Left Column: Final Score Donut Card */}
         <div style={{ background: '#ffffff', borderRadius: '24px', padding: '36px', border: '1px solid #e2e8f0', boxShadow: '0 4px 20px rgba(0,37,66,0.04)', textAlign: 'center' }}>
@@ -1706,7 +1688,7 @@ export function LLAssessmentResultPage() {
               Assessment Summary
             </h3>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '14px' }}>
+            <div className="grid-4col-to-2col" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '14px' }}>
               <div style={{ background: '#f8fafc', borderRadius: '14px', padding: '16px', border: '1px solid #e2e8f0' }}>
                 <div style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', marginBottom: '4px' }}>Total Questions</div>
                 <div style={{ fontSize: '22px', fontWeight: 800, color: '#173b57' }}>15</div>
@@ -1828,7 +1810,7 @@ export function LLVerifiedPage() {
       </div>
 
       {/* 2-Column Split Layout */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: '32px', alignItems: 'start' }}>
+      <div className="grid-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: '32px', alignItems: 'start' }}>
         
         {/* Left Column: Digital Preview Card */}
         <div>

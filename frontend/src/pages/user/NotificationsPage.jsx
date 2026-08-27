@@ -129,7 +129,7 @@ export function NotificationsPage() {
       </div>
 
       {/* Main 2-Column Grid (Left Filter Sidebar + Right Feed) */}
-      <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: '32px', alignItems: 'start' }}>
+      <div className="grid-2col" style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: '32px', alignItems: 'start' }}>
         
         {/* Left Filter Sidebar */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>

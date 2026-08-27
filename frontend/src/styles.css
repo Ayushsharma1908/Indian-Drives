@@ -28,12 +28,24 @@
   box-sizing: border-box;
 }
 
-body, html, button, input, select, textarea {
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+  box-sizing: border-box;
   font-family: 'Hanken Grotesk', "Noto Sans Devanagari", system-ui, -apple-system, sans-serif !important;
 }
 
+#root {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
 body {
-  margin: 0;
   min-width: 320px;
   background: var(--background);
   color: var(--text);
@@ -108,6 +120,10 @@ select {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  width: 100%;
+  max-width: 100vw;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .topbar {
@@ -115,6 +131,9 @@ select {
   top: 0;
   z-index: 50;
   min-height: 78px;
+  width: 100%;
+  max-width: 100vw;
+  box-sizing: border-box;
   display: grid;
   grid-template-columns: minmax(210px, 1fr) auto minmax(260px, 1fr);
   gap: 24px;
@@ -1878,5 +1897,293 @@ select:focus {
 
 .journey-destination-card:hover .dest-btn-arrow {
   transform: translateX(6px);
+}
+
+/* ==========================================================================
+   COMPREHENSIVE RESPONSIVE DESIGN SYSTEM (MOBILE, TABLET, DESKTOP)
+   ========================================================================== */
+
+/* 1. TABLET & LAPTOP BREAPPOINTS (MAX-WIDTH: 1024PX) */
+@media screen and (max-width: 1024px) {
+  .topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 24px;
+    min-height: 64px;
+  }
+
+  .topbar .navlinks {
+    gap: 16px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  /* Universal 2-column to 1-column responsive layout grids (FORCES right section to come BELOW on tablet and mobile) */
+  .grid-2col, 
+  .hero-section-grid,
+  .dashboard-main-grid,
+  .journey-cockpit-grid,
+  .ask-ai-grid,
+  .ll-review-grid,
+  .dl-review-grid,
+  div[style*="gridTemplateColumns: '1fr 380px'"],
+  div[style*="gridTemplateColumns: '1fr 340px'"],
+  div[style*="gridTemplateColumns: '1fr 360px'"],
+  div[style*="gridTemplateColumns: '1fr 320px'"],
+  div[style*="gridTemplateColumns: '380px 1fr'"],
+  div[style*="gridTemplateColumns: '340px 1fr'"],
+  div[style*="gridTemplateColumns: '360px 1fr'"],
+  div[style*="gridTemplateColumns: '320px 1fr'"],
+  div[style*="gridTemplateColumns: '2fr 1fr'"],
+  div[style*="gridTemplateColumns: '1fr 2fr'"],
+  div[style*="gridTemplateColumns: '260px 1fr'"],
+  div[style*="gridTemplateColumns: 1fr 380px"],
+  div[style*="gridTemplateColumns: 1fr 340px"],
+  div[style*="gridTemplateColumns: 1fr 360px"],
+  div[style*="gridTemplateColumns: 1fr 320px"],
+  div[style*="gridTemplateColumns: 380px 1fr"],
+  div[style*="gridTemplateColumns: 340px 1fr"],
+  div[style*="gridTemplateColumns: 360px 1fr"],
+  div[style*="gridTemplateColumns: 320px 1fr"],
+  form[style*="gridTemplateColumns"] {
+    grid-template-columns: 1fr !important;
+    gap: 24px !important;
+  }
+
+  /* Help Center categories */
+  .help-categories-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  /* App main container padding — tablet */
+  main {
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+    box-sizing: border-box !important;
+  }
+
+  .page, .page-journey-figma, .page-ll-flow, .page-ll-cockpit, .page-dl-flow, [class*="page-"] {
+    width: 100% !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Override inline min() widths on tablet so they use full width */
+  div[style*="min(1184px"],
+  div[style*="min(1024px"],
+  div[style*="min(960px"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    box-sizing: border-box !important;
+  }
+}
+
+/* 2. MOBILE RESPONSIVE BREAKPOINT (MAX-WIDTH: 768PX) */
+@media screen and (max-width: 768px) {
+  /* Typography Scaling for Mobile */
+  h1, .page-title, .hero-title, .main-heading, .page-main-heading {
+    font-size: 32px !important;
+    line-height: 1.25 !important;
+    letter-spacing: -0.5px !important;
+  }
+
+  h2, h3, .card-header, .card-title, .panel-title, .section-heading {
+    font-size: 20px !important;
+    line-height: 1.3 !important;
+  }
+
+  body {
+    font-size: 14px;
+  }
+
+  /* Topbar Mobile Layout */
+  .topbar {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    box-sizing: border-box !important;
+    gap: 12px !important;
+    padding: 10px 16px !important;
+  }
+
+  /* Main wrapper — mobile: 16px side padding, no clipping */
+  main {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  /* All page containers — let main's padding handle centering */
+  .page,
+  .page-journey-figma,
+  .page-ll-flow,
+  .page-ll-cockpit,
+  .page-dl-flow,
+  .page-dashboard,
+  .page-journey,
+  [class*="page-"] {
+    width: 100% !important;
+    margin: 16px 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Override inline min() widths — make full width on mobile */
+  div[style*="min(1184px"],
+  div[style*="min(1024px"],
+  div[style*="min(960px"],
+  div[style*="min(900px"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .app-footer, footer {
+    width: 100% !important;
+    max-width: 100vw !important;
+    box-sizing: border-box !important;
+    padding: 16px 14px !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 8px !important;
+  }
+
+  .topbar .brand img,
+  .topbar .brand-logo-img {
+    height: 34px !important;
+  }
+
+  .topbar .navlinks {
+    order: 3;
+    width: 100%;
+    justify-content: flex-start;
+    border-top: 1px solid #f1f5f9;
+    padding-top: 10px;
+    margin-top: 4px;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .top-actions {
+    gap: 8px;
+  }
+
+  /* Form Fields 2-Column Grids -> 1-Column Mobile */
+  .form-grid-2,
+  div[style*="gridTemplateColumns: '1fr 1fr'"],
+  div[style*="gridTemplateColumns: 1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  .grid-4col-to-2col,
+  div[style*="gridTemplateColumns: 'repeat(4, 1fr)'"],
+  div[style*="gridTemplateColumns: repeat(4, 1fr)"] {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+
+  div[style*="gridTemplateColumns: 'repeat(5, 1fr)'"],
+  div[style*="gridTemplateColumns: repeat(5, 1fr)"] {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  /* Help Center Category Grid on Mobile */
+  .help-categories-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Stepper bars & filter tabs horizontal scroll */
+  .stepper-bar,
+  .filter-tabs {
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Unified Responsive Stepper Bar */
+  .unified-stage-stepper-card {
+    padding: 16px 14px !important;
+    border-radius: 12px !important;
+    margin-bottom: 20px !important;
+  }
+
+  .stepper-mobile-header {
+    display: block !important;
+  }
+
+  /* Full-width responsive cards — prevent side overflow */
+  .card, .panel, .bento-grid > div, .ask-card, .chat-container, .document-card, .status-card, .cockpit-panel, .info-card, .hero-card {
+    padding: 20px 16px !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Ensure all div children of pages don't overflow */
+  .page > div,
+  .page-ll-flow > div,
+  .page-ll-cockpit > div,
+  .page-dl-flow > div {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Help Center Search Bar */
+  .help-search-container {
+    flex-direction: column !important;
+    border-radius: 16px !important;
+    padding: 8px !important;
+  }
+
+  .help-search-container input {
+    width: 100% !important;
+  }
+
+  .help-search-container button {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  /* Modal drawers & overlays on mobile */
+  .modal-container, .drawer-container, div[style*="maxWidth: '560px'"], div[style*="maxWidth: '860px'"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 20px 16px !important;
+  }
+}
+
+/* 3. SMALL MOBILE BREAKPOINT (MAX-WIDTH: 480PX) */
+@media screen and (max-width: 480px) {
+  h1, .page-title, .hero-title, .main-heading, .page-main-heading {
+    font-size: 26px !important;
+  }
+
+  h2, h3, .card-header, .card-title {
+    font-size: 18px !important;
+  }
+
+  .button, button, .btn {
+    padding: 10px 16px !important;
+    font-size: 14px !important;
+  }
+
+  /* Speedometer Dial Container scale on small phones */
+  div[style*="width: '340px'"][style*="height: '310px'"] {
+    transform: scale(0.85);
+    transform-origin: center top;
+    margin-bottom: -40px;
+  }
 }
 

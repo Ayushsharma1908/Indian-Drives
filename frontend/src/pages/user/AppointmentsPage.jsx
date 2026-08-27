@@ -11,7 +11,7 @@ export function AppointmentsPage() {
       title: 'Automated Driving Licence Skill Test',
       date: '24 Oct 2026',
       time: '10:00 AM - 11:00 AM',
-      location: 'RTO Office Track 4, Indiranagar, Bengaluru',
+      location: 'Jamshedpur RTO Test Track, Sakchi, Jamshedpur (JH-05)',
       type: 'upcoming',
       status: 'Scheduled',
       ref: 'IND-DL-SLOT-994'

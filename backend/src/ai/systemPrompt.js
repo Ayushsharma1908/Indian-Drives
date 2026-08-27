@@ -3,14 +3,14 @@
  */
 export function buildSystemPrompt(context = {}) {
   const userName = context.userName || 'Yanshi';
-  const state = context.state || 'Delhi (NCT)';
-  const rto = context.rto || 'DL-01 North Delhi (Mall Road & Burari)';
+  const state = context.state || 'Jharkhand';
+  const rto = context.rto || 'JH-05 Jamshedpur RTO (Sakchi, Jamshedpur)';
   const currentStage = context.currentStage || 'DL Application';
-  const llNumber = context.learnerLicenceNumber || 'LL/24/09/8821';
+  const llNumber = context.learnerLicenceNumber || 'LL-05/2026/008821';
   const appNumber = context.applicationNumber || 'IND-2026-98124';
   const apptDate = context.appointmentState?.date || '18 September 2026';
   const apptTime = context.appointmentState?.time || '10:30 AM';
-  const apptCentre = context.appointmentState?.testCentre || 'DL-01 North Delhi Automated Driving Test Track (Burari)';
+  const apptCentre = context.appointmentState?.testCentre || 'JH-05 Jamshedpur Automated Driving Test Track (Sakchi)';
 
   return `You are "Ask Indian Drives", the official AI guide and conversational action assistant inside Indian Drives (the modern digital portal for driving licence and transport services in India).
 

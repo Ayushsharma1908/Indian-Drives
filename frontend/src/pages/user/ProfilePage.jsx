@@ -5,29 +5,14 @@ import {
   ArrowRight, ShieldCheck, Calendar, MapPin, LogOut
 } from 'lucide-react';
 import { AuthContext } from '../../main';
+import { getStoredUserProfile, setStoredUserProfile } from '../../data/userProfileData';
 
 export function ProfilePage() {
   const navigate = useNavigate();
   const auth = useContext(AuthContext);
 
-  // Load initial profile details from localStorage or defaults
-  const [profile, setProfile] = useState(() => {
-    const saved = localStorage.getItem('indian-drives-user-profile');
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch (e) {}
-    }
-    return {
-      fullName: 'Rahul Sharma',
-      phone: '+91 98765 43210',
-      email: 'rahul.sharma@example.in',
-      dob: '15 Aug 1990',
-      gender: 'Male',
-      bloodGroup: 'O+',
-      address: 'A-12, Vasant Kunj Sector C, New Delhi, Delhi - 110070'
-    };
-  });
+  // Load initial profile details from unified single source of truth
+  const [profile, setProfile] = useState(() => getStoredUserProfile());
 
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState(profile);
@@ -39,8 +24,8 @@ export function ProfilePage() {
 
   const handleSave = (e) => {
     e.preventDefault();
-    setProfile(editForm);
-    localStorage.setItem('indian-drives-user-profile', JSON.stringify(editForm));
+    const updated = setStoredUserProfile(editForm);
+    setProfile(updated);
     setIsEditing(false);
   };
 
@@ -161,7 +146,7 @@ export function ProfilePage() {
       </div>
 
       {/* 2. MAIN CONTENT GRID (2 COLUMNS: LEFT 340PX, RIGHT 1FR) */}
-      <div style={{ display: 'grid', gridTemplateColumns: '340px 1fr', gap: '32px', alignItems: 'start' }}>
+      <div className="grid-2col" style={{ display: 'grid', gridTemplateColumns: '340px 1fr', gap: '32px', alignItems: 'start' }}>
         
         {/* LEFT COLUMN: PERSONAL INFORMATION CARD */}
         <div style={{

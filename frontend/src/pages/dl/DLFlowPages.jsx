@@ -6,81 +6,27 @@ import {
   User, FileText, Home, ExternalLink, Shield, Sparkles, Building2, HelpCircle
 } from 'lucide-react';
 import { StatusBadge } from '../../components/ui/StatusBadge';
+import { getStoredUserProfile } from '../../data/userProfileData';
+import { UnifiedStageStepper } from '../../components/ui/UnifiedStageStepper';
 
 // ----------------------------------------------------------------------
 // COMMON DL FLOW TOP STEPPER COMPONENT (1:1 REFERENCE MATCH FROM IMAGE 1)
 // ----------------------------------------------------------------------
 export function DLFlowHeaderStepper({ currentStep = 1 }) {
   const steps = [
-    { num: 1, title: 'Confirm Details', icon: User, label: 'CURRENT STEP' },
-    { num: 2, title: 'Documents', icon: FileText },
-    { num: 3, title: 'Payment', icon: CreditCard },
-    { num: 4, title: 'Driving Test', icon: Car },
-    { num: 5, title: 'Licence', icon: ShieldCheck }
+    { id: 'details', num: 1, title: 'Confirm Details', icon: User, path: '/dl/documents' },
+    { id: 'documents', num: 2, title: 'Documents', icon: FileText, path: '/dl/documents' },
+    { id: 'payment', num: 3, title: 'Payment', icon: CreditCard, path: '/dl/fee-summary' },
+    { id: 'test', num: 4, title: 'Driving Test', icon: Car, path: '/dl/test-slot' },
+    { id: 'licence', num: 5, title: 'Licence', icon: ShieldCheck, path: '/dl/dispatch' }
   ];
 
   return (
-    <div style={{
-      background: '#ffffff',
-      border: '1px solid #e2e8f0',
-      borderRadius: '20px',
-      padding: '24px 36px',
-      marginBottom: '36px',
-      boxShadow: '0 2px 12px rgba(0, 37, 66, 0.03)'
-    }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' }}>
-        {steps.map((step, idx) => {
-          const Icon = step.icon;
-          const isActive = idx + 1 === currentStep;
-          const isDone = idx + 1 < currentStep;
-
-          return (
-            <React.Fragment key={step.num}>
-              {/* Step Item */}
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', position: 'relative', zIndex: 2 }}>
-                <div style={{
-                  width: '44px',
-                  height: '44px',
-                  borderRadius: '50%',
-                  background: isActive ? '#002542' : isDone ? '#002542' : '#f1f5f9',
-                  color: isActive ? '#ffffff' : isDone ? '#ffffff' : '#64748b',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: isActive ? '0 0 0 4px rgba(0, 37, 66, 0.15)' : 'none',
-                  transition: 'all 0.2s ease'
-                }}>
-                  {isDone ? <Check size={20} strokeWidth={3} /> : <Icon size={20} />}
-                </div>
-
-                <div style={{ textAlign: 'center' }}>
-                  <div style={{ fontSize: '14px', fontWeight: isActive ? 800 : 600, color: isActive ? '#173b57' : '#64748b' }}>
-                    {step.title}
-                  </div>
-                  {isActive && (
-                    <div style={{ fontSize: '9px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px', marginTop: '2px' }}>
-                      CURRENT STEP
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Connecting Line */}
-              {idx < steps.length - 1 && (
-                <div style={{
-                  flex: 1,
-                  height: '2px',
-                  background: idx + 1 < currentStep ? '#002542' : '#e2e8f0',
-                  margin: '0 16px',
-                  marginBottom: '24px',
-                  transition: 'all 0.2s ease'
-                }} />
-              )}
-            </React.Fragment>
-          );
-        })}
-      </div>
-    </div>
+    <UnifiedStageStepper
+      steps={steps}
+      currentStepIndex={currentStep - 1}
+      flowName="DRIVING LICENCE FLOW"
+    />
   );
 }
 
@@ -228,6 +174,7 @@ export function DLIntroPage() {
 // ----------------------------------------------------------------------
 export function DLLearnerFoundPage() {
   const navigate = useNavigate();
+  const profile = getStoredUserProfile();
 
   return (
     <div className="page page-dl-ll-found" style={{ minHeight: 'calc(100vh - 120px)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 24px', fontFamily: 'Inter, system-ui, sans-serif' }}>
@@ -274,7 +221,7 @@ export function DLLearnerFoundPage() {
               LICENCE HOLDER
             </div>
             <div style={{ fontSize: '22px', fontWeight: 800, color: '#173b57', marginTop: '2px' }}>
-              Yanshi Sharma
+              {profile.fullName}
             </div>
           </div>
 
@@ -287,7 +234,7 @@ export function DLLearnerFoundPage() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
           <div>
             <div style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', marginBottom: '4px' }}>LL Number</div>
-            <div style={{ fontSize: '16px', fontWeight: 800, color: '#173b57' }}>LLA20260012345</div>
+            <div style={{ fontSize: '16px', fontWeight: 800, color: '#173b57' }}>{profile.llNumber}</div>
           </div>
 
           <div>
