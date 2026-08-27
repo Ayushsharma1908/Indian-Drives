@@ -6,6 +6,7 @@ import {
   User, FileText, Home, ExternalLink, Shield, Sparkles, Building2, HelpCircle
 } from 'lucide-react';
 import { StatusBadge } from '../../components/ui/StatusBadge';
+import { centralDataStore } from '../../data/centralDataStore';
 import { getStoredUserProfile } from '../../data/userProfileData';
 import { UnifiedStageStepper } from '../../components/ui/UnifiedStageStepper';
 
@@ -1131,7 +1132,20 @@ export function DLPaymentCheckoutPage() {
           </div>
 
           <button
-            onClick={() => setPaid(true)}
+            onClick={() => {
+              centralDataStore.createPayment({
+                title: 'Driving Licence Application & Test Fee',
+                amount: 700,
+                purpose: 'DL Application Fee',
+                method: paymentMethod === 'upi' ? 'UPI (GPay)' : paymentMethod === 'netbanking' ? 'Net Banking' : 'Credit Card',
+                breakdown: [
+                  { label: 'DL Form Fee (Form 7)', fee: '₹200.00' },
+                  { label: 'Automated Track Test Fee', fee: '₹300.00' },
+                  { label: 'Smartcard Licence Printing', fee: '₹200.00' }
+                ]
+              });
+              setPaid(true);
+            }}
             style={{
               width: '100%',
               background: '#002542',
@@ -1715,7 +1729,15 @@ export function DLTestSlotBookingPage() {
             </div>
 
             <button
-              onClick={() => navigate('/dl/appointment-fixed')}
+              onClick={() => {
+                centralDataStore.bookAppointment({
+                  date: `${selectedDay} October 2026`,
+                  time: selectedSlot,
+                  slot: selectedSlot,
+                  location: 'Jamshedpur RTO Test Track, Sakchi (JH-05)'
+                });
+                navigate('/dl/appointment-fixed');
+              }}
               style={{
                 width: '100%',
                 background: '#002542',

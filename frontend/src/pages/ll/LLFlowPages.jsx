@@ -6,6 +6,7 @@ import {
   Laptop, Check, Info, HeartPulse, CreditCard, Edit3, User, Eye, Save, Lock
 } from 'lucide-react';
 import { StatusBadge } from '../../components/ui/StatusBadge';
+import { centralDataStore } from '../../data/centralDataStore';
 import { getStoredUserProfile } from '../../data/userProfileData';
 import { UnifiedStageStepper } from '../../components/ui/UnifiedStageStepper';
 import { LanguageContext, useLanguage } from '../../main';
@@ -150,7 +151,43 @@ export function LLApplicationIntroPage() {
 export function LLApplicantDetailsPage() {
   const navigate = useNavigate();
   const { t } = useLanguage();
-  const profile = getStoredUserProfile();
+  const profile = centralDataStore.getUserProfile();
+  const savedDraft = centralDataStore.getDraftForm('ll_applicant');
+
+  const [formData, setFormData] = useState({
+    fullName: savedDraft.fullName ?? profile.fullName ?? '',
+    dob: savedDraft.dob ?? profile.dob ?? '',
+    gender: savedDraft.gender ?? profile.gender ?? 'Female',
+    bloodGroup: savedDraft.bloodGroup ?? profile.bloodGroup ?? 'O+ve',
+    mobile: savedDraft.mobile ?? profile.mobile ?? '',
+    email: savedDraft.email ?? profile.email ?? ''
+  });
+
+  const [errors, setErrors] = useState({});
+
+  const handleChange = (field, value) => {
+    const updated = { ...formData, [field]: value };
+    setFormData(updated);
+    centralDataStore.saveDraftForm('ll_applicant', updated);
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: null }));
+    }
+  };
+
+  const handleContinue = () => {
+    const newErrors = {};
+    if (!formData.fullName.trim()) newErrors.fullName = 'Full name is required';
+    if (!formData.dob.trim()) newErrors.dob = 'Date of birth is required';
+    if (!formData.mobile.trim()) newErrors.mobile = 'Mobile number is required';
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    centralDataStore.saveDraftForm('ll_applicant', formData);
+    navigate('/ll/address');
+  };
 
   return (
     <LLFlowLayout currentStepIndex={0} title={t('llFlow.applicantTitle')}>
@@ -167,7 +204,14 @@ export function LLApplicantDetailsPage() {
             <label style={{ fontSize: '13px', fontWeight: 700, color: '#173b57', display: 'block', marginBottom: '6px' }}>
               {t('llFlow.fullName')} <span style={{ color: '#ef4444' }}>*</span>
             </label>
-            <input className="input-field" defaultValue={profile.fullName} placeholder={profile.fullName} style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid #e2e8f0', fontSize: '15px' }} />
+            <input
+              className="input-field"
+              value={formData.fullName}
+              onChange={(e) => handleChange('fullName', e.target.value)}
+              placeholder="e.g. Yanshi Chauhan"
+              style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: errors.fullName ? '1px solid #ef4444' : '1px solid #e2e8f0', fontSize: '15px', boxSizing: 'border-box' }}
+            />
+            {errors.fullName && <div style={{ fontSize: '12px', color: '#ef4444', marginTop: '4px' }}>{errors.fullName}</div>}
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
@@ -175,15 +219,29 @@ export function LLApplicantDetailsPage() {
               <label style={{ fontSize: '13px', fontWeight: 700, color: '#173b57', display: 'block', marginBottom: '6px' }}>
                 {t('llFlow.dob')} <span style={{ color: '#ef4444' }}>*</span>
               </label>
-              <input type="text" className="input-field" defaultValue={profile.dob} placeholder={profile.dob} style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid #e2e8f0', fontSize: '15px' }} />
+              <input
+                type="text"
+                className="input-field"
+                value={formData.dob}
+                onChange={(e) => handleChange('dob', e.target.value)}
+                placeholder="DD/MM/YYYY"
+                style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: errors.dob ? '1px solid #ef4444' : '1px solid #e2e8f0', fontSize: '15px', boxSizing: 'border-box' }}
+              />
+              {errors.dob && <div style={{ fontSize: '12px', color: '#ef4444', marginTop: '4px' }}>{errors.dob}</div>}
             </div>
             <div>
               <label style={{ fontSize: '13px', fontWeight: 700, color: '#173b57', display: 'block', marginBottom: '6px' }}>
                 {t('llFlow.gender')} <span style={{ color: '#ef4444' }}>*</span>
               </label>
-              <select className="input-field" defaultValue={profile.gender || "Male"} style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid #e2e8f0', fontSize: '15px' }}>
-                <option value="Male">Male</option>
+              <select
+                className="input-field"
+                value={formData.gender}
+                onChange={(e) => handleChange('gender', e.target.value)}
+                style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid #e2e8f0', fontSize: '15px', background: '#ffffff' }}
+              >
                 <option value="Female">Female</option>
+                <option value="Male">Male</option>
+                <option value="Other">Other</option>
               </select>
             </div>
           </div>
@@ -193,17 +251,31 @@ export function LLApplicantDetailsPage() {
               <label style={{ fontSize: '13px', fontWeight: 700, color: '#173b57', display: 'block', marginBottom: '6px' }}>
                 Blood Group
               </label>
-              <select className="input-field" defaultValue={profile.bloodGroup || "O+ve"} style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid #e2e8f0', fontSize: '15px' }}>
+              <select
+                className="input-field"
+                value={formData.bloodGroup}
+                onChange={(e) => handleChange('bloodGroup', e.target.value)}
+                style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid #e2e8f0', fontSize: '15px', background: '#ffffff' }}
+              >
                 <option value="O+ve">O+ve</option>
                 <option value="A+ve">A+ve</option>
                 <option value="B+ve">B+ve</option>
+                <option value="AB+ve">AB+ve</option>
+                <option value="O-ve">O-ve</option>
               </select>
             </div>
             <div>
               <label style={{ fontSize: '13px', fontWeight: 700, color: '#173b57', display: 'block', marginBottom: '6px' }}>
                 {t('llFlow.mobile')} <span style={{ color: '#ef4444' }}>*</span>
               </label>
-              <input className="input-field" defaultValue={profile.mobile} placeholder={profile.mobile} style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid #e2e8f0', fontSize: '15px' }} />
+              <input
+                className="input-field"
+                value={formData.mobile}
+                onChange={(e) => handleChange('mobile', e.target.value)}
+                placeholder="+91 98765 43210"
+                style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: errors.mobile ? '1px solid #ef4444' : '1px solid #e2e8f0', fontSize: '15px', boxSizing: 'border-box' }}
+              />
+              {errors.mobile && <div style={{ fontSize: '12px', color: '#ef4444', marginTop: '4px' }}>{errors.mobile}</div>}
             </div>
           </div>
 
@@ -211,7 +283,13 @@ export function LLApplicantDetailsPage() {
             <label style={{ fontSize: '13px', fontWeight: 700, color: '#173b57', display: 'block', marginBottom: '6px' }}>
               {t('llFlow.email')}
             </label>
-            <input className="input-field" defaultValue={profile.email} placeholder={profile.email} style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid #e2e8f0', fontSize: '15px' }} />
+            <input
+              className="input-field"
+              value={formData.email}
+              onChange={(e) => handleChange('email', e.target.value)}
+              placeholder="e.g. name@example.com"
+              style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid #e2e8f0', fontSize: '15px', boxSizing: 'border-box' }}
+            />
           </div>
         </div>
 
@@ -219,7 +297,7 @@ export function LLApplicantDetailsPage() {
           <button onClick={() => navigate('/ll/intro')} style={{ background: '#e0f0ff', color: '#002542', border: 'none', padding: '12px 24px', borderRadius: '10px', fontWeight: 700, fontSize: '14px', cursor: 'pointer' }}>
             {t('common.back')}
           </button>
-          <button onClick={() => navigate('/ll/address')} style={{ background: '#0f2942', color: '#ffffff', border: 'none', padding: '12px 28px', borderRadius: '10px', fontWeight: 700, fontSize: '14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <button onClick={handleContinue} style={{ background: '#0f2942', color: '#ffffff', border: 'none', padding: '12px 28px', borderRadius: '10px', fontWeight: 700, fontSize: '14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
             {t('common.continue')} <ArrowRight size={16} />
           </button>
         </div>
@@ -234,7 +312,41 @@ export function LLApplicantDetailsPage() {
 export function LLAddressDetailsPage() {
   const navigate = useNavigate();
   const { t } = useLanguage();
-  const profile = getStoredUserProfile();
+  const profile = centralDataStore.getUserProfile();
+  const savedDraft = centralDataStore.getDraftForm('ll_address');
+
+  const [addressData, setAddressData] = useState({
+    streetAddress: savedDraft.streetAddress ?? profile.streetAddress ?? '',
+    city: savedDraft.city ?? profile.city ?? '',
+    state: savedDraft.state ?? profile.state ?? 'Jharkhand',
+    pincode: savedDraft.pincode ?? profile.pincode ?? '831001'
+  });
+
+  const [errors, setErrors] = useState({});
+
+  const handleChange = (field, value) => {
+    const updated = { ...addressData, [field]: value };
+    setAddressData(updated);
+    centralDataStore.saveDraftForm('ll_address', updated);
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: null }));
+    }
+  };
+
+  const handleContinue = () => {
+    const newErrors = {};
+    if (!addressData.streetAddress.trim()) newErrors.streetAddress = 'Street address is required';
+    if (!addressData.city.trim()) newErrors.city = 'City is required';
+    if (!addressData.pincode.trim()) newErrors.pincode = 'Pincode is required';
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    centralDataStore.saveDraftForm('ll_address', addressData);
+    navigate('/ll/vehicle');
+  };
 
   return (
     <LLFlowLayout currentStepIndex={1} title={t('llFlow.addressTitle')}>
@@ -248,18 +360,45 @@ export function LLAddressDetailsPage() {
 
         <div style={{ display: 'grid', gap: '20px', marginBottom: '32px' }}>
           <div>
-            <label style={{ fontSize: '13px', fontWeight: 700, color: '#173b57', display: 'block', marginBottom: '6px' }}>{t('llFlow.street')}</label>
-            <input className="input-field" defaultValue={profile.streetAddress} placeholder={profile.streetAddress} style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid #e2e8f0', fontSize: '15px' }} />
+            <label style={{ fontSize: '13px', fontWeight: 700, color: '#173b57', display: 'block', marginBottom: '6px' }}>
+              {t('llFlow.street')} <span style={{ color: '#ef4444' }}>*</span>
+            </label>
+            <input
+              className="input-field"
+              value={addressData.streetAddress}
+              onChange={(e) => handleChange('streetAddress', e.target.value)}
+              placeholder="e.g. Flat 402, Green Park Heights, Sakchi"
+              style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: errors.streetAddress ? '1px solid #ef4444' : '1px solid #e2e8f0', fontSize: '15px', boxSizing: 'border-box' }}
+            />
+            {errors.streetAddress && <div style={{ fontSize: '12px', color: '#ef4444', marginTop: '4px' }}>{errors.streetAddress}</div>}
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
             <div>
-              <label style={{ fontSize: '13px', fontWeight: 700, color: '#173b57', display: 'block', marginBottom: '6px' }}>{t('llFlow.city')}</label>
-              <input className="input-field" defaultValue={profile.city} placeholder={profile.city} style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid #e2e8f0', fontSize: '15px' }} />
+              <label style={{ fontSize: '13px', fontWeight: 700, color: '#173b57', display: 'block', marginBottom: '6px' }}>
+                {t('llFlow.city')} <span style={{ color: '#ef4444' }}>*</span>
+              </label>
+              <input
+                className="input-field"
+                value={addressData.city}
+                onChange={(e) => handleChange('city', e.target.value)}
+                placeholder="e.g. Jamshedpur"
+                style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: errors.city ? '1px solid #ef4444' : '1px solid #e2e8f0', fontSize: '15px', boxSizing: 'border-box' }}
+              />
+              {errors.city && <div style={{ fontSize: '12px', color: '#ef4444', marginTop: '4px' }}>{errors.city}</div>}
             </div>
             <div>
-              <label style={{ fontSize: '13px', fontWeight: 700, color: '#173b57', display: 'block', marginBottom: '6px' }}>{t('llFlow.pincode')}</label>
-              <input className="input-field" defaultValue={`${profile.state} - ${profile.pincode}`} placeholder={`${profile.state} - ${profile.pincode}`} style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '1px solid #e2e8f0', fontSize: '15px' }} />
+              <label style={{ fontSize: '13px', fontWeight: 700, color: '#173b57', display: 'block', marginBottom: '6px' }}>
+                {t('llFlow.pincode')} <span style={{ color: '#ef4444' }}>*</span>
+              </label>
+              <input
+                className="input-field"
+                value={addressData.pincode}
+                onChange={(e) => handleChange('pincode', e.target.value)}
+                placeholder="e.g. 831001"
+                style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: errors.pincode ? '1px solid #ef4444' : '1px solid #e2e8f0', fontSize: '15px', boxSizing: 'border-box' }}
+              />
+              {errors.pincode && <div style={{ fontSize: '12px', color: '#ef4444', marginTop: '4px' }}>{errors.pincode}</div>}
             </div>
           </div>
         </div>
@@ -268,7 +407,7 @@ export function LLAddressDetailsPage() {
           <button onClick={() => navigate('/ll/applicant')} style={{ background: '#e0f0ff', color: '#002542', border: 'none', padding: '12px 24px', borderRadius: '10px', fontWeight: 700, fontSize: '14px', cursor: 'pointer' }}>
             {t('common.back')}
           </button>
-          <button onClick={() => navigate('/ll/vehicle')} style={{ background: '#0f2942', color: '#ffffff', border: 'none', padding: '12px 28px', borderRadius: '10px', fontWeight: 700, fontSize: '14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <button onClick={handleContinue} style={{ background: '#0f2942', color: '#ffffff', border: 'none', padding: '12px 28px', borderRadius: '10px', fontWeight: 700, fontSize: '14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
             {t('common.continue')} <ArrowRight size={16} />
           </button>
         </div>

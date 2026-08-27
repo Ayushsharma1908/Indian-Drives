@@ -1,17 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Calendar, ArrowRight, Car, FileText, Shield, Bell, CheckCircle2, Award, X } from 'lucide-react';
+import {
+  Calendar,
+  ArrowRight,
+  Car,
+  FileText,
+  Shield,
+  Bell,
+  CheckCircle2,
+  X
+} from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { api } from '../../services/api';
+import { centralDataStore } from '../../data/centralDataStore';
 import { getStoredUserProfile } from '../../data/userProfileData';
 import { useLanguage } from '../../main';
 
 export function DashboardPage() {
   const navigate = useNavigate();
   const { t } = useLanguage();
-  const profile = getStoredUserProfile();
+  const profile = centralDataStore.getUserProfile() || getStoredUserProfile();
   const [searchParams] = useSearchParams();
-  const [upcomingVisit, setUpcomingVisit] = useState(null);
+  const [upcomingVisit, setUpcomingVisit] = useState(() => centralDataStore.getUpcomingAppointment());
   const [importantNotice, setImportantNotice] = useState(null);
   const [showProcessedNotification, setShowProcessedNotification] = useState(false);
   const [activeFlow, setActiveFlow] = useState(null);
@@ -38,7 +48,6 @@ export function DashboardPage() {
     const fee = localStorage.getItem('last_processed_fee') || '250';
 
     if (flow) {
-      // Check if this notification was ALREADY shown in this session
       if (sessionStorage.getItem(`seen_${flow}`) === 'true') {
         localStorage.removeItem('last_processed_flow');
         localStorage.removeItem('last_processed_title');
@@ -52,15 +61,10 @@ export function DashboardPage() {
       setActiveFlow(flow);
       setFlowTitle(title);
       setFlowFee(fee);
-
-      // Mark as seen immediately in sessionStorage so it NEVER triggers a 2nd time
       sessionStorage.setItem(`seen_${flow}`, 'true');
 
-      // 1.5-Second Delay before popping in notification on Dashboard
       const timer = setTimeout(() => {
         setShowProcessedNotification(true);
-
-        // ✅ Clear so the notification ONLY shows once
         localStorage.removeItem('last_processed_flow');
         localStorage.removeItem('last_processed_title');
         localStorage.removeItem('last_processed_fee');
@@ -74,453 +78,216 @@ export function DashboardPage() {
     }
   }, [searchParams, navigate]);
 
-
   useEffect(() => {
-    // Check for active booked appointments
-    api.appointments()
-      .then((res) => {
-        if (Array.isArray(res) && res.length > 0) {
-          const booked = res.find((a) => a.status === 'booked' || a.status === 'scheduled');
-          if (booked) {
-            setUpcomingVisit(booked);
-            return;
-          }
-        }
-      })
-      .catch(() => { });
+    const handleStateChange = () => {
+      setUpcomingVisit(centralDataStore.getUpcomingAppointment());
+    };
+    window.addEventListener('indian-drives-state-change', handleStateChange);
 
-    // Check for urgent unread notifications
-    api.notifications()
-      .then((res) => {
-        if (Array.isArray(res)) {
-          const urgent = res.find(
-            (n) => !n.read && (
-              n.title.toLowerCase().includes('verified') ||
-              n.title.toLowerCase().includes('ready') ||
-              n.title.toLowerCase().includes('retest') ||
-              n.title.toLowerCase().includes('important')
-            )
-          );
-          if (urgent) {
-            setImportantNotice(urgent);
-          }
-        }
-      })
-      .catch(() => { });
+    // Also check for urgent unread notifications
+    const notes = centralDataStore.getNotifications();
+    const urgent = notes.find(
+      (n) => n.unread && (
+        n.title.toLowerCase().includes('verified') ||
+        n.title.toLowerCase().includes('ready') ||
+        n.title.toLowerCase().includes('retest') ||
+        n.title.toLowerCase().includes('important')
+      )
+    );
+    if (urgent) {
+      setImportantNotice(urgent);
+    }
+
+    return () => window.removeEventListener('indian-drives-state-change', handleStateChange);
   }, []);
 
   return (
-    <div className="page-dashboard-container" style={{ background: '#f7f9fb', minHeight: 'calc(100vh - 72px)', padding: '32px 0 60px 0', fontFamily: 'Inter, system-ui, sans-serif' }}>
-      <div style={{ maxWidth: '1184px', margin: '0 auto', padding: '0 24px', display: 'flex', flexDirection: 'column', gap: '48px' }}>
+    <div
+      className="page-dashboard-container"
+      style={{
+        position: 'relative',
+        background: '#f8fafc',
+        minHeight: 'calc(100vh - 72px)',
+        padding: '36px 0 64px 0',
+        fontFamily: 'Inter, system-ui, sans-serif',
+        overflow: 'hidden'
+      }}
+    >
+      {/* ─────────────────────────────────────────────────────────────
+          1. SUBTLE AMBIENT BACKGROUND ROAD ART (WATERMARK STYLE)
+      ───────────────────────────────────────────────────────────── */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          inset: 0,
+          pointerEvents: 'none',
+          zIndex: 0,
+          overflow: 'hidden'
+        }}
+      >
+        <svg
+          width="100%"
+          height="100%"
+          viewBox="0 0 1440 900"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          preserveAspectRatio="none"
+          style={{ opacity: 0.35 }}
+        >
+          <path
+            d="M -100 320 C 350 320, 520 120, 920 120 C 1260 120, 1380 440, 1600 440"
+            stroke="#e2e8f0"
+            strokeWidth="36"
+            strokeLinecap="round"
+          />
+          <path
+            d="M -100 320 C 350 320, 520 120, 920 120 C 1260 120, 1380 440, 1600 440"
+            stroke="#cbd5e1"
+            strokeWidth="2"
+            strokeDasharray="12 14"
+            strokeLinecap="round"
+          />
+        </svg>
+      </div>
 
-        {/* 1. DYNAMIC NOTIFICATION BANNER (SHOWS ONLY THE CURRENTLY PROCESSED FLOW AFTER 2-SECOND DELAY) */}
+      {/* ─────────────────────────────────────────────────────────────
+          2. MAIN DASHBOARD CONTENT CONTAINER
+      ───────────────────────────────────────────────────────────── */}
+      <div
+        style={{
+          position: 'relative',
+          zIndex: 1,
+          maxWidth: '1184px',
+          margin: '0 auto',
+          padding: '0 24px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '40px'
+        }}
+      >
+        
+        {/* DYNAMIC NOTIFICATIONS / APPOINTMENTS BANNER */}
         <AnimatePresence mode="wait">
           {showProcessedNotification && activeFlow === 'dl_passed' && (
             <motion.div
               key="dl-passed-notification"
-              initial={{ opacity: 0, y: -20, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
+              initial={{ opacity: 0, y: -16 }}
+              animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
               style={{ display: 'flex', justifyContent: 'center' }}
             >
-              <div style={{
-                background: 'linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%)',
-                border: '2px solid #bbf7d0',
-                borderRadius: '20px',
-                padding: '20px 28px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: '24px',
-                width: '100%',
-                maxWidth: '860px',
-                boxShadow: '0 8px 30px rgba(22, 163, 74, 0.12)'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
-                  <div style={{
-                    position: 'relative',
-                    width: '50px',
-                    height: '50px',
-                    borderRadius: '16px',
-                    background: '#dcfce7',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#16a34a',
-                    flexShrink: 0
-                  }}>
-                    <CheckCircle2 size={26} strokeWidth={2.5} />
-                    <span style={{
-                      position: 'absolute',
-                      top: '6px',
-                      right: '6px',
-                      width: '10px',
-                      height: '10px',
-                      borderRadius: '50%',
-                      background: '#16a34a',
-                      boxShadow: '0 0 0 2px #ffffff'
-                    }} />
+              <div
+                style={{
+                  background: '#ffffff',
+                  border: '1px solid #bbf7d0',
+                  borderRadius: '14px',
+                  padding: '16px 24px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '20px',
+                  width: '100%',
+                  boxShadow: '0 2px 8px rgba(0, 37, 66, 0.04)'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                  <div
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: '10px',
+                      background: '#f0fdf4',
+                      color: '#16805a',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0
+                    }}
+                  >
+                    <CheckCircle2 size={22} />
                   </div>
-
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                    <div style={{ fontSize: '11px', fontWeight: 800, color: '#16a34a', letterSpacing: '0.8px', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#16a34a' }} />
-                      STAGE 4 COMPLETED · DL PRACTICAL TEST PASSED
+                  <div>
+                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#16805a', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
+                      DRIVING LICENCE ISSUED
                     </div>
-                    <div style={{ fontSize: '16px', fontWeight: 800, color: '#173b57' }}>
-                      Congratulations! You've passed your driving test.
-                    </div>
-                    <div style={{ fontSize: '13px', color: '#64748b', fontWeight: 500 }}>
-                      Your skill test results have been verified and submitted for official approval.
+                    <div style={{ fontSize: '14px', fontWeight: 600, color: '#173b57' }}>
+                      Practical Driving Test Passed — Driving Licence is active.
                     </div>
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <button
                     onClick={() => {
                       dismissNotification();
-                      navigate('/dl/test-result');
+                      navigate('/dl/congrats');
                     }}
                     style={{
                       background: '#002542',
                       color: '#ffffff',
-                      fontSize: '14px',
-                      fontWeight: 800,
+                      fontSize: '13px',
+                      fontWeight: 600,
                       cursor: 'pointer',
                       display: 'inline-flex',
                       alignItems: 'center',
-                      gap: '8px',
-                      padding: '12px 22px',
-                      borderRadius: '12px',
-                      border: 'none',
-                      boxShadow: '0 4px 14px rgba(0, 37, 66, 0.2)'
+                      gap: '6px',
+                      padding: '8px 14px',
+                      borderRadius: '8px',
+                      border: 'none'
                     }}
                   >
-                    View Test Result <ArrowRight size={16} />
+                    View Licence <ArrowRight size={14} />
                   </button>
-
                   <button
                     onClick={dismissNotification}
-                    title="Dismiss"
-                    style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#94a3b8', padding: '6px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#94a3b8', padding: '4px' }}
                   >
-                    <X size={18} />
+                    <X size={16} />
                   </button>
                 </div>
               </div>
             </motion.div>
           )}
 
-          {showProcessedNotification && activeFlow === 'licence_service' && (
-            <motion.div
-              key="licence-service-notification"
-              initial={{ opacity: 0, y: -20, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-              style={{ display: 'flex', justifyContent: 'center' }}
-            >
-              <div style={{
-                background: 'linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%)',
-                border: '2px solid #bae6fd',
-                borderRadius: '20px',
-                padding: '20px 28px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: '24px',
-                width: '100%',
-                maxWidth: '860px',
-                boxShadow: '0 8px 30px rgba(3, 105, 161, 0.12)'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
-                  <div style={{
-                    position: 'relative',
-                    width: '50px',
-                    height: '50px',
-                    borderRadius: '16px',
-                    background: '#e0f2fe',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#0369a1',
-                    flexShrink: 0
-                  }}>
-                    <Award size={26} strokeWidth={2.5} />
-                    <span style={{
-                      position: 'absolute',
-                      top: '6px',
-                      right: '6px',
-                      width: '10px',
-                      height: '10px',
-                      borderRadius: '50%',
-                      background: '#0369a1',
-                      boxShadow: '0 0 0 2px #ffffff'
-                    }} />
-                  </div>
-
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                    <div style={{ fontSize: '11px', fontWeight: 800, color: '#0369a1', letterSpacing: '0.8px', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#0369a1' }} />
-                      LICENCE SERVICE SUBMITTED
-                    </div>
-                    <div style={{ fontSize: '16px', fontWeight: 800, color: '#173b57' }}>
-                      {flowTitle} Processed Successfully!
-                    </div>
-                    <div style={{ fontSize: '13px', color: '#64748b', fontWeight: 500 }}>
-                      Your application fee payment of ₹{flowFee}.00 was processed securely and submitted to RTO.
-                    </div>
-                  </div>
-                </div>
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
-                  <button
-                    onClick={() => {
-                      dismissNotification();
-                      navigate('/manage-licence');
-                    }}
-                    style={{
-                      background: '#002542',
-                      color: '#ffffff',
-                      fontSize: '14px',
-                      fontWeight: 800,
-                      cursor: 'pointer',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      padding: '12px 22px',
-                      borderRadius: '12px',
-                      border: 'none',
-                      boxShadow: '0 4px 14px rgba(0, 37, 66, 0.2)'
-                    }}
-                  >
-                    View Licence Wallet <ArrowRight size={16} />
-                  </button>
-
-                  <button
-                    onClick={dismissNotification}
-                    title="Dismiss"
-                    style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#94a3b8', padding: '6px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                  >
-                    <X size={18} />
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {showProcessedNotification && activeFlow === 'dl_appointment' && (
-            <motion.div
-              key="dl-appointment-notification"
-              initial={{ opacity: 0, y: -20, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-              style={{ display: 'flex', justifyContent: 'center' }}
-            >
-              <div style={{
-                background: 'linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%)',
-                border: '2px solid #bae6fd',
-                borderRadius: '20px',
-                padding: '20px 28px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: '24px',
-                width: '100%',
-                maxWidth: '860px',
-                boxShadow: '0 8px 30px rgba(3, 105, 161, 0.12)'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
-                  <div style={{
-                    position: 'relative',
-                    width: '50px',
-                    height: '50px',
-                    borderRadius: '16px',
-                    background: '#e0f2fe',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#002542',
-                    flexShrink: 0
-                  }}>
-                    <Calendar size={26} strokeWidth={2.5} />
-                  </div>
-
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                    <div style={{ fontSize: '11px', fontWeight: 800, color: '#0369a1', letterSpacing: '0.8px', textTransform: 'uppercase' }}>
-                      APPOINTMENT CONFIRMED · DL PRACTICAL TEST
-                    </div>
-                    <div style={{ fontSize: '16px', fontWeight: 800, color: '#173b57' }}>
-                      Driving Test Appointment Fixed at Pune RTO!
-                    </div>
-                    <div style={{ fontSize: '13px', color: '#64748b', fontWeight: 500 }}>
-                      Scheduled for Oct 24, 2026 at 10:30 AM. Bring your original LL & identity proof.
-                    </div>
-                  </div>
-                </div>
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
-                  <button
-                    onClick={() => {
-                      dismissNotification();
-                      navigate('/dl/appointment-fixed');
-                    }}
-                    style={{
-                      background: '#002542',
-                      color: '#ffffff',
-                      fontSize: '14px',
-                      fontWeight: 800,
-                      cursor: 'pointer',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      padding: '12px 22px',
-                      borderRadius: '12px',
-                      border: 'none',
-                      boxShadow: '0 4px 14px rgba(0, 37, 66, 0.2)'
-                    }}
-                  >
-                    View Appointment <ArrowRight size={16} />
-                  </button>
-
-                  <button
-                    onClick={dismissNotification}
-                    title="Dismiss"
-                    style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#94a3b8', padding: '6px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                  >
-                    <X size={18} />
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {showProcessedNotification && activeFlow === 'll' && (
-            <motion.div
-              key="ll-completed-notification"
-              initial={{ opacity: 0, y: -20, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-              style={{ display: 'flex', justifyContent: 'center' }}
-            >
-              <div style={{
-                background: 'linear-gradient(135deg, #ffffff 0%, #fff7ed 100%)',
-                border: '2px solid #fed7aa',
-                borderRadius: '20px',
-                padding: '20px 28px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: '24px',
-                width: '100%',
-                maxWidth: '860px',
-                boxShadow: '0 8px 30px rgba(232, 138, 45, 0.12)'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
-                  <div style={{
-                    position: 'relative',
-                    width: '50px',
-                    height: '50px',
-                    borderRadius: '16px',
-                    background: '#ffedd5',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#c2410c',
-                    flexShrink: 0
-                  }}>
-                    <Car size={26} strokeWidth={2.5} />
-                  </div>
-
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                    <div style={{ fontSize: '11px', fontWeight: 800, color: '#c2410c', letterSpacing: '0.8px', textTransform: 'uppercase' }}>
-                      STAGE 1 COMPLETED · LEARNER LICENCE ACTIVE
-                    </div>
-                    <div style={{ fontSize: '16px', fontWeight: 800, color: '#173b57' }}>
-                      Learner Licence Application Verified!
-                    </div>
-                    <div style={{ fontSize: '13px', color: '#64748b', fontWeight: 500 }}>
-                      Your Learner Licence is issued. You can now apply for your permanent Driving Licence.
-                    </div>
-                  </div>
-                </div>
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
-                  <button
-                    onClick={() => {
-                      dismissNotification();
-                      navigate('/journey?stage=dl');
-                    }}
-                    style={{
-                      background: '#002542',
-                      color: '#ffffff',
-                      fontSize: '14px',
-                      fontWeight: 800,
-                      cursor: 'pointer',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      padding: '12px 22px',
-                      borderRadius: '12px',
-                      border: 'none',
-                      boxShadow: '0 4px 14px rgba(0, 37, 66, 0.2)'
-                    }}
-                  >
-                    Continue to DL <ArrowRight size={16} />
-                  </button>
-
-                  <button
-                    onClick={dismissNotification}
-                    title="Dismiss"
-                    style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#94a3b8', padding: '6px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                  >
-                    <X size={18} />
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {!showProcessedNotification && upcomingVisit && (
+          {upcomingVisit && !showProcessedNotification && (
             <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <div style={{
-                background: '#ffffff',
-                border: '1px solid #e2e8f0',
-                borderRadius: '16px',
-                padding: '16px 24px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: '24px',
-                width: '100%',
-                maxWidth: '840px',
-                boxShadow: '0 2px 10px rgba(0, 37, 66, 0.03)'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                  <div style={{
-                    position: 'relative',
-                    width: '42px',
-                    height: '42px',
-                    borderRadius: '12px',
-                    background: '#f1f5f9',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#173b57'
-                  }}>
-                    <Calendar size={20} />
+              <div
+                style={{
+                  background: '#ffffff',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '14px',
+                  padding: '14px 22px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '20px',
+                  width: '100%',
+                  boxShadow: '0 1px 4px rgba(0, 37, 66, 0.03)'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                  <div
+                    style={{
+                      width: '38px',
+                      height: '38px',
+                      borderRadius: '10px',
+                      background: '#f1f5f9',
+                      color: '#173b57',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                  >
+                    <Calendar size={19} />
                   </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                    <span style={{ fontSize: '11px', fontWeight: 800, color: '#476179', letterSpacing: '0.8px', textTransform: 'uppercase' }}>
-                      UPCOMING FOR YOU
+                  <div>
+                    <span style={{ fontSize: '11px', fontWeight: 700, color: '#476179', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
+                      UPCOMING TEST APPOINTMENT
                     </span>
-                    <span style={{ fontSize: '15px', fontWeight: 600, color: '#173b57' }}>
-                      RTO Visit: {upcomingVisit.vehicleClass || 'Driving Licence Test'} <span style={{ color: '#94a3b8', margin: '0 6px' }}>·</span> {upcomingVisit.date}, {upcomingVisit.time || upcomingVisit.slot || '10:30 AM'}
-                    </span>
+                    <div style={{ fontSize: '14px', fontWeight: 600, color: '#173b57' }}>
+                      RTO Practical Test: {upcomingVisit.vehicleClass || 'LMV'} · {upcomingVisit.date}, {upcomingVisit.time || upcomingVisit.slot || '10:30 AM'}
+                    </div>
                   </div>
                 </div>
 
@@ -528,182 +295,470 @@ export function DashboardPage() {
                   onClick={() => navigate('/appointments')}
                   style={{
                     background: 'transparent',
-                    border: 'none',
+                    border: '1px solid #cbd5e1',
                     color: '#173b57',
-                    fontSize: '14px',
+                    fontSize: '13px',
                     fontWeight: 600,
                     cursor: 'pointer',
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '6px',
-                    padding: '6px 12px',
+                    padding: '7px 13px',
                     borderRadius: '8px'
                   }}
                 >
-                  View appointment <ArrowRight size={15} />
+                  View appointment <ArrowRight size={14} />
                 </button>
               </div>
             </div>
           )}
         </AnimatePresence>
 
-        {/* 2. HERO SECTION ("Namaste, Yanshi 👋") */}
-        <div className="hero-section-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(360px, 480px)', gap: '40px', alignItems: 'center', padding: '20px 0' }}>
-
+        {/* ─────────────────────────────────────────────────────────────
+            3. HERO SECTION (GREETING ON LEFT + S-CURVE ROAD ON RIGHT)
+        ───────────────────────────────────────────────────────────── */}
+        <div
+          className="hero-section-grid"
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'minmax(0, 1.15fr) minmax(360px, 480px)',
+            gap: '36px',
+            alignItems: 'center',
+            padding: '12px 0 20px 0'
+          }}
+        >
           {/* Left Text */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <h1 style={{ fontSize: '54px', fontWeight: 700, color: '#173b57', margin: 0, lineHeight: 1.1, letterSpacing: '-1.5px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {/* Minimal Tricolor Top Accent */}
+            <div style={{ display: 'flex', width: '36px', height: '3px', borderRadius: '2px', overflow: 'hidden' }}>
+              <div style={{ flex: 1, background: 'var(--color-saffron)' }} />
+              <div style={{ flex: 1, background: 'var(--color-border)' }} />
+              <div style={{ flex: 1, background: 'var(--color-sage)' }} />
+            </div>
+
+            <h1
+              style={{
+                fontSize: '44px',
+                fontWeight: 700,
+                color: 'var(--color-deep-navy)',
+                margin: 0,
+                lineHeight: 1.15,
+                letterSpacing: '-1.2px'
+              }}
+            >
               {t('dashboard.title')}, {profile.firstName || 'Yanshi'} 🙏
             </h1>
-            <div style={{ fontSize: '22px', color: '#173b57', fontWeight: 600, lineHeight: 1.4 }}>
+
+            <div style={{ fontSize: '18px', color: 'var(--color-primary-navy)', fontWeight: 600, lineHeight: 1.4 }}>
               Welcome to Indian Drives.
-              <div style={{ color: '#476179', fontWeight: 400, marginTop: '4px' }}>
+              <div style={{ color: 'var(--color-text-secondary)', fontWeight: 400, fontSize: '15px', marginTop: '4px' }}>
                 {t('dashboard.subtitle')}
               </div>
             </div>
           </div>
 
-          {/* Right S-Curve Roadmap SVG Graphic */}
-          <div style={{ position: 'relative', width: '100%', height: '180px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <svg width="440" height="160" viewBox="0 0 440 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+          {/* ═══════════════════════════════════════════════════════════
+              RIGHT: SEAMLESS S-CURVE ROAD DIAGRAM (STITCH SPEC)
+          ═══════════════════════════════════════════════════════════ */}
+          <div
+            style={{
+              position: 'relative',
+              width: '100%',
+              height: '160px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <svg
+              width="100%"
+              height="100%"
+              viewBox="0 0 450 160"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              preserveAspectRatio="xMidYMid meet"
+            >
               <defs>
-                <filter id="premium-glow" x="-50%" y="-50%" width="200%" height="200%">
-                  <feGaussianBlur stdDeviation="4" result="blur" />
-                  <feComposite in="SourceGraphic" in2="blur" operator="over" />
-                </filter>
-                <linearGradient id="roadmapGradient" x1="0%" y1="100%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#e88a2d" />
-                  <stop offset="45%" stopColor="#173b57" />
-                  <stop offset="100%" stopColor="#16805a" />
+                {/* Centerline Multi-Color Transition Gradient */}
+                <linearGradient id="roadStitchGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#E8892D" />
+                  <stop offset="35%" stopColor="#102D43" />
+                  <stop offset="65%" stopColor="#425B78" />
+                  <stop offset="100%" stopColor="#5D9278" />
                 </linearGradient>
               </defs>
-              {/* Outer Soft Thick Track */}
+
+              {/* 1. Road Outer Shoulder / Curb Outline */}
               <path
-                d="M 30 130 C 120 130, 140 35, 210 35 C 270 35, 300 85, 390 85"
-                stroke="#e2e8f0"
+                d="M 35 110 C 110 110, 140 28, 210 28 C 270 28, 290 62, 340 62 C 370 62, 385 45, 410 38"
+                stroke="#DCE4EA"
+                strokeWidth="18"
+                strokeLinecap="round"
+              />
+
+              {/* 2. Road Asphalt Surface Body */}
+              <path
+                d="M 35 110 C 110 110, 140 28, 210 28 C 270 28, 290 62, 340 62 C 370 62, 385 45, 410 38"
+                stroke="#F7F9FB"
                 strokeWidth="14"
                 strokeLinecap="round"
-                opacity="0.8"
               />
-              {/* Center Dotted Highway Line */}
+
+              {/* 3. Live Animated Multi-Color Dashed Center Road Line */}
               <path
-                d="M 30 130 C 120 130, 140 35, 210 35 C 270 35, 300 85, 390 85"
-                stroke="url(#roadmapGradient)"
-                strokeWidth="4"
+                className="live-road-dashes"
+                d="M 35 110 C 110 110, 140 28, 210 28 C 270 28, 290 62, 340 62 C 370 62, 385 45, 410 38"
+                stroke="url(#roadStitchGrad)"
+                strokeWidth="2.2"
+                strokeDasharray="5 7"
                 strokeLinecap="round"
               />
 
-              {/* Node 1: 0 (START) */}
-              <g transform="translate(30, 130)">
-                <circle r="12" fill="#e88a2d" fillOpacity="0.15" filter="url(#premium-glow)" />
-                <circle r="10" fill="#f7f9fb" stroke="#e88a2d" strokeWidth="4" />
-                <circle r="4" fill="#e88a2d" />
-                <text x="0" y="26" textAnchor="middle" fill="#e88a2d" fontSize="11" fontWeight="800" letterSpacing="0.5">0 (START)</text>
+              {/* ──────────────────────────────────────────────────
+                  4 MILESTONE NODES (START, LL, TEST, DL)
+              ────────────────────────────────────────────────── */}
+
+              {/* NODE 1: START (Bottom Left) */}
+              <g transform="translate(35, 110)">
+                <circle r="14" fill="#FFF3E3" fillOpacity="0.8" />
+                <circle r="5.5" fill="#E8892D" />
+                <text
+                  x="0"
+                  y="24"
+                  textAnchor="middle"
+                  fill="#E8892D"
+                  fontSize="11"
+                  fontWeight="800"
+                  letterSpacing="0.8"
+                >
+                  START
+                </text>
               </g>
 
-              {/* Node 2: LL */}
-              <g transform="translate(210, 35)">
-                <circle r="6" fill="#173b57" />
-                <text x="0" y="-14" textAnchor="middle" fill="#476179" fontSize="11" fontWeight="700">LL (35%)</text>
+              {/* NODE 2: LL (Top Peak Crest) */}
+              <g transform="translate(210, 28)">
+                <circle r="6" fill="#102D43" />
+                <circle r="2" fill="#FFFFFF" />
+                <text
+                  x="0"
+                  y="-12"
+                  textAnchor="middle"
+                  fill="#102D43"
+                  fontSize="11"
+                  fontWeight="800"
+                  letterSpacing="0.4"
+                >
+                  LL
+                </text>
               </g>
 
-              {/* Node 3: TEST */}
-              <g transform="translate(305, 48)">
-                <circle r="6" fill="#173b57" opacity="0.6" />
-                <text x="0" y="-14" textAnchor="middle" fill="#476179" fontSize="11" fontWeight="700">TEST (65%)</text>
+              {/* NODE 3: TEST (Descent Valley) */}
+              <g transform="translate(320, 62)">
+                <circle r="4.5" fill="#8693A2" />
+                <text
+                  x="0"
+                  y="-11"
+                  textAnchor="middle"
+                  fill="#8693A2"
+                  fontSize="10.5"
+                  fontWeight="700"
+                  letterSpacing="0.4"
+                >
+                  TEST
+                </text>
               </g>
 
-              {/* Node 4: 100 (DL ISSUED) */}
-              <g transform="translate(390, 85)">
-                <circle r="12" fill="none" stroke="#16805a" strokeWidth="2" strokeDasharray="3 3" />
-                <circle r="5" fill="#16805a" />
-                <text x="0" y="26" textAnchor="middle" fill="#16805a" fontSize="11" fontWeight="800">100 (DL ISSUED)</text>
+              {/* NODE 4: DL (End Target) */}
+              <g transform="translate(410, 38)">
+                <circle
+                  r="12"
+                  fill="none"
+                  stroke="#5D9278"
+                  strokeWidth="1.8"
+                  strokeDasharray="3 3"
+                />
+                <circle r="5.5" fill="#5D9278" />
+                <text
+                  x="0"
+                  y="24"
+                  textAnchor="middle"
+                  fill="#102D43"
+                  fontSize="11"
+                  fontWeight="800"
+                  letterSpacing="0.4"
+                >
+                  DL
+                </text>
               </g>
             </svg>
           </div>
-
         </div>
 
         {/* SECTION DIVIDER */}
-        <div style={{ height: '1px', background: '#e2e8f0', width: '100%' }} />
+        <div style={{ height: '1px', background: 'var(--color-border)', width: '100%' }} />
 
-        {/* 3. WHERE ARE YOU IN YOUR DRIVING JOURNEY SECTION */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+        {/* ─────────────────────────────────────────────────────────────
+            4. CLEAN, BALANCED 3 DESTINATION CARDS
+        ───────────────────────────────────────────────────────────── */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           <div>
-            <div style={{ color: '#e88a2d', fontSize: '12px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>
+            <div
+              style={{
+                color: 'var(--color-indigo)',
+                fontSize: '11px',
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                letterSpacing: '1px',
+                marginBottom: '6px'
+              }}
+            >
               WHERE ARE YOU IN YOUR DRIVING JOURNEY?
             </div>
-            <h2 style={{ fontSize: '36px', fontWeight: 700, color: '#173b57', margin: 0, letterSpacing: '-0.8px' }}>
+            <h2
+              style={{
+                fontSize: '26px',
+                fontWeight: 700,
+                color: 'var(--color-deep-navy)',
+                margin: 0,
+                letterSpacing: '-0.5px'
+              }}
+            >
               {"Tell us where you are, and we'll take you from there."}
             </h2>
           </div>
 
-          {/* 3 Interactive Destination Cards with Smooth Hover Animations */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '32px' }}>
-
-            {/* Card 01: Starting Fresh */}
+          {/* 3 Destination Cards */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(310px, 1fr))',
+              gap: '24px'
+            }}
+          >
+            
+            {/* CARD 01: STARTING FRESH */}
             <div
-              className="journey-destination-card"
               onClick={() => navigate('/journey?stage=ll')}
+              className="card"
+              style={{
+                padding: '28px 24px',
+                display: 'flex',
+                flexDirection: 'column',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-3px)';
+                e.currentTarget.style.borderColor = 'var(--color-slate-blue)';
+                e.currentTarget.style.boxShadow = 'var(--shadow-hover)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.borderColor = 'var(--color-border)';
+                e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+              }}
             >
-              <div className="dest-icon-circle">
-                <Car size={24} />
+              <div
+                style={{
+                  width: '44px',
+                  height: '44px',
+                  borderRadius: '12px',
+                  background: 'var(--color-pale-indigo)',
+                  border: '1px solid var(--color-border)',
+                  color: 'var(--color-primary-navy)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: '16px'
+                }}
+              >
+                <Car size={22} />
               </div>
-              <div className="dest-step-tag">
+
+              <div
+                style={{
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  letterSpacing: '0.8px',
+                  textTransform: 'uppercase',
+                  color: 'var(--color-text-secondary)',
+                  marginBottom: '8px'
+                }}
+              >
                 01 · STARTING FRESH
               </div>
-              <h3 className="dest-heading">
+
+              <h3 style={{ fontSize: '19px', fontWeight: 700, color: 'var(--color-deep-navy)', margin: '0 0 8px 0', lineHeight: 1.3 }}>
                 {"I'm starting from scratch"}
               </h3>
-              <p className="dest-description">
-                {"I don't have a Learner Licence yet."}
+              <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', lineHeight: 1.6, margin: '0 0 24px 0', flexGrow: 1 }}>
+                {"I don't have a Learner Licence yet. Start your online Form 2 application with Aadhaar."}
               </p>
-              <div className="dest-action-btn">
-                Start with LL <ArrowRight size={16} className="dest-btn-arrow" />
+
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  color: 'var(--color-primary-navy)',
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  marginTop: 'auto'
+                }}
+              >
+                <span>Start with LL</span>
+                <ArrowRight size={15} />
               </div>
             </div>
 
-            {/* Card 02: Continue Your Journey */}
+            {/* CARD 02: CONTINUE YOUR JOURNEY (ACTIVE) */}
             <div
-              className="journey-destination-card"
               onClick={() => navigate('/journey?stage=dl')}
+              className="card"
+              style={{
+                padding: '28px 24px',
+                display: 'flex',
+                flexDirection: 'column',
+                cursor: 'pointer',
+                border: '1px solid var(--color-slate-blue)',
+                position: 'relative'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-3px)';
+                e.currentTarget.style.borderColor = 'var(--color-primary-navy)';
+                e.currentTarget.style.boxShadow = 'var(--shadow-hover)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.borderColor = 'var(--color-slate-blue)';
+                e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+              }}
             >
-              <div className="dest-icon-circle">
-                <FileText size={24} />
+              <div
+                style={{
+                  width: '44px',
+                  height: '44px',
+                  borderRadius: '12px',
+                  background: 'var(--color-pale-amber)',
+                  border: '1px solid #F6D8B0',
+                  color: 'var(--color-deep-navy)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: '16px'
+                }}
+              >
+                <FileText size={22} />
               </div>
-              <div className="dest-step-tag">
+
+              <div
+                style={{
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  letterSpacing: '0.8px',
+                  textTransform: 'uppercase',
+                  color: 'var(--color-deep-navy)',
+                  marginBottom: '8px'
+                }}
+              >
                 02 · CONTINUE YOUR JOURNEY
               </div>
-              <h3 className="dest-heading">
+
+              <h3 style={{ fontSize: '19px', fontWeight: 700, color: 'var(--color-deep-navy)', margin: '0 0 8px 0', lineHeight: 1.3 }}>
                 I have a Learner Licence
               </h3>
-              <p className="dest-description">
-                Continue towards your Driving Licence.
+              <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', lineHeight: 1.6, margin: '0 0 24px 0', flexGrow: 1 }}>
+                Continue towards your Driving Licence and schedule your practical driving test.
               </p>
-              <div className="dest-action-btn">
-                Continue to DL <ArrowRight size={16} className="dest-btn-arrow" />
+
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  color: 'var(--color-primary-navy)',
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  marginTop: 'auto'
+                }}
+              >
+                <span>Continue to DL</span>
+                <ArrowRight size={15} />
               </div>
             </div>
 
-            {/* Card 03: Existing Licence */}
+            {/* CARD 03: EXISTING LICENCE */}
             <div
-              className="journey-destination-card"
               onClick={() => navigate('/licence-services')}
+              className="card"
+              style={{
+                padding: '28px 24px',
+                display: 'flex',
+                flexDirection: 'column',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-3px)';
+                e.currentTarget.style.borderColor = 'var(--color-slate-blue)';
+                e.currentTarget.style.boxShadow = 'var(--shadow-hover)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.borderColor = 'var(--color-border)';
+                e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+              }}
             >
-              <div className="dest-icon-circle">
-                <Shield size={24} />
+              <div
+                style={{
+                  width: '44px',
+                  height: '44px',
+                  borderRadius: '12px',
+                  background: 'var(--color-pale-teal)',
+                  border: '1px solid #B8E4DD',
+                  color: 'var(--color-teal)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: '16px'
+                }}
+              >
+                <Shield size={22} />
               </div>
-              <div className="dest-step-tag">
+
+              <div
+                style={{
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  letterSpacing: '0.8px',
+                  textTransform: 'uppercase',
+                  color: 'var(--color-text-secondary)',
+                  marginBottom: '8px'
+                }}
+              >
                 03 · EXISTING LICENCE
               </div>
-              <h3 className="dest-heading">
+
+              <h3 style={{ fontSize: '19px', fontWeight: 700, color: 'var(--color-deep-navy)', margin: '0 0 8px 0', lineHeight: 1.3 }}>
                 I already have a Driving Licence
               </h3>
-              <p className="dest-description">
-                Manage services related to your existing licence.
+              <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', lineHeight: 1.6, margin: '0 0 24px 0', flexGrow: 1 }}>
+                Manage renewals, duplicate Smart Cards, address updates and citizen services.
               </p>
-              <div className="dest-action-btn">
-                View licence services <ArrowRight size={16} className="dest-btn-arrow" />
+
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  color: 'var(--color-primary-navy)',
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  marginTop: 'auto'
+                }}
+              >
+                <span>View licence services</span>
+                <ArrowRight size={15} />
               </div>
             </div>
 

@@ -155,6 +155,7 @@ function App() {
   );
 }
 
+import { centralDataStore } from "./data/centralDataStore";
 import { ScreenSwitcher } from "./components/layout/ScreenSwitcher";
 import { LanguageSelector } from "./components/layout/LanguageSelector";
 import { DashboardPage } from "./pages/dashboard";
@@ -320,19 +321,23 @@ function Shell({ children }) {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const [hasUnread, setHasUnread] = useState(() => {
-    return localStorage.getItem('indian-drives-unread-notifications') !== 'false';
-  });
+  const [unreadCount, setUnreadCount] = useState(() => centralDataStore.getUnreadNotificationCount());
 
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [location.pathname]);
 
   useEffect(() => {
-    const handleRead = () => setHasUnread(false);
-    window.addEventListener('notifications-read', handleRead);
-    return () => window.removeEventListener('notifications-read', handleRead);
+    const handleUpdate = () => setUnreadCount(centralDataStore.getUnreadNotificationCount());
+    window.addEventListener('notifications-updated', handleUpdate);
+    window.addEventListener('indian-drives-state-change', handleUpdate);
+    return () => {
+      window.removeEventListener('notifications-updated', handleUpdate);
+      window.removeEventListener('indian-drives-state-change', handleUpdate);
+    };
   }, []);
+
+  const currentUser = user || centralDataStore.getUserProfile();
 
   return (
     <div className="app-shell">
@@ -360,7 +365,7 @@ function Shell({ children }) {
           <LanguageSelector currentLanguage={language} onSelectLanguage={setLanguage} />
           <Link className="icon-button" to="/notifications" aria-label="Notifications" style={{ position: 'relative' }}>
             <Bell size={18} />
-            {hasUnread && (
+            {unreadCount > 0 && (
               <span
                 style={{
                   position: 'absolute',
@@ -375,8 +380,8 @@ function Shell({ children }) {
               />
             )}
           </Link>
-          <Link className="profile-pill" to="/profile" aria-label="Profile" style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#f1f5f9', color: '#173b57', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '14px' }}>
-            A
+          <Link className="profile-pill" to="/profile" aria-label="Profile" style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'var(--color-pale-indigo)', color: 'var(--color-primary-navy)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '14px' }}>
+            {currentUser?.avatar || 'YC'}
           </Link>
           <button
             className="landing-mobile-toggle"
