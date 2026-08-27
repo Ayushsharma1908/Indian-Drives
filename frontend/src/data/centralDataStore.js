@@ -9,13 +9,13 @@ const STORAGE_KEY = 'indian_drives_central_store_v2';
 const INITIAL_STATE = {
   user: {
     id: 'user-demo',
-    name: 'Yanshi Chauhan',
-    firstName: 'Yanshi',
-    lastName: 'Chauhan',
-    email: 'yanshi.chauhan@example.com',
+    name: 'Raj Singh',
+    firstName: 'Raj',
+    lastName: 'Singh',
+    email: 'raj.singh@example.com',
     mobile: '+91 98765 43210',
-    avatar: 'YC',
-    fatherName: 'Rajesh Chauhan',
+    avatar: 'RS',
+    fatherName: 'Rajesh Singh',
     dob: '1998-08-19',
     gender: 'Female',
     bloodGroup: 'O+ve',
@@ -31,7 +31,7 @@ const INITIAL_STATE = {
   licences: {
     ll: {
       number: 'LL-05/2026/008821',
-      name: 'Yanshi Chauhan',
+      name: 'Raj Singh',
       dob: '1998-08-19',
       vehicleClass: 'LMV (Light Motor Vehicle)',
       issueDate: '14 Jul 2026',

@@ -406,16 +406,28 @@ function Shell({ children }) {
         {/* Mobile Slide Drawer */}
         <div className={`landing-mobile-drawer ${mobileMenuOpen ? 'open' : ''}`}>
           <NavLink to="/dashboard" className="landing-nav-link" onClick={() => setMobileMenuOpen(false)}>
-            {t('nav.dashboard')}
+            <LayoutDashboard size={18} /> {t('nav.dashboard')}
           </NavLink>
           <NavLink to="/journey" className="landing-nav-link" onClick={() => setMobileMenuOpen(false)}>
-            {t('nav.journey')}
+            <Car size={18} /> {t('nav.journey')}
+          </NavLink>
+          <NavLink to="/documents" className="landing-nav-link" onClick={() => setMobileMenuOpen(false)}>
+            <FileCheck2 size={18} /> {t('nav.documents') || 'Document Vault'}
+          </NavLink>
+          <NavLink to="/appointments" className="landing-nav-link" onClick={() => setMobileMenuOpen(false)}>
+            <CalendarDays size={18} /> {t('nav.appointments') || 'Appointments'}
+          </NavLink>
+          <NavLink to="/payments" className="landing-nav-link" onClick={() => setMobileMenuOpen(false)}>
+            <CreditCard size={18} /> {t('nav.payments') || 'Payments & Receipts'}
+          </NavLink>
+          <NavLink to="/services" className="landing-nav-link" onClick={() => setMobileMenuOpen(false)}>
+            <ShieldCheck size={18} /> {t('nav.services') || 'Licence Services'}
           </NavLink>
           <NavLink to="/help" className="landing-nav-link" onClick={() => setMobileMenuOpen(false)}>
-            {t('nav.help')}
+            <CircleHelp size={18} /> {t('nav.help')}
           </NavLink>
           <NavLink to="/ask" className="landing-ai-link" onClick={() => setMobileMenuOpen(false)}>
-            ✦ {t('nav.ask')}
+            <span>✦</span> {t('nav.ask')}
           </NavLink>
         </div>
       </header>

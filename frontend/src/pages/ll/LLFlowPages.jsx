@@ -1473,7 +1473,7 @@ export function LLFeePaymentPage() {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', fontSize: '13.5px', marginBottom: '20px', background: '#f8fafc', padding: '16px', borderRadius: '12px' }}>
                 <div><strong>Application No:</strong> IND-2026-98124</div>
                 <div><strong>Date & Time:</strong> {receiptMeta?.date || 'Today'}</div>
-                <div><strong>Challan Ref (GRN):</strong> {receiptMeta?.grn || 'GRN-2026-JH-98124'}</div>
+                <div><strong>Treasury Ref (GRN):</strong> {receiptMeta?.grn || 'GRN-2026-JH-98124'}</div>
                 <div><strong>Bank UTR / Ref:</strong> {receiptMeta?.utr || 'UTR928471928471'}</div>
                 <div><strong>Applicant Name:</strong> Yanshi Chauhan</div>
                 <div><strong>Licence Type:</strong> Learner Licence (LL)</div>
@@ -1742,7 +1742,7 @@ export function LLFeePaymentPage() {
               <div style={{ textAlign: 'left', background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '13px', marginBottom: '20px' }}>
                 <div style={{ marginBottom: '6px' }}>Account Holder: <strong>YANSHI CHAUHAN</strong></div>
                 <div style={{ marginBottom: '6px' }}>Debited Account: <strong>Savings A/C ••••••••4091</strong></div>
-                <div style={{ marginBottom: '6px' }}>Challan Description: <strong>Learner Licence RTO Fee</strong></div>
+                <div style={{ marginBottom: '6px' }}>Payment Purpose: <strong>Learner Licence Application Fee</strong></div>
                 <div>Amount: <strong style={{ color: '#002542', fontSize: '16px' }}>₹220.00</strong></div>
               </div>
 
