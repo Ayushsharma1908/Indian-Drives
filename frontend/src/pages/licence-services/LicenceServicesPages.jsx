@@ -3,7 +3,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   RefreshCw, Copy, Edit3, ShieldCheck, CheckCircle2, FileText, ArrowRight,
   Upload, Clock, Sparkles, MapPin, CalendarDays, Search, HelpCircle, Check,
-  Car, Shield, Award, Flag, User, CreditCard, Lock, AlertCircle, FileCheck, X
+  Car, Shield, Award, Flag, User, CreditCard, Lock, AlertCircle, FileCheck, X,
+  Download, Smartphone
 } from 'lucide-react';
 import { getStoredUserProfile } from '../../data/userProfileData';
 import { centralDataStore } from '../../data/centralDataStore';
@@ -1182,20 +1183,142 @@ export function LicenceServicePaymentCheckoutPage() {
   const titleName = searchParams.get('title') || 'Driving Licence Service';
 
   const [paymentMethod, setPaymentMethod] = useState('upi');
-  const [upiId, setUpiId] = useState('arjun@okaxis');
+  const [upiId, setUpiId] = useState('yanshi@okhdfcbank');
+  const [gatewayStage, setGatewayStage] = useState('idle');
+  const [gatewayTimer, setGatewayTimer] = useState(299);
+  const [otpValue, setOtpValue] = useState('123456');
 
   const baseFee = feeAmount > 50 ? feeAmount - 50 : feeAmount;
   const processingFee = 50;
 
+  useEffect(() => {
+    let interval = null;
+    if (gatewayStage === 'challenge') {
+      interval = setInterval(() => setGatewayTimer((prev) => (prev > 0 ? prev - 1 : 0)), 1000);
+    }
+    return () => clearInterval(interval);
+  }, [gatewayStage]);
+
   const handlePay = (e) => {
     e.preventDefault();
+    setGatewayStage('connecting');
+    setGatewayTimer(299);
+    setTimeout(() => setGatewayStage('challenge'), 800);
+  };
+
+  const handleAuthorizePayment = () => {
+    setGatewayStage('verifying');
     const refId = Math.floor(10000 + Math.random() * 90000);
-    navigate(`/licence-services/payment-success?service=${serviceKey}&fee=${feeAmount}&title=${encodeURIComponent(titleName)}&ref=REQ-LS-${refId}`);
+    setTimeout(() => {
+      centralDataStore.createPayment({
+        title: `${titleName} Fee`,
+        amount: feeAmount,
+        purpose: 'Licence Service Fee',
+        method: paymentMethod === 'upi' ? `UPI (${upiId})` : paymentMethod === 'card' ? 'Visa Debit Card (•••• 8910)' : 'HDFC Bank NetBanking',
+        breakdown: [
+          { label: `${titleName} Base Fee`, fee: `₹${baseFee}.00` },
+          { label: 'RTO Processing Charge', fee: `₹${processingFee}.00` }
+        ]
+      });
+      navigate(`/licence-services/payment-success?service=${serviceKey}&fee=${feeAmount}&title=${encodeURIComponent(titleName)}&ref=REQ-LS-${refId}`);
+    }, 1300);
+  };
+
+  const formatTimer = (sec) => {
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
   };
 
   return (
     <div className="page page-ls-payment" style={{ width: 'min(1080px, calc(100% - 48px))', margin: '36px auto', fontFamily: 'Inter, system-ui, sans-serif' }}>
       
+      {/* Real Gateway Processing Modal */}
+      {gatewayStage !== 'idle' && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(0, 24, 44, 0.75)',
+          backdropFilter: 'blur(6px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          padding: '20px'
+        }}>
+          <div style={{
+            background: '#ffffff',
+            borderRadius: '24px',
+            width: 'min(480px, 100%)',
+            padding: '32px',
+            boxShadow: '0 25px 60px rgba(0, 0, 0, 0.3)',
+            textAlign: 'center'
+          }}>
+            {gatewayStage === 'connecting' && (
+              <div>
+                <div style={{ width: '60px', height: '60px', borderRadius: '50%', border: '4px solid #e2e8f0', borderTopColor: '#002542', animation: 'spin 0.8s linear infinite', margin: '0 auto 16px auto' }} />
+                <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#102D43', margin: '0 0 6px 0' }}>Connecting to Bank Gateway...</h3>
+                <p style={{ fontSize: '13px', color: '#64748b', margin: 0 }}>Establishing 256-bit SSL encrypted connection.</p>
+              </div>
+            )}
+
+            {gatewayStage === 'challenge' && (
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e2e8f0', paddingBottom: '12px', marginBottom: '16px' }}>
+                  <span style={{ fontSize: '13px', fontWeight: 800, color: '#002542' }}>🏛 National Payment Gateway</span>
+                  <span style={{ fontSize: '12px', fontWeight: 800, color: '#e88a2d' }}>⏱ {formatTimer(gatewayTimer)}</span>
+                </div>
+
+                <div style={{ background: '#f8fafc', padding: '14px', borderRadius: '12px', border: '1px solid #e2e8f0', textAlign: 'left', fontSize: '13px', marginBottom: '16px' }}>
+                  <div>Payee: <strong>PARIVAHAN - TRANSPORT DEPT (GOI)</strong></div>
+                  <div>Service: <strong>{titleName}</strong></div>
+                  <div>Total Fee: <strong style={{ color: '#16a34a', fontSize: '16px' }}>₹{feeAmount}.00</strong></div>
+                </div>
+
+                <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '16px' }}>
+                  {paymentMethod === 'upi' ? `Approve the collect request sent to ${upiId} on your UPI app.` : 'Enter your 6-digit OTP to authorize this payment.'}
+                </p>
+
+                {paymentMethod !== 'upi' && (
+                  <input
+                    type="text"
+                    maxLength={6}
+                    value={otpValue}
+                    onChange={(e) => setOtpValue(e.target.value.replace(/\D/g, ''))}
+                    style={{ width: '180px', textAlign: 'center', letterSpacing: '6px', fontSize: '20px', fontWeight: 800, padding: '8px', borderRadius: '8px', border: '2px solid #002542', marginBottom: '16px' }}
+                  />
+                )}
+
+                <div style={{ display: 'grid', gap: '10px' }}>
+                  <button
+                    type="button"
+                    onClick={handleAuthorizePayment}
+                    style={{ background: '#16a34a', color: '#ffffff', border: 'none', padding: '12px', borderRadius: '10px', fontWeight: 800, fontSize: '14px', cursor: 'pointer' }}
+                  >
+                    Simulate Authorization & Pay ₹{feeAmount}.00 (✓)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setGatewayStage('idle')}
+                    style={{ background: 'none', border: 'none', color: '#64748b', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {gatewayStage === 'verifying' && (
+              <div>
+                <div style={{ width: '60px', height: '60px', borderRadius: '50%', border: '4px solid #bbf7d0', borderTopColor: '#16a34a', animation: 'spin 0.8s linear infinite', margin: '0 auto 16px auto' }} />
+                <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#102D43', margin: '0 0 6px 0' }}>Verifying Transaction...</h3>
+                <p style={{ fontSize: '13px', color: '#64748b', margin: 0 }}>Settling transaction with State Treasury.</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Header Section */}
       <div style={{ marginBottom: '32px' }}>
         <span style={{ background: '#e0f2fe', color: '#0369a1', fontSize: '11px', fontWeight: 800, padding: '4px 12px', borderRadius: '16px', textTransform: 'uppercase' }}>
@@ -1372,6 +1495,7 @@ export function LicenceServicePaymentSuccessPage() {
   const feeAmount = searchParams.get('fee') || '250';
   const titleName = searchParams.get('title') || 'Licence Service Application';
   const refNo = searchParams.get('ref') || 'REQ-LS-99182';
+  const [showPrintModal, setShowPrintModal] = useState(false);
 
   useEffect(() => {
     localStorage.setItem('last_processed_flow', 'licence_service');
@@ -1400,11 +1524,11 @@ export function LicenceServicePaymentSuccessPage() {
         </div>
 
         <h1 style={{ fontSize: '34px', fontWeight: 800, color: '#173b57', margin: '0 0 8px 0', letterSpacing: '-0.5px' }}>
-          Payment Successful!
+          Payment Successful & Verified!
         </h1>
 
         <p style={{ color: '#64748b', fontSize: '15px', margin: '0 auto 32px auto', maxWidth: '520px', lineHeight: 1.5 }}>
-          Your <strong>{titleName}</strong> fee payment has been processed securely. A confirmation email and SMS have been sent with your official receipt.
+          Your <strong>{titleName}</strong> fee payment has been processed securely and credited to the Transport Department account.
         </p>
 
         {/* Detailed Receipt Card */}
@@ -1431,7 +1555,7 @@ export function LicenceServicePaymentSuccessPage() {
 
             <div>
               <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Payment Method</div>
-              <div style={{ fontSize: '15px', fontWeight: 700, color: '#173b57', marginTop: '4px' }}>UPI (GPay •• 9812)</div>
+              <div style={{ fontSize: '15px', fontWeight: 700, color: '#173b57', marginTop: '4px' }}>UPI (Google Pay)</div>
             </div>
 
             <div>
@@ -1460,50 +1584,112 @@ export function LicenceServicePaymentSuccessPage() {
               borderRadius: '12px',
               fontWeight: 800,
               fontSize: '15px',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              boxShadow: '0 4px 14px rgba(0, 37, 66, 0.2)'
+              cursor: 'pointer'
             }}
           >
-            Back to Dashboard <ArrowRight size={18} />
+            Return to Dashboard
           </button>
 
           <button
-            onClick={() => navigate('/manage-licence')}
+            onClick={() => setShowPrintModal(true)}
             style={{
               background: '#ffffff',
-              color: '#173b57',
               border: '1px solid #cbd5e1',
+              color: '#002542',
               padding: '16px 24px',
               borderRadius: '12px',
               fontWeight: 700,
               fontSize: '15px',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px'
             }}
           >
-            View Licence Wallet
-          </button>
-
-          <button
-            onClick={() => alert("Downloading official RTO Payment Receipt PDF...")}
-            style={{
-              background: '#ffffff',
-              color: '#173b57',
-              border: '1px solid #cbd5e1',
-              padding: '16px 20px',
-              borderRadius: '12px',
-              fontWeight: 700,
-              fontSize: '15px',
-              cursor: 'pointer'
-            }}
-          >
-            📥 Download Receipt
+            <Download size={16} /> Print / Save Receipt
           </button>
         </div>
 
       </div>
+
+      {/* PRINTABLE MODAL */}
+      {showPrintModal && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(0, 37, 66, 0.65)',
+          backdropFilter: 'blur(4px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          padding: '20px'
+        }}>
+          <div style={{
+            background: '#ffffff',
+            borderRadius: '20px',
+            width: 'min(640px, 100%)',
+            maxHeight: '90vh',
+            overflowY: 'auto',
+            padding: '32px',
+            boxShadow: '0 20px 50px rgba(0, 0, 0, 0.2)',
+            position: 'relative',
+            textAlign: 'left'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #002542', paddingBottom: '16px', marginBottom: '20px' }}>
+              <div>
+                <div style={{ fontSize: '11px', fontWeight: 800, color: '#e88a2d', letterSpacing: '0.8px', textTransform: 'uppercase' }}>
+                  GOVERNMENT OF INDIA · MINISTRY OF ROAD TRANSPORT & HIGHWAYS
+                </div>
+                <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#002542', margin: '4px 0 0 0' }}>
+                  Official e-Challan & Fee Receipt
+                </h2>
+              </div>
+              <button onClick={() => setShowPrintModal(false)} style={{ background: 'none', border: 'none', fontSize: '20px', color: '#64748b', cursor: 'pointer' }}>✕</button>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', fontSize: '13.5px', marginBottom: '20px', background: '#f8fafc', padding: '16px', borderRadius: '12px' }}>
+              <div><strong>Application Ref No:</strong> {refNo}</div>
+              <div><strong>Date & Time:</strong> {new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</div>
+              <div><strong>Applicant Name:</strong> Yanshi Chauhan</div>
+              <div><strong>Service:</strong> {titleName}</div>
+            </div>
+
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13.5px', marginBottom: '20px' }}>
+              <thead>
+                <tr style={{ background: '#002542', color: '#ffffff', textAlign: 'left' }}>
+                  <th style={{ padding: '10px 12px' }}>Service Head</th>
+                  <th style={{ padding: '10px 12px', textAlign: 'right' }}>Amount (INR)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
+                  <td style={{ padding: '10px 12px' }}>{titleName} Application Fee</td>
+                  <td style={{ padding: '10px 12px', textAlign: 'right' }}>₹{baseFee}.00</td>
+                </tr>
+                <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
+                  <td style={{ padding: '10px 12px' }}>RTO Processing & Portal Charge</td>
+                  <td style={{ padding: '10px 12px', textAlign: 'right' }}>₹{processingFee}.00</td>
+                </tr>
+                <tr style={{ background: '#f1f5f9', fontWeight: 800 }}>
+                  <td style={{ padding: '12px' }}>Total Amount Paid (Verified)</td>
+                  <td style={{ padding: '12px', textAlign: 'right', fontSize: '16px', color: '#002542' }}>₹{feeAmount}.00</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+              <button onClick={() => setShowPrintModal(false)} style={{ padding: '10px 18px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#ffffff', cursor: 'pointer', fontWeight: 700 }}>
+                Close
+              </button>
+              <button onClick={() => window.print()} style={{ padding: '10px 22px', borderRadius: '8px', border: 'none', background: '#002542', color: '#ffffff', cursor: 'pointer', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <Download size={15} /> Print / Save as PDF
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

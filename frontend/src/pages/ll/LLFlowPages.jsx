@@ -1,10 +1,10 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   FileCheck2, Car, ShieldCheck, CheckCircle2, ArrowRight, ArrowLeft, Upload,
   Clock, AlertTriangle, Play, HelpCircle, Award, RefreshCw, FileText, MapPin,
   Laptop, Check, Info, HeartPulse, CreditCard, Edit3, User, Eye, Save, Lock,
-  Download, Truck, Zap
+  Download, Truck, Zap, Smartphone
 } from 'lucide-react';
 import { StatusBadge } from '../../components/ui/StatusBadge';
 import { centralDataStore } from '../../data/centralDataStore';
@@ -1105,6 +1105,13 @@ export function LLFeePaymentPage() {
   const [paid, setPaid] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('upi'); // 'upi' | 'card' | 'netbanking'
 
+  // Gateway Processing State Machine: 'idle' | 'connecting' | 'challenge' | 'verifying' | 'success'
+  const [gatewayStage, setGatewayStage] = useState('idle');
+  const [gatewayTimer, setGatewayTimer] = useState(299); // 4:59 countdown
+  const [otpValue, setOtpValue] = useState('123456');
+  const [otpTimer, setOtpTimer] = useState(59);
+  const [showPrintModal, setShowPrintModal] = useState(false);
+
   // UPI State
   const [selectedUpiApp, setSelectedUpiApp] = useState('gpay');
   const [upiId, setUpiId] = useState('');
@@ -1124,6 +1131,28 @@ export function LLFeePaymentPage() {
 
   // Successful receipt metadata
   const [receiptMeta, setReceiptMeta] = useState(null);
+
+  // Countdown timer for Gateway Challenge
+  useEffect(() => {
+    let interval = null;
+    if (gatewayStage === 'challenge') {
+      interval = setInterval(() => {
+        setGatewayTimer((prev) => (prev > 0 ? prev - 1 : 0));
+        setOtpTimer((prev) => (prev > 0 ? prev - 1 : 0));
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [gatewayStage]);
+
+  // Card Brand Detection
+  const getCardBrand = (num) => {
+    const clean = num.replace(/\s/g, '');
+    if (clean.startsWith('4')) return { brand: 'Visa', color: '#1a1f71' };
+    if (/^(5[1-5]|2[2-7])/.test(clean)) return { brand: 'MasterCard', color: '#eb001b' };
+    if (/^(60|65|81|82)/.test(clean)) return { brand: 'RuPay', color: '#097939' };
+    if (/^(34|37)/.test(clean)) return { brand: 'Amex', color: '#006fcf' };
+    return { brand: 'Debit/Credit Card', color: '#002542' };
+  };
 
   // Card Number Formatter
   const handleCardNumberChange = (e) => {
@@ -1150,7 +1179,8 @@ export function LLFeePaymentPage() {
     if (cardErrors.cvv) setCardErrors(prev => ({ ...prev, cvv: null }));
   };
 
-  const handleProcessPayment = () => {
+  // Step 1: Initiate Payment Gateway
+  const handleInitiatePayment = () => {
     let methodDisplay = 'UPI (Google Pay)';
 
     if (paymentMethod === 'upi') {
@@ -1178,8 +1208,9 @@ export function LLFeePaymentPage() {
         setCardErrors(errs);
         return;
       }
+      const brand = getCardBrand(cardNumber).brand;
       const last4 = cleanNum.slice(-4);
-      methodDisplay = `Credit/Debit Card (ending in •••• ${last4})`;
+      methodDisplay = `${brand} Card (•••• ${last4})`;
     } else if (paymentMethod === 'netbanking') {
       const bankNames = {
         sbi: 'State Bank of India',
@@ -1192,33 +1223,64 @@ export function LLFeePaymentPage() {
       methodDisplay = `Net Banking (${customBank || bankNames[selectedBank] || 'HDFC Bank'})`;
     }
 
-    const txnId = `DS-PAY-${Math.floor(1000 + Math.random() * 9000)}-LL`;
+    const randomSuffix = Math.floor(1000 + Math.random() * 9000);
+    const txnId = `DS-PAY-${randomSuffix}-LL`;
+    const utr = `UTR${Math.floor(100000000000 + Math.random() * 900000000000)}`;
+    const grn = `GRN-2026-JH-${randomSuffix}`;
     const now = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 
-    setReceiptMeta({
+    const meta = {
       txnId,
+      utr,
+      grn,
       date: now,
       method: methodDisplay,
       amount: '₹220.00',
       appId: 'IND-2026-98124'
-    });
+    };
 
-    centralDataStore.createPayment({
-      title: 'Learner Licence Application Fee',
-      amount: 220,
-      purpose: 'LL Application Fee',
-      method: methodDisplay,
-      breakdown: [
-        { label: 'Application Fee', fee: '₹150.00' },
-        { label: 'LL Test Fee', fee: '₹50.00' },
-        { label: 'Service Charge', fee: '₹20.00' }
-      ]
-    });
+    setReceiptMeta(meta);
+    setGatewayStage('connecting');
+    setGatewayTimer(299);
+    setOtpTimer(59);
 
-    setPaid(true);
+    setTimeout(() => {
+      setGatewayStage('challenge');
+    }, 900);
   };
 
-  // SUCCESS SCREEN WITH COOL CELEBRATION ANIMATION
+  // Step 2: Complete Gateway Verification & Settlement
+  const handleAuthorizeGatewayPayment = () => {
+    setGatewayStage('verifying');
+
+    setTimeout(() => {
+      if (receiptMeta) {
+        centralDataStore.createPayment({
+          title: 'Learner Licence Application Fee',
+          amount: 220,
+          purpose: 'LL Application Fee',
+          method: receiptMeta.method,
+          appId: receiptMeta.appId,
+          breakdown: [
+            { label: 'Application Fee (Form 2)', fee: '₹150.00' },
+            { label: 'LL Online Test Fee', fee: '₹50.00' },
+            { label: 'Service Charge', fee: '₹20.00' }
+          ]
+        });
+      }
+
+      setGatewayStage('success');
+      setPaid(true);
+    }, 1400);
+  };
+
+  const formatTimer = (sec) => {
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
+  };
+
+  // SUCCESS SCREEN WITH OFFICIAL GOVERNMENT RECEIPT
   if (paid) {
     return (
       <div className="page page-ll-payment-success" style={{ width: 'min(1184px, calc(100% - 48px))', margin: '36px auto', fontFamily: 'Inter, system-ui, sans-serif' }}>
@@ -1262,8 +1324,8 @@ export function LLFeePaymentPage() {
 
         {/* Center Success Header with Radiating Animation */}
         <div style={{ textAlign: 'center', marginBottom: '36px', position: 'relative' }}>
-          <div style={{ position: 'absolute', top: '10px', left: '30%', color: 'var(--color-saffron)' }} className="payment-sparkle">✦</div>
-          <div style={{ position: 'absolute', top: '20px', right: '32%', color: 'var(--color-teal)' }} className="payment-sparkle">✦</div>
+          <div style={{ position: 'absolute', top: '10px', left: '30%', color: '#e88a2d' }} className="payment-sparkle">✦</div>
+          <div style={{ position: 'absolute', top: '20px', right: '32%', color: '#0d9488' }} className="payment-sparkle">✦</div>
 
           <div
             className="payment-success-badge-anim"
@@ -1285,34 +1347,39 @@ export function LLFeePaymentPage() {
           </div>
 
           <h1 style={{ fontSize: '36px', fontWeight: 800, color: '#102D43', margin: '0 0 8px 0', letterSpacing: '-0.5px' }}>
-            {t('llFlow.paymentSuccessTitle') || 'Payment Successful'}
+            {t('llFlow.paymentSuccessTitle') || 'Payment Successful & Verified!'}
           </h1>
           <p style={{ color: '#607083', fontSize: '16px', maxWidth: '520px', margin: '0 auto', lineHeight: 1.5 }}>
-            Your fee of <strong>₹220.00</strong> has been confirmed by the gateway. Your test slot is now ready.
+            {t('llFlow.paymentSuccessSub') || 'Your fee of ₹220.00 has been confirmed by the gateway. Your test slot is now ready.'}
           </p>
         </div>
 
         {/* Transaction Receipt Card */}
         <div style={{ background: '#ffffff', borderRadius: '24px', padding: '32px', border: '1px solid #e2e8f0', boxShadow: '0 4px 20px rgba(0,37,66,0.04)', maxWidth: '640px', margin: '0 auto 36px auto', position: 'relative', overflow: 'hidden' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '24px' }}>
-            <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#eef6ff', color: '#173b57', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <FileText size={20} />
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#eef6ff', color: '#173b57', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <FileText size={20} />
+              </div>
+              <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 800, color: '#173b57' }}>
+                Official Transaction Receipt
+              </h3>
             </div>
-            <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 800, color: '#173b57' }}>
-              Transaction Receipt
-            </h3>
+            <span style={{ fontSize: '12px', background: '#f0fdf4', color: '#16a34a', fontWeight: 800, padding: '4px 10px', borderRadius: '12px' }}>
+              ● Verified & Credited
+            </span>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', fontSize: '14px', marginBottom: '24px' }}>
             <div>
               <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>AMOUNT PAID</div>
-              <div style={{ fontWeight: 800, color: '#173b57', fontSize: '20px' }}>₹220.00</div>
+              <div style={{ fontWeight: 800, color: '#173b57', fontSize: '22px' }}>₹220.00</div>
             </div>
 
             <div>
               <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>TRANSACTION ID</div>
-              <span style={{ background: '#f1f5f9', padding: '4px 10px', borderRadius: '6px', fontSize: '13px', fontWeight: 700, color: '#173b57' }}>
-                {receiptMeta?.txnId || 'DS-PAY-9842-XKL'}
+              <span style={{ background: '#f1f5f9', padding: '4px 10px', borderRadius: '6px', fontSize: '13px', fontWeight: 700, color: '#173b57', fontFamily: 'monospace' }}>
+                {receiptMeta?.txnId || 'DS-PAY-9842-LL'}
               </span>
             </div>
 
@@ -1353,27 +1420,386 @@ export function LLFeePaymentPage() {
           <button
             onClick={() => navigate('/ll/assessment-cockpit')}
             className="primary-button"
-            style={{ padding: '16px 32px', borderRadius: '12px', fontWeight: 800, fontSize: '15px', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+            style={{ padding: '16px 32px', borderRadius: '12px', fontWeight: 800, fontSize: '15px', display: 'inline-flex', alignItems: 'center', gap: '8px', background: '#002542', color: '#ffffff', border: 'none', cursor: 'pointer' }}
           >
             Start LL Test Scenario <ArrowRight size={18} />
           </button>
 
           <button
-            onClick={() => window.print()}
+            onClick={() => setShowPrintModal(true)}
             className="secondary-button"
-            style={{ padding: '16px 24px', borderRadius: '12px', fontWeight: 700, fontSize: '15px', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+            style={{ padding: '16px 24px', borderRadius: '12px', fontWeight: 700, fontSize: '15px', display: 'inline-flex', alignItems: 'center', gap: '8px', background: '#ffffff', border: '1px solid #cbd5e1', color: '#002542', cursor: 'pointer' }}
           >
             <Download size={16} /> Print / Save Receipt
           </button>
         </div>
 
+        {/* PRINTABLE OFFICIAL E-CHALLAN MODAL */}
+        {showPrintModal && (
+          <div style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0, 37, 66, 0.65)',
+            backdropFilter: 'blur(4px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 9999,
+            padding: '20px'
+          }}>
+            <div style={{
+              background: '#ffffff',
+              borderRadius: '20px',
+              width: 'min(640px, 100%)',
+              maxHeight: '90vh',
+              overflowY: 'auto',
+              padding: '32px',
+              boxShadow: '0 20px 50px rgba(0, 0, 0, 0.2)',
+              position: 'relative',
+              textAlign: 'left'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #002542', paddingBottom: '16px', marginBottom: '20px' }}>
+                <div>
+                  <div style={{ fontSize: '11px', fontWeight: 800, color: '#e88a2d', letterSpacing: '0.8px', textTransform: 'uppercase' }}>
+                    GOVERNMENT OF INDIA · MINISTRY OF ROAD TRANSPORT & HIGHWAYS
+                  </div>
+                  <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#002542', margin: '4px 0 0 0' }}>
+                    Official e-Challan & Fee Receipt (Form 2)
+                  </h2>
+                </div>
+                <button onClick={() => setShowPrintModal(false)} style={{ background: 'none', border: 'none', fontSize: '20px', color: '#64748b', cursor: 'pointer' }}>✕</button>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', fontSize: '13.5px', marginBottom: '20px', background: '#f8fafc', padding: '16px', borderRadius: '12px' }}>
+                <div><strong>Application No:</strong> IND-2026-98124</div>
+                <div><strong>Date & Time:</strong> {receiptMeta?.date || 'Today'}</div>
+                <div><strong>Challan Ref (GRN):</strong> {receiptMeta?.grn || 'GRN-2026-JH-98124'}</div>
+                <div><strong>Bank UTR / Ref:</strong> {receiptMeta?.utr || 'UTR928471928471'}</div>
+                <div><strong>Applicant Name:</strong> Yanshi Chauhan</div>
+                <div><strong>Licence Type:</strong> Learner Licence (LL)</div>
+              </div>
+
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13.5px', marginBottom: '20px' }}>
+                <thead>
+                  <tr style={{ background: '#002542', color: '#ffffff', textAlign: 'left' }}>
+                    <th style={{ padding: '10px 12px' }}>Service Head / Description</th>
+                    <th style={{ padding: '10px 12px', textAlign: 'right' }}>Amount (INR)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
+                    <td style={{ padding: '10px 12px' }}>Learner Licence Application Fee (Form 2)</td>
+                    <td style={{ padding: '10px 12px', textAlign: 'right' }}>₹150.00</td>
+                  </tr>
+                  <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
+                    <td style={{ padding: '10px 12px' }}>Online Road Safety Assessment / Test Fee</td>
+                    <td style={{ padding: '10px 12px', textAlign: 'right' }}>₹50.00</td>
+                  </tr>
+                  <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
+                    <td style={{ padding: '10px 12px' }}>Portal Service & Security Charge</td>
+                    <td style={{ padding: '10px 12px', textAlign: 'right' }}>₹20.00</td>
+                  </tr>
+                  <tr style={{ background: '#f1f5f9', fontWeight: 800 }}>
+                    <td style={{ padding: '12px' }}>Total Amount Paid (Verified & Credited)</td>
+                    <td style={{ padding: '12px', textAlign: 'right', fontSize: '16px', color: '#002542' }}>₹220.00</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div style={{ fontSize: '12px', color: '#64748b', textAlign: 'center', marginBottom: '24px' }}>
+                This is a digitally signed and verified government electronic receipt. No physical signature required under Section 65B of the Indian Evidence Act.
+              </div>
+
+              <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+                <button onClick={() => setShowPrintModal(false)} style={{ padding: '10px 18px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#ffffff', cursor: 'pointer', fontWeight: 700 }}>
+                  Close
+                </button>
+                <button onClick={() => window.print()} style={{ padding: '10px 22px', borderRadius: '8px', border: 'none', background: '#002542', color: '#ffffff', cursor: 'pointer', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Download size={15} /> Print / Save as PDF
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
       </div>
     );
   }
 
+  // REAL GATEWAY PROCESSING MODAL (FOR ALL PAYMENT METHODS)
+  const renderGatewayModal = () => {
+    if (gatewayStage === 'idle') return null;
+
+    return (
+      <div style={{
+        position: 'fixed',
+        inset: 0,
+        background: 'rgba(0, 24, 44, 0.75)',
+        backdropFilter: 'blur(6px)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 9999,
+        padding: '20px'
+      }}>
+        <div style={{
+          background: '#ffffff',
+          borderRadius: '24px',
+          width: 'min(480px, 100%)',
+          padding: '32px',
+          boxShadow: '0 25px 60px rgba(0, 0, 0, 0.3)',
+          textAlign: 'center',
+          position: 'relative'
+        }}>
+          
+          {/* STAGE 1: CONNECTING TO GATEWAY */}
+          {gatewayStage === 'connecting' && (
+            <div>
+              <div style={{ width: '64px', height: '64px', borderRadius: '50%', border: '4px solid #e2e8f0', borderTopColor: '#002542', animation: 'spin 0.8s linear infinite', margin: '0 auto 20px auto' }} />
+              <h3 style={{ fontSize: '20px', fontWeight: 800, color: '#102D43', margin: '0 0 8px 0' }}>
+                Connecting to Secure Bank Gateway...
+              </h3>
+              <p style={{ fontSize: '13.5px', color: '#64748b', margin: 0 }}>
+                Establishing 256-bit SSL encrypted connection with Treasury Payment Server.
+              </p>
+            </div>
+          )}
+
+          {/* STAGE 2: GATEWAY CHALLENGE (BY PAYMENT METHOD) */}
+          {gatewayStage === 'challenge' && paymentMethod === 'upi' && (
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e2e8f0', paddingBottom: '12px', marginBottom: '18px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ background: '#002542', color: '#ffffff', padding: '3px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 800 }}>UPI</span>
+                  <span style={{ fontSize: '13px', fontWeight: 800, color: '#102D43' }}>NPCI Bharat Payment</span>
+                </div>
+                <span style={{ fontSize: '12px', fontWeight: 800, color: '#e88a2d' }}>⏱ {formatTimer(gatewayTimer)}</span>
+              </div>
+
+              {upiMode === 'qr' ? (
+                <div>
+                  <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#102D43', margin: '0 0 6px 0' }}>
+                    Scan QR to Pay ₹220.00
+                  </h3>
+                  <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '16px' }}>
+                    Open Google Pay, PhonePe, Paytm or BHIM on your phone
+                  </p>
+
+                  <div style={{ display: 'inline-block', background: '#ffffff', padding: '16px', borderRadius: '16px', border: '2px solid #002542', marginBottom: '16px' }}>
+                    <svg width="150" height="150" viewBox="0 0 24 24" fill="none" stroke="#002542" strokeWidth="1.8">
+                      <rect x="3" y="3" width="7" height="7" rx="1" />
+                      <rect x="14" y="3" width="7" height="7" rx="1" />
+                      <rect x="3" y="14" width="7" height="7" rx="1" />
+                      <rect x="14" y="14" width="3" height="3" />
+                      <rect x="18" y="14" width="3" height="3" />
+                      <rect x="14" y="18" width="7" height="3" />
+                    </svg>
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <div style={{ width: '60px', height: '60px', borderRadius: '50%', background: '#f0f9ff', color: '#0284c7', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px auto', border: '2px solid #bae6fd' }}>
+                    <Smartphone size={32} />
+                  </div>
+
+                  <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#102D43', margin: '0 0 6px 0' }}>
+                    Approve Payment on Your UPI App
+                  </h3>
+                  <p style={{ fontSize: '13.5px', color: '#64748b', margin: '0 0 16px 0', lineHeight: 1.4 }}>
+                    We've sent a payment request of <strong>₹220.00</strong> to <strong>{upiMode === 'id' ? upiId : (selectedUpiApp.toUpperCase() + ' UPI')}</strong>. Please open the app and enter your UPI PIN.
+                  </p>
+
+                  <div style={{ background: '#f8fafc', padding: '12px', borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '12.5px', color: '#64748b', marginBottom: '20px' }}>
+                    Payee: <strong>PARIVAHAN - TRANSPORT DEPT (GOI)</strong><br />
+                    Amount: <strong style={{ color: '#16a34a', fontSize: '15px' }}>₹220.00</strong>
+                  </div>
+                </div>
+              )}
+
+              <div style={{ display: 'grid', gap: '10px' }}>
+                <button
+                  type="button"
+                  onClick={handleAuthorizeGatewayPayment}
+                  style={{
+                    background: '#16a34a',
+                    color: '#ffffff',
+                    border: 'none',
+                    padding: '13px',
+                    borderRadius: '10px',
+                    fontWeight: 800,
+                    fontSize: '14px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px',
+                    boxShadow: '0 4px 12px rgba(22, 163, 74, 0.25)'
+                  }}
+                >
+                  <CheckCircle2 size={16} /> Simulate Approve in UPI App (✓)
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setGatewayStage('idle')}
+                  style={{ background: 'none', border: 'none', color: '#64748b', fontSize: '13px', fontWeight: 700, cursor: 'pointer', padding: '6px' }}
+                >
+                  Cancel Transaction
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* STAGE 2: 3D SECURE OTP CHALLENGE (FOR CARDS) */}
+          {gatewayStage === 'challenge' && paymentMethod === 'card' && (
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e2e8f0', paddingBottom: '12px', marginBottom: '18px' }}>
+                <span style={{ fontSize: '13px', fontWeight: 800, color: '#002542' }}>
+                  🏦 Bank 3D Secure 2.0 Verification
+                </span>
+                <span style={{ fontSize: '11px', background: '#f0fdf4', color: '#16a34a', fontWeight: 800, padding: '3px 8px', borderRadius: '6px' }}>
+                  🔒 Verified by Visa/RuPay
+                </span>
+              </div>
+
+              <div style={{ textAlign: 'left', background: '#f8fafc', padding: '14px', borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '13px', marginBottom: '16px' }}>
+                <div>Merchant: <strong>Ministry of Road Transport & Highways</strong></div>
+                <div>Amount: <strong style={{ color: '#002542', fontSize: '15px' }}>₹220.00</strong></div>
+                <div>Card: <strong>{getCardBrand(cardNumber).brand} (•••• {cardNumber.replace(/\s/g, '').slice(-4) || '8910'})</strong></div>
+              </div>
+
+              <p style={{ fontSize: '13px', color: '#64748b', margin: '0 0 12px 0' }}>
+                Enter the 6-digit OTP sent to your registered mobile number ending in <strong>•••• 8124</strong>:
+              </p>
+
+              <div style={{ marginBottom: '18px' }}>
+                <input
+                  type="text"
+                  maxLength={6}
+                  value={otpValue}
+                  onChange={(e) => setOtpValue(e.target.value.replace(/\D/g, ''))}
+                  style={{
+                    width: '200px',
+                    textAlign: 'center',
+                    letterSpacing: '8px',
+                    fontSize: '22px',
+                    fontWeight: 800,
+                    padding: '10px',
+                    borderRadius: '10px',
+                    border: '2px solid #002542',
+                    boxSizing: 'border-box',
+                    color: '#002542'
+                  }}
+                  autoFocus
+                />
+                <div style={{ fontSize: '12px', color: '#64748b', marginTop: '6px' }}>
+                  {otpTimer > 0 ? `Resend OTP in ${otpTimer}s` : <span style={{ color: '#0284c7', cursor: 'pointer', fontWeight: 700 }} onClick={() => setOtpTimer(59)}>Resend OTP</span>}
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gap: '10px' }}>
+                <button
+                  type="button"
+                  onClick={handleAuthorizeGatewayPayment}
+                  style={{
+                    background: '#002542',
+                    color: '#ffffff',
+                    border: 'none',
+                    padding: '13px',
+                    borderRadius: '10px',
+                    fontWeight: 800,
+                    fontSize: '14px',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 12px rgba(0, 37, 66, 0.2)'
+                  }}
+                >
+                  Submit OTP & Pay ₹220.00
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setGatewayStage('idle')}
+                  style={{ background: 'none', border: 'none', color: '#64748b', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* STAGE 2: NETBANKING GATEWAY OVERLAY */}
+          {gatewayStage === 'challenge' && paymentMethod === 'netbanking' && (
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e2e8f0', paddingBottom: '12px', marginBottom: '18px' }}>
+                <span style={{ fontSize: '14px', fontWeight: 800, color: '#002542' }}>
+                  🏛 {customBank || 'HDFC Bank'} Internet Banking
+                </span>
+                <span style={{ fontSize: '11px', background: '#f0fdf4', color: '#16a34a', fontWeight: 800, padding: '3px 8px', borderRadius: '6px' }}>
+                  256-Bit SSL
+                </span>
+              </div>
+
+              <div style={{ textAlign: 'left', background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '13px', marginBottom: '20px' }}>
+                <div style={{ marginBottom: '6px' }}>Account Holder: <strong>YANSHI CHAUHAN</strong></div>
+                <div style={{ marginBottom: '6px' }}>Debited Account: <strong>Savings A/C ••••••••4091</strong></div>
+                <div style={{ marginBottom: '6px' }}>Challan Description: <strong>Learner Licence RTO Fee</strong></div>
+                <div>Amount: <strong style={{ color: '#002542', fontSize: '16px' }}>₹220.00</strong></div>
+              </div>
+
+              <div style={{ display: 'grid', gap: '10px' }}>
+                <button
+                  type="button"
+                  onClick={handleAuthorizeGatewayPayment}
+                  style={{
+                    background: '#002542',
+                    color: '#ffffff',
+                    border: 'none',
+                    padding: '13px',
+                    borderRadius: '10px',
+                    fontWeight: 800,
+                    fontSize: '14px',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 12px rgba(0, 37, 66, 0.2)'
+                  }}
+                >
+                  Confirm & Authorize Payment (₹220.00)
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setGatewayStage('idle')}
+                  style={{ background: 'none', border: 'none', color: '#64748b', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* STAGE 3: VERIFYING WITH TREASURY */}
+          {gatewayStage === 'verifying' && (
+            <div>
+              <div style={{ width: '64px', height: '64px', borderRadius: '50%', border: '4px solid #bbf7d0', borderTopColor: '#16a34a', animation: 'spin 0.8s linear infinite', margin: '0 auto 20px auto' }} />
+              <h3 style={{ fontSize: '20px', fontWeight: 800, color: '#102D43', margin: '0 0 8px 0' }}>
+                Verifying with State Treasury...
+              </h3>
+              <p style={{ fontSize: '13.5px', color: '#64748b', margin: 0 }}>
+                Confirming transaction settlement with RBI Bharat BillPay & issuing government e-Challan.
+              </p>
+            </div>
+          )}
+
+        </div>
+      </div>
+    );
+  };
+
   // MAIN CHECKOUT FORM SCREEN
   return (
     <div className="page page-ll-secure-payment" style={{ width: 'min(1184px, calc(100% - 48px))', margin: '36px auto', fontFamily: 'Inter, system-ui, sans-serif' }}>
+      
+      {/* Interactive Payment Gateway Modal */}
+      {renderGatewayModal()}
       
       {/* Title Header & Badges */}
       <div style={{ marginBottom: '28px' }}>
@@ -1636,7 +2062,7 @@ export function LLFeePaymentPage() {
 
           <button
             type="button"
-            onClick={handleProcessPayment}
+            onClick={handleInitiatePayment}
             className="primary-button"
             style={{
               width: '100%',
@@ -1648,7 +2074,8 @@ export function LLFeePaymentPage() {
               alignItems: 'center',
               justifyContent: 'center',
               gap: '8px',
-              marginBottom: '16px'
+              marginBottom: '16px',
+              cursor: 'pointer'
             }}
           >
             {paymentMethod === 'upi' ? '🔒 PAY ₹220.00 VIA UPI' : paymentMethod === 'card' ? '🔒 PAY ₹220.00 WITH CARD' : '🔒 PROCEED TO BANK (₹220.00)'}

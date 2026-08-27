@@ -329,6 +329,8 @@ const en = {
     alertBanner: "Final Review Required",
     paymentTitle: "Fee Payment Checkout",
     paymentSub: "Official Government RTO Fee Payment",
+    paymentSuccessTitle: "Payment Successful & Verified!",
+    paymentSuccessSub: "Your fee has been confirmed by the gateway. Your test slot is now ready.",
     verifiedTitle: "Learner Licence Issued!",
     verifiedSub: "Congratulations! Your Learner Licence is now active and valid across India."
   },
@@ -339,6 +341,8 @@ const en = {
     confirmAddrTitle: "Confirm your address",
     docsTitle: "Verified Documents from LL",
     checkoutTitle: "Secure DL Fee Payment",
+    paymentSuccessTitle: "Payment Successful & Verified!",
+    paymentSuccessSub: "Your fee has been received and credited to the Transport Department account. Your practical driving test booking is now unlocked.",
     centerTitle: "Select a Test Centre",
     slotTitle: "Select a Test Slot",
     fixedTitle: "Driving Test Appointment Fixed!",
