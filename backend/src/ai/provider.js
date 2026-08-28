@@ -50,131 +50,132 @@ How can I help you today?
 [[SUGGESTIONS: What is my next step? | What documents do I need? | How much is the licence fee?]]`;
   }
 
+  if (query.includes('bring') || query.includes('carry') || query.includes('checklist') || query.includes('prepare')) {
+    return `**RTO Test Day Checklist & Preparation**:
+
+When visiting the RTO for your practical driving test, please bring:
+
+1. 📋 **Printed Appointment Pass**: With QR code from Indian Drives
+2. 🆔 **Original Identity Proof**: Original Aadhaar Card / Passport
+3. 📄 **Form 3 Learner Licence**: Original or printed Learner Licence
+4. 💳 **Fee Payment Receipt**: Proof of application & test fee (TXN-882194)
+5. 🚗 **Test Vehicle**: Roadworthy vehicle with valid RC, Insurance, Pollution Certificate (PUC), and prominent red 'L' plates on front & rear.
+[[ACTION:VIEW_APPOINTMENT]]
+[[SUGGESTIONS: Show my appointment | What are the 4 track tests? | What happens if I fail?]]`;
+  }
+
+  if (query.includes('book') || query.includes('slot') || query.includes('appointment') || query.includes('schedule') || query.includes('reschedule') || query.includes('track')) {
+    return `**Booking Your Practical Driving Test Slot**:
+
+1. **Eligibility**: Ensure your Learner Licence has been active for at least 30 days.
+2. **Select RTO Track**: Choose your local automated testing track (e.g. Jamshedpur RTO Track / Burari Track).
+3. **Pick Date & Time**: Select an available morning or afternoon slot.
+4. **Confirmation**: Confirm your booking and download your instant QR Appointment Pass.
+
+*Note: Free online rescheduling is available up to 48 hours prior to your slot.*
+[[ACTION:BOOK_APPOINTMENT]]
+[[SUGGESTIONS: What should I bring to the RTO? | Can I reschedule my appointment? | What are the 4 track tests?]]`;
+  }
+
+  if (query.includes('learner') || query.includes('ll') || query.includes('quiz') || query.includes('exam') || query.includes('form 2')) {
+    return `**Applying for a Learner Licence (LL)**:
+
+1. **Form 2 Online Application**: Submit personal details with instant Aadhaar eKYC verification.
+2. **Document Upload**: Upload identity proof, address proof, and Form 1A self-declaration.
+3. **Fee Payment**: Pay ₹200 (Form fee + Online Assessment fee).
+4. **15-Minute Online Quiz**: Take the proctored traffic rules & road sign assessment (Pass mark: 9/15).
+5. **Instant LL Issuance**: Upon passing, your official Form 3 Learner Licence is generated instantly.
+[[ACTION:START_LL_APPLICATION]]
+[[SUGGESTIONS: What documents do I need? | How much is the LL fee? | What is my next step?]]`;
+  }
+
+  if (query.includes('driving licence') || query.includes('dl') || query.includes('details') || query.includes('overview') || query.includes('permanent')) {
+    return `**Driving Licence (DL) Overview & Process**:
+
+1. **Eligibility**: Active Learner Licence held for at least 30 days.
+2. **Application**: Launch guided DL application and verify address & details.
+3. **Practical Track Test**: Complete 4 automated maneuvers (Parallel Park, 8-Track, S-Track, Gradient Hill Stop & Start).
+4. **Smartcard Issuance**: After passing, your official Smartcard DL is printed and dispatched via Speed Post with live tracking.
+[[ACTION:START_DL_APPLICATION]]
+[[SUGGESTIONS: How to book a driving test slot? | What documents do I need for DL? | How much is the DL fee?]]`;
+  }
+
   if (query.includes('fail') || query.includes('retest') || query.includes('retry') || query.includes('score') || query.includes('marks')) {
-    return `RTO Assessment & Retest Rules:
+    return `**RTO Assessment & Retest Rules**:
 
 1. **Learner Licence (LL) Online Test**:
-   - Format: 15 Multiple-Choice Questions on road signs & safety.
-   - Passing Score: **9 out of 15** (60%).
-   - If you don't pass on your first attempt, you can retake the online assessment after 24 hours.
+   - Format: 15 Multiple-Choice Questions (Pass mark: 9/15).
+   - Retake: You can retake the online assessment after 24 hours.
 
 2. **Driving Licence (DL) Practical Track Test**:
-   - Evaluates 4 automated track maneuvers: Parallel Parking, 8-Track, S-Track, and Gradient Hill Stop & Start.
+   - Evaluates 4 automated track maneuvers.
    - If you do not qualify on test day, you can re-book a fresh test slot after 7 days from the portal.
 [[ACTION:BOOK_APPOINTMENT]]
 [[SUGGESTIONS: What should I bring to the RTO? | How to book a driving test slot? | What are the 4 track tests?]]`;
   }
 
   if (query.includes('age') || query.includes('eligible') || query.includes('eligibility')) {
-    return `Official Age & Eligibility Criteria for Indian Driving Licences:
+    return `**Official Age & Eligibility Criteria**:
 
 - **16 Years**: Learner Licence for non-geared 2-wheelers up to 50cc (with parental consent).
-- **18 Years**: Learner & Permanent Licence for Light Motor Vehicles (LMV - Cars) and Geared Motor Cycles (MCWG).
-- **20 Years**: Commercial & Transport Vehicles (requires valid LMV licence for 1+ year).
-
-All applicants must pass the mandatory Aadhaar eKYC verification and Form 1A medical self-declaration.
+- **18 Years**: Learner & Permanent Licence for LMV (Cars) and Geared Motor Cycles (MCWG).
+- **20 Years**: Commercial & Transport Vehicles.
 [[ACTION:START_LL_APPLICATION]]
 [[SUGGESTIONS: What documents do I need? | How to apply for Learner Licence? | What is the LL fee?]]`;
   }
 
   if (query.includes('valid') || query.includes('expire') || query.includes('duration') || query.includes('how long')) {
-    return `Licence Validity Terms:
+    return `**Licence Validity Terms**:
 
-- **Learner Licence (LL)**: Valid for **6 months** across all states in India. Non-renewable; must apply for permanent DL within 6 months.
-- **Driving Licence (DL)**: Valid for **20 years** or until age 40 (whichever comes earlier). After age 40, DL is renewed in 5-year increments.
+- **Learner Licence (LL)**: Valid for **6 months** across all states in India. Non-renewable; apply for permanent DL after 30 days.
+- **Driving Licence (DL)**: Valid for **20 years** or until age 40 (whichever is earlier).
 - **International Driving Permit (IDP)**: Valid for **1 year** from date of issue.
 [[ACTION:RENEW_LICENCE]]
 [[SUGGESTIONS: How to apply for DL? | How to renew my licence? | What documents are needed for DL?]]`;
   }
 
   if (query.includes('document') || query.includes('proof') || query.includes('aadhaar') || query.includes('upload') || query.includes('photo')) {
-    return `Required Documents for Indian Driving Licence:
+    return `**Required Documents for Licence Application**:
 
-1. **Identity Proof**: Aadhaar Card (with instant eKYC verification), Passport, or Voter ID.
+1. **Identity Proof**: Aadhaar Card (with eKYC verification), Voter ID, or Passport.
 2. **Address Proof**: Aadhaar Card, Electricity Bill, or Utility Bill matching your RTO jurisdiction.
 3. **Age Proof**: Birth Certificate, 10th School Certificate, or Passport.
 4. **Form 3 Learner Licence**: Copy of active LL (for permanent DL applications).
 5. **Form 1A Medical Cert**: Mandatory for applicants aged 50+ or Commercial licences.
-
-All documents are stored and verified securely in your digital Document Vault on Indian Drives.
 [[ACTION:OPEN_DOCUMENT_CENTER]]
 [[SUGGESTIONS: What is my next step? | How much is the licence fee? | Show my appointment]]`;
   }
 
-  if (query.includes('test') || query.includes('slot') || query.includes('track') || query.includes('booking') || query.includes('appointment')) {
-    return `To prepare for and book your RTO Practical Driving Test:
-
-1. **Eligibility**: You can book a test slot 30 days after your Learner Licence issuance.
-2. **Automated Track Exercises**:
-   - **LMV (Car)**: Parallel Parking, 8-Track Steering, S-Track, and Gradient Hill Stop & Start.
-   - **MCWG (Two-Wheeler)**: Figure-8 balance track and emergency braking zone.
-3. **Slot Booking**: Select your local RTO track, preferred date, and morning/afternoon time slot.
-4. **Rescheduling**: You can reschedule your slot online for free up to 48 hours before your appointment.
-[[ACTION:VIEW_APPOINTMENT]]
-[[SUGGESTIONS: What should I bring to the RTO? | Can I reschedule my appointment? | What documents do I need?]]`;
-  }
-
-  if (query.includes('bring') || query.includes('carry') || query.includes('rto visit') || query.includes('prepare') || query.includes('checklist')) {
-    return `RTO Test Day Checklist:
-
-Please bring the following to your testing track:
-1. **Printed Appointment Pass**: With QR code from Indian Drives.
-2. **Original Identity Proof**: Original Aadhaar Card / Passport.
-3. **Form 3 Learner Licence**: Original or printed copy.
-4. **Fee Payment Receipt**: Proof of application & test fee.
-5. **Test Vehicle**: Roadworthy vehicle with valid RC, Insurance, PUC certificate, and prominent red 'L' plates on front and rear.
-[[ACTION:VIEW_APPOINTMENT]]
-[[SUGGESTIONS: Show my appointment | What are the 4 track tests? | What happens if I fail?]]`;
-  }
-
   if (query.includes('fee') || query.includes('pay') || query.includes('cost') || query.includes('charge') || query.includes('price') || query.includes('receipt')) {
-    return `Official RTO Licence Fee Structure:
+    return `**Official RTO Licence Fee Structure**:
 
 - **Learner Licence (LL)**: ₹150 (Application Form) + ₹50 (Online Assessment) = **₹200**
 - **Driving Licence (DL)**: ₹200 (Form 7) + ₹300 (Automated Track Test) + ₹200 (Smartcard Printing) = **₹700**
 - **Licence Renewal**: **₹200**
 - **Address / Name Change**: **₹200**
 - **Duplicate Smartcard**: **₹200**
-
-All payments include official tax receipts with Treasury GRN numbers, payable via UPI, Credit/Debit Card, or Net Banking.
 [[ACTION:OPEN_PAYMENTS]]
 [[SUGGESTIONS: Show my payment receipt | What do I do next? | How to book a test slot?]]`;
   }
 
-  if (query.includes('learner') || query.includes('ll') || query.includes('exam') || query.includes('quiz')) {
-    return `Learner Licence (LL) Process & Online Quiz:
-
-1. **Form 2 Submission**: Complete your online application with Aadhaar eKYC.
-2. **Online Assessment**: Take the 15-minute proctored traffic rules & road sign quiz.
-3. **Passing Score**: Score **9 out of 15** correct answers.
-4. **Instant Download**: Upon passing, your Form 3 Learner Licence is instantly generated.
-5. **Validity**: Valid for 6 months across India.
-[[ACTION:START_LL_APPLICATION]]
-[[SUGGESTIONS: What documents do I need? | How much is the LL fee? | What is my next step?]]`;
-  }
-
-  if (query.includes('renew') || query.includes('duplicate') || query.includes('address') || query.includes('change') || query.includes('international') || query.includes('service')) {
-    return `Citizen Licence Services & Smartcard Updates:
+  if (query.includes('renew') || query.includes('duplicate') || query.includes('address') || query.includes('change') || query.includes('service') || query.includes('international') || query.includes('idp')) {
+    return `**Citizen Licence Services & Smartcard Updates**:
 
 - **DL Renewal**: Apply up to 1 year prior to expiry or within 1 year post expiry.
 - **Address Change**: Upload updated address proof with Aadhaar eKYC.
 - **Duplicate Smartcard**: Instant request if original card is lost, damaged, or stolen.
 - **International Driving Permit (IDP)**: Apply with valid passport, visa, and Form 1A medical cert.
-- **Speed Post Tracking**: Track your smartcard delivery live from your dashboard.
 [[ACTION:RENEW_LICENCE]]
 [[SUGGESTIONS: How to renew my licence? | What documents are needed for renewal? | Track my smartcard]]`;
   }
 
-  return `Namaste! I am DriveSeva AI, your digital assistant for Indian driving licence & RTO citizen services.
+  return `**Driving Licence Journey Guidance**:
 
-I can assist you with:
-- **Learner Licence (LL)**: Form 2 application, rules & online test prep
-- **Driving Licence (DL)**: Practical test booking & automated track exercises
-- **Documents**: Aadhaar eKYC & Form 1A medical certificates
-- **Payments**: Official fee receipts & smartcard payment tracking
-- **Citizen Services**: DL renewal, duplicate smartcard & address change
-
-How can I help you today?
+1. **Learner Licence**: Apply for Form 2 & pass 15-minute online quiz.
+2. **Practice Period**: Hold LL for 30 days.
+3. **Practical Driving Test**: Book automated track slot & pass 4 driving maneuvers.
+4. **Smartcard DL**: Printed & delivered to registered address.
+[[ACTION:START_DL_APPLICATION]]
 [[SUGGESTIONS: What is my next step? | What documents do I need? | How to book a driving test slot?]]`;
 }
 
