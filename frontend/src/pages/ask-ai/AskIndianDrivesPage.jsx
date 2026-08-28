@@ -79,7 +79,7 @@ export function AskIndianDrivesPage() {
     {
       id: 'welcome',
       sender: 'assistant',
-      text: `Hello, Yanshi! 👋 I'm your DriveSEVA Assistant. I can help you with your application steps, document checklists, fee payments, and driving test bookings. How can I help you today?`,
+      text: `Hello, Raj! 👋 I'm your DriveSEVA Assistant. I can help you with your application steps, document checklists, fee payments, and driving test bookings. How can I help you today?`,
       timestamp: 'Just now',
       followUps: [
         "What do I do next?",
@@ -230,7 +230,7 @@ export function AskIndianDrivesPage() {
       {
         id: `welcome-${Date.now()}`,
         sender: 'assistant',
-        text: `Hello, Yanshi! 👋 A fresh conversation has been started. How can I help you today?`,
+        text: `Hello, Raj! 👋 A fresh conversation has been started. How can I help you today?`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         followUps: [
           "What do I do next?",
