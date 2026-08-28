@@ -349,7 +349,7 @@ export function LicenceFoundPage() {
             }}>
               <img
                 src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80"
-                alt="Rajesh Kumar Sharma"
+                alt="Raj Kumar"
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
             </div>
@@ -360,7 +360,7 @@ export function LicenceFoundPage() {
                 <div>
                   <div style={{ fontSize: '11px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase' }}>Full Name</div>
                   <h2 style={{ fontSize: '26px', fontWeight: 800, color: '#173b57', margin: '2px 0 16px 0' }}>
-                    Rajesh Kumar Sharma
+                    Raj Kumar
                   </h2>
                 </div>
 
@@ -1183,7 +1183,7 @@ export function LicenceServicePaymentCheckoutPage() {
   const titleName = searchParams.get('title') || 'Driving Licence Service';
 
   const [paymentMethod, setPaymentMethod] = useState('upi');
-  const [upiId, setUpiId] = useState('yanshi@okhdfcbank');
+  const [upiId, setUpiId] = useState('raj.kumar@okhdfcbank');
   const [gatewayStage, setGatewayStage] = useState('idle');
   const [gatewayTimer, setGatewayTimer] = useState(299);
   const [otpValue, setOtpValue] = useState('123456');
@@ -1651,7 +1651,7 @@ export function LicenceServicePaymentSuccessPage() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', fontSize: '13.5px', marginBottom: '20px', background: '#f8fafc', padding: '16px', borderRadius: '12px' }}>
               <div><strong>Application Ref No:</strong> {refNo}</div>
               <div><strong>Date & Time:</strong> {new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</div>
-              <div><strong>Applicant Name:</strong> Yanshi Chauhan</div>
+              <div><strong>Applicant Name:</strong> Raj Kumar</div>
               <div><strong>Service:</strong> {titleName}</div>
             </div>
 

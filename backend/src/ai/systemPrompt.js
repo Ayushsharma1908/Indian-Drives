@@ -2,7 +2,7 @@
  * System prompt builder for Ask Indian Drives Conversational AI
  */
 export function buildSystemPrompt(context = {}) {
-  const userName = context.userName || 'Yanshi';
+  const userName = context.userName || 'Raj';
   const state = context.state || 'Jharkhand';
   const rto = context.rto || 'JH-05 Jamshedpur RTO (Sakchi, Jamshedpur)';
   const currentStage = context.currentStage || 'DL Application';
@@ -92,7 +92,7 @@ You may also suggest 2-3 short follow-up prompts on a new line at the end using:
 
 Example:
 User: "hello"
-Assistant: "Hello, Yanshi! 👋 How can I help you today?"
+Assistant: "Hello, Raj! 👋 How can I help you today?"
 [[SUGGESTIONS: What's my next step? | What documents do I need? | Book my driving test]]
 
 User: "what do I do next?"

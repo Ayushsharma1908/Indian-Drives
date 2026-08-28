@@ -6,7 +6,7 @@ import { ACTION_CATALOG } from '../actions/actionCatalog';
  */
 export function parseAssistantIntent(input, context, conversationHistory = []) {
   const query = (input || '').trim().toLowerCase();
-  const userName = context.userName || 'Yanshi';
+  const userName = context.userName || 'Raj';
   const appt = context.appointmentState || {};
 
   // 1. CASUAL GREETINGS

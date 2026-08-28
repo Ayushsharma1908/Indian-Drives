@@ -9,15 +9,16 @@ const STORAGE_KEY = 'indian_drives_central_store_v2';
 const INITIAL_STATE = {
   user: {
     id: 'user-demo',
-    name: 'Raj Singh',
+    name: 'Raj Kumar',
+    fullName: 'Raj Kumar',
     firstName: 'Raj',
-    lastName: 'Singh',
-    email: 'raj.singh@example.com',
+    lastName: 'Kumar',
+    email: 'raj.kumar@example.com',
     mobile: '+91 98765 43210',
-    avatar: 'RS',
-    fatherName: 'Rajesh Singh',
+    avatar: 'RK',
+    fatherName: 'Rajesh Kumar',
     dob: '1998-08-19',
-    gender: 'Female',
+    gender: 'Male',
     bloodGroup: 'O+ve',
     streetAddress: 'Flat 402, Green Park Heights, Sakchi',
     city: 'Jamshedpur',
@@ -31,7 +32,7 @@ const INITIAL_STATE = {
   licences: {
     ll: {
       number: 'LL-05/2026/008821',
-      name: 'Raj Singh',
+      name: 'Raj Kumar',
       dob: '1998-08-19',
       vehicleClass: 'LMV (Light Motor Vehicle)',
       issueDate: '14 Jul 2026',
@@ -212,7 +213,25 @@ class CentralDataStore {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
-        return { ...INITIAL_STATE, ...JSON.parse(stored) };
+        const parsed = JSON.parse(stored);
+        if (
+          parsed.user?.name?.includes('Yanshi') ||
+          parsed.user?.email?.includes('yanshi') ||
+          parsed.user?.name?.includes('Singh') ||
+          parsed.user?.lastName === 'Chauhan' ||
+          parsed.user?.lastName === 'Singh'
+        ) {
+          parsed.user = INITIAL_STATE.user;
+          if (parsed.licences?.ll?.name) {
+            parsed.licences.ll.name = 'Raj Kumar';
+          }
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+        }
+        return {
+          ...INITIAL_STATE,
+          ...parsed,
+          user: { ...INITIAL_STATE.user, ...(parsed.user || {}) }
+        };
       }
     } catch (e) {
       console.warn('Could not parse stored state, using defaults:', e);

@@ -464,7 +464,7 @@ export function DLConfirmAddressPage() {
       pincode,
       fullAddress: fullAddr,
       type: 'Updated Dispatch Address',
-      recipientName: profile.name || 'Yanshi Chauhan',
+      recipientName: profile.name || 'Raj Kumar',
       mobile: profile.mobile || '+91 98765 43210'
     };
     centralDataStore.saveDraftForm('dl_address', addressObj);
@@ -488,7 +488,7 @@ export function DLConfirmAddressPage() {
       pincode,
       fullAddress: fullAddr,
       type: unchanged ? 'Learner Licence Registered Address' : 'Updated Dispatch Address',
-      recipientName: profile.name || 'Yanshi Chauhan',
+      recipientName: profile.name || 'Raj Kumar',
       mobile: profile.mobile || '+91 98765 43210'
     };
     centralDataStore.saveDraftForm('dl_address', addressObj);
@@ -1266,7 +1266,7 @@ export function DLPaymentCheckoutPage() {
                 <div><strong>Date & Time:</strong> {receiptMeta?.date || 'Today'}</div>
                 <div><strong>Treasury Ref (GRN):</strong> {receiptMeta?.grn || 'GRN-2026-UK-98124'}</div>
                 <div><strong>Bank UTR / Ref:</strong> {receiptMeta?.utr || 'UTR928471928471'}</div>
-                <div><strong>Applicant Name:</strong> Yanshi Chauhan</div>
+                <div><strong>Applicant Name:</strong> Raj Kumar</div>
                 <div><strong>Licence Type:</strong> Driving Licence (MCWG + LMV)</div>
               </div>
 
@@ -1533,7 +1533,7 @@ export function DLPaymentCheckoutPage() {
               </div>
 
               <div style={{ textAlign: 'left', background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '13px', marginBottom: '20px' }}>
-                <div style={{ marginBottom: '6px' }}>Account Holder: <strong>YANSHI CHAUHAN</strong></div>
+                <div style={{ marginBottom: '6px' }}>Account Holder: <strong>RAJ KUMAR</strong></div>
                 <div style={{ marginBottom: '6px' }}>Debited Account: <strong>Savings A/C ••••••••4091</strong></div>
                 <div style={{ marginBottom: '6px' }}>Payment Purpose: <strong>Driving Licence Application & Test Fee</strong></div>
                 <div>Amount: <strong style={{ color: '#002542', fontSize: '16px' }}>₹700.00</strong></div>
@@ -1760,7 +1760,7 @@ export function DLPaymentCheckoutPage() {
                     </div>
                     {upiVerified && (
                       <div style={{ fontSize: '12px', color: '#16a34a', fontWeight: 700, marginTop: '6px' }}>
-                        ✓ Verified: Yanshi Chauhan (HDFC Bank)
+                        ✓ Verified: Raj Kumar (HDFC Bank)
                       </div>
                     )}
                   </div>
@@ -1830,7 +1830,7 @@ export function DLPaymentCheckoutPage() {
                   </label>
                   <input
                     type="text"
-                    placeholder="e.g. YANSHI CHAUHAN"
+                    placeholder="e.g. RAJ KUMAR"
                     value={cardName}
                     onChange={(e) => {
                       setCardName(e.target.value.toUpperCase());
@@ -3086,7 +3086,7 @@ export function DLTestSlotBookingPage() {
       stateName: user.state || 'Jharkhand',
       pincode: user.pincode || '831001',
       fullAddress: user.fullAddress || 'Flat 402, Green Park Heights, Sakchi, Jamshedpur, Jharkhand - 831001',
-      recipientName: user.name || 'Yanshi Chauhan',
+      recipientName: user.name || 'Raj Kumar',
       mobile: user.mobile || '+91 98765 43210',
       type: 'Verified Learner Licence Address'
     };
@@ -3126,7 +3126,7 @@ export function DLTestSlotBookingPage() {
     city: addressData.city || 'Jamshedpur',
     stateName: addressData.stateName || 'Jharkhand',
     pincode: addressData.pincode || '831001',
-    recipientName: addressData.recipientName || user.name || 'Yanshi Chauhan',
+    recipientName: addressData.recipientName || user.name || 'Raj Kumar',
     mobile: addressData.mobile || user.mobile || '+91 98765 43210'
   });
 
@@ -3316,7 +3316,7 @@ export function DLTestSlotBookingPage() {
             </div>
             
             <div style={{ fontSize: '15px', fontWeight: 800, color: '#ffffff' }}>
-              {addressData.recipientName || user.name || 'Yanshi Chauhan'} ({addressData.mobile || user.mobile || '+91 98765 43210'})
+              {addressData.recipientName || user.name || 'Raj Kumar'} ({addressData.mobile || user.mobile || '+91 98765 43210'})
             </div>
             
             <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: '#cbd5e1', lineHeight: 1.4 }}>
@@ -3338,7 +3338,7 @@ export function DLTestSlotBookingPage() {
               city: addressData.city || 'Jamshedpur',
               stateName: addressData.stateName || 'Jharkhand',
               pincode: addressData.pincode || '831001',
-              recipientName: addressData.recipientName || user.name || 'Yanshi Chauhan',
+              recipientName: addressData.recipientName || user.name || 'Raj Kumar',
               mobile: addressData.mobile || user.mobile || '+91 98765 43210'
             });
             setIsEditAddressOpen(true);
@@ -4024,7 +4024,7 @@ export function DLAppointmentFixedPage() {
   const slotTime = upcomingApt.slot || upcomingApt.time || '10:30 AM';
   const reportingTime = upcomingApt.reportingTime || '10:15 AM';
   const dispatchAddress = upcomingApt.dispatchAddress || savedAddress.fullAddress || `${savedAddress.flatNo || savedAddress.streetAddress || 'Flat 402, Green Park Heights'}, ${savedAddress.city || 'Jamshedpur'}`;
-  const recipientName = upcomingApt.recipientName || savedAddress.recipientName || savedAddress.name || 'Yanshi Chauhan';
+  const recipientName = upcomingApt.recipientName || savedAddress.recipientName || savedAddress.name || 'Raj Kumar';
 
   useEffect(() => {
     localStorage.setItem('last_processed_flow', 'dl_appointment');
@@ -4991,7 +4991,7 @@ export function LicenceDispatchPage() {
 
             <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '16px' }}>
               <div style={{ fontSize: '15px', fontWeight: 800, color: '#173b57', marginBottom: '6px' }}>
-                Rajesh Kumar Verma
+                Raj Kumar
               </div>
               <div style={{ fontSize: '13px', color: '#64748b', lineHeight: 1.6 }}>
                 A-402, Sunshine Apartments,<br />

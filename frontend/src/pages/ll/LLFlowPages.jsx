@@ -209,7 +209,7 @@ export function LLApplicantDetailsPage() {
               className="input-field"
               value={formData.fullName}
               onChange={(e) => handleChange('fullName', e.target.value)}
-              placeholder="e.g. Yanshi Chauhan"
+              placeholder="e.g. Raj Kumar"
               style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: errors.fullName ? '1px solid #ef4444' : '1px solid #e2e8f0', fontSize: '15px', boxSizing: 'border-box' }}
             />
             {errors.fullName && <div style={{ fontSize: '12px', color: '#ef4444', marginTop: '4px' }}>{errors.fullName}</div>}
@@ -748,10 +748,10 @@ export function LLDocumentRequirementsPage() {
 
         <div style={{ display: 'grid', gap: '16px', marginBottom: '32px' }}>
           {[
-            { title: 'Passport Size Photograph', file: 'rajesh_photo_2024.jpg • 1.2 MB' },
+            { title: 'Passport Size Photograph', file: 'raj_photo_2024.jpg • 1.2 MB' },
             { title: 'Identity Proof (Aadhaar Card)', file: 'aadhaar_front_back.pdf • 2.4 MB' },
             { title: 'Address Proof (Voter ID)', file: 'voter_id_scan.pdf • 1.8 MB' },
-            { title: 'Scanned Signature', file: 'rajesh_sign.png • 0.5 MB' }
+            { title: 'Scanned Signature', file: 'raj_sign.png • 0.5 MB' }
           ].map((doc, idx) => (
             <div key={idx} style={{ background: '#f8fafc', padding: '18px 24px', borderRadius: '14px', border: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
@@ -973,10 +973,10 @@ export function LLApplicationReviewPage() {
 
             <div style={{ display: 'grid', gap: '12px' }}>
               {[
-                { name: 'Passport Size Photograph', file: 'rajesh_photo_2024.jpg • 1.2 MB' },
+                { name: 'Passport Size Photograph', file: 'raj_photo_2024.jpg • 1.2 MB' },
                 { name: 'Identity Proof (Aadhaar Card)', file: 'aadhaar_front_back.pdf • 2.4 MB' },
                 { name: 'Address Proof (Voter ID)', file: 'voter_id_scan.pdf • 1.8 MB' },
-                { name: 'Scanned Signature', file: 'rajesh_sign.png • 0.5 MB' }
+                { name: 'Scanned Signature', file: 'raj_sign.png • 0.5 MB' }
               ].map((doc, idx) => (
                 <div key={idx} style={{ background: '#f8fafc', padding: '16px 20px', borderRadius: '14px', border: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
@@ -1475,7 +1475,7 @@ export function LLFeePaymentPage() {
                 <div><strong>Date & Time:</strong> {receiptMeta?.date || 'Today'}</div>
                 <div><strong>Treasury Ref (GRN):</strong> {receiptMeta?.grn || 'GRN-2026-JH-98124'}</div>
                 <div><strong>Bank UTR / Ref:</strong> {receiptMeta?.utr || 'UTR928471928471'}</div>
-                <div><strong>Applicant Name:</strong> Yanshi Chauhan</div>
+                <div><strong>Applicant Name:</strong> Raj Kumar</div>
                 <div><strong>Licence Type:</strong> Learner Licence (LL)</div>
               </div>
 
@@ -1740,7 +1740,7 @@ export function LLFeePaymentPage() {
               </div>
 
               <div style={{ textAlign: 'left', background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '13px', marginBottom: '20px' }}>
-                <div style={{ marginBottom: '6px' }}>Account Holder: <strong>YANSHI CHAUHAN</strong></div>
+                <div style={{ marginBottom: '6px' }}>Account Holder: <strong>RAJ KUMAR</strong></div>
                 <div style={{ marginBottom: '6px' }}>Debited Account: <strong>Savings A/C ••••••••4091</strong></div>
                 <div style={{ marginBottom: '6px' }}>Payment Purpose: <strong>Learner Licence Application Fee</strong></div>
                 <div>Amount: <strong style={{ color: '#002542', fontSize: '16px' }}>₹220.00</strong></div>
@@ -1895,7 +1895,7 @@ export function LLFeePaymentPage() {
                   </div>
                   {upiVerified && (
                     <div style={{ fontSize: '12px', color: '#16a34a', fontWeight: 700, marginTop: '6px' }}>
-                      ✓ Verified: Yanshi Chauhan (HDFC Bank)
+                      ✓ Verified: Raj Kumar (HDFC Bank)
                     </div>
                   )}
                 </div>
@@ -1932,7 +1932,7 @@ export function LLFeePaymentPage() {
                   <label style={{ fontSize: '11px', fontWeight: 800, color: '#476179', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>NAME ON CARD</label>
                   <input
                     type="text"
-                    placeholder="e.g. YANSHI CHAUHAN"
+                    placeholder="e.g. RAJ KUMAR"
                     value={cardName}
                     onChange={(e) => {
                       setCardName(e.target.value.toUpperCase());
@@ -2861,7 +2861,7 @@ export function LLVerifiedPage() {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', fontSize: '14px' }}>
                 <div style={{ gridColumn: 'span 2' }}>
                   <div style={{ fontSize: '10px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '2px' }}>NAME</div>
-                  <div style={{ fontSize: '17px', fontWeight: 800, color: '#173b57' }}>Rajesh Kumar Sharma</div>
+                  <div style={{ fontSize: '17px', fontWeight: 800, color: '#173b57' }}>Raj Kumar</div>
                 </div>
 
                 <div>

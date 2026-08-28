@@ -38,7 +38,7 @@ export function LandingPage() {
     localStorage.setItem('indian-drives-authenticated', 'true');
     localStorage.setItem('indian-drives-token', 'demo-token-' + Date.now());
     if (auth && auth.login) {
-      auth.login({ email: 'yanshi.chauhan@example.com' }).catch(() => {});
+      auth.login({ email: 'raj.kumar@example.com' }).catch(() => {});
     }
     setShowLoginModal(false);
     navigate('/dashboard');

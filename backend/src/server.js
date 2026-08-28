@@ -20,12 +20,12 @@ const ids = { app: 2, doc: 4, pay: 1, appointment: 1, note: 5 };
 const db = {
   user: {
     id: "user-demo",
-    name: "Yanshi Chauhan",
-    email: process.env.SMTP_USER || "ynsh.ai.codes@gmail.com",
+    name: "Raj Kumar",
+    email: process.env.SMTP_USER || "raj.kumar@example.com",
     mobile: "+91 98765 43210",
     userType: "ll-holder",
     language: "en",
-    avatar: "YC",
+    avatar: "RK",
     address: "Flat 402, Green Park Heights, Sakchi, Jamshedpur, Jharkhand - 831001"
   },
   journey: {
@@ -47,7 +47,7 @@ const db = {
       status: "in-progress",
       currentStage: "test-booking",
       vehicleClass: "LMV",
-      applicantName: "Yanshi Chauhan",
+      applicantName: "Raj Kumar",
       rto: "JH-05 Jamshedpur RTO (Sakchi, Jamshedpur)",
       submittedAt: "2026-08-24"
     }
@@ -55,7 +55,7 @@ const db = {
   licences: {
     ll: {
       number: "LL-05/2026/008821",
-      name: "Yanshi Chauhan",
+      name: "Raj Kumar",
       dob: "1998-08-19",
       vehicleClass: "LMV",
       issueDate: "2026-07-14",
@@ -541,7 +541,7 @@ app.use((error, _req, res, _next) => {
 function issuedLicence() {
   return {
     number: "JH26/DL/654321",
-    name: "Yanshi Chauhan",
+    name: "Raj Kumar",
     dob: "2004-05-12",
     vehicleClass: "LMV",
     issueDate: "2026-08-26",

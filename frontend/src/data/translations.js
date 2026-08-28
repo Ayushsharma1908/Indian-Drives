@@ -96,7 +96,7 @@ const en = {
     enterOtpLabel: "ENTER 4-DIGIT OTP SENT TO YOUR DEVICE",
     sendOtpBtn: "Send OTP",
     verifyBtn: "Verify & Login",
-    demoLoginBtn: "⚡ Instant Demo Citizen Login (Yanshi Chauhan)"
+    demoLoginBtn: "⚡ Instant Demo Citizen Login (Raj Kumar)"
   },
   cockpit: {
     nextCheckpoint: "NEXT CHECKPOINT",

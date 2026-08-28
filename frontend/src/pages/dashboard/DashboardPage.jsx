@@ -497,7 +497,7 @@ export function DashboardPage() {
               letterSpacing: '-1.2px'
             }}
           >
-            {t('dashboard.title')}, {profile.firstName || 'Yanshi'} 🙏
+            {t('dashboard.title')}, {profile.firstName || 'Raj'} 🙏
           </h1>
 
           <div style={{ fontSize: '18px', color: 'var(--color-primary-navy)', fontWeight: 600, lineHeight: 1.4 }}>

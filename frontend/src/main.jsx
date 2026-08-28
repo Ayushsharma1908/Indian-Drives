@@ -486,7 +486,7 @@ function Login() {
   const { login } = useContext(AuthContext);
   const { tr } = useContext(LanguageContext);
   const navigate = useNavigate();
-  const [form, setForm] = useState({ email: "yanshi.chauhan@example.com", password: "demo123" });
+  const [form, setForm] = useState({ email: "raj.kumar@example.com", password: "demo123" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -650,7 +650,7 @@ function ApplicationForm({ type }) {
   const { tr } = useContext(LanguageContext);
   const navigate = useNavigate();
   const { refreshJourney } = useContext(JourneyContext);
-  const [form, setForm] = useState({ type, applicantName: "Yanshi Chauhan", vehicleClass: "LMV", rto: "Jamshedpur RTO" });
+  const [form, setForm] = useState({ type, applicantName: "Raj Kumar", vehicleClass: "LMV", rto: "Jamshedpur RTO" });
   const [loading, setLoading] = useState(false);
 
   async function submit(event) {
