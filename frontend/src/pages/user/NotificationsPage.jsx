@@ -71,13 +71,13 @@ export function NotificationsPage() {
         <div>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: 'var(--color-indigo)', fontSize: '11px', fontWeight: 800, letterSpacing: '1.2px', textTransform: 'uppercase', marginBottom: '6px' }}>
             <span style={{ display: 'inline-block', width: '16px', height: '2px', background: 'var(--color-indigo)' }} />
-            SYSTEM ALERTS & ACTIVITY
+            {t('notifications.eyebrow', 'SYSTEM ALERTS & ACTIVITY')}
           </div>
           <h1 style={{ fontSize: '36px', fontWeight: 700, color: 'var(--color-deep-navy)', margin: 0, letterSpacing: '-0.8px' }}>
-            {t('userFlow.notificationsTitle')}
+            {t('notifications.title', 'Notifications & System Alerts')}
           </h1>
           <p style={{ color: 'var(--color-text-secondary)', fontSize: '15px', margin: '6px 0 0 0' }}>
-            Real-time updates regarding your applications, payments, appointments, and driving licences.
+            {t('notifications.subtitle', 'Real-time updates regarding test appointments, RTO processing, and licence status.')}
           </p>
         </div>
 
@@ -94,7 +94,7 @@ export function NotificationsPage() {
               gap: '8px'
             }}
           >
-            <Check size={16} /> Mark all as read
+            <Check size={16} /> {t('notifications.markAllRead', 'Mark all as read')}
           </button>
         )}
       </div>

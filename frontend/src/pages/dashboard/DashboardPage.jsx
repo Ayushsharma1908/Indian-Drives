@@ -291,10 +291,10 @@ export function DashboardPage() {
                   </div>
                   <div>
                     <div style={{ fontSize: '11px', fontWeight: 700, color: '#16805a', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
-                      DRIVING LICENCE ISSUED
+                      {t('dashboard.dlIssuedNotif', 'DRIVING LICENCE ISSUED')}
                     </div>
                     <div style={{ fontSize: '14px', fontWeight: 600, color: '#173b57' }}>
-                      Practical Driving Test Passed — Driving Licence is active.
+                      {t('dashboard.dlPassedDesc', 'Practical Driving Test Passed — Driving Licence is active.')}
                     </div>
                   </div>
                 </div>
@@ -319,7 +319,7 @@ export function DashboardPage() {
                       border: 'none'
                     }}
                   >
-                    View Licence <ArrowRight size={14} />
+                    {t('dashboard.viewLicence', 'View Licence')} <ArrowRight size={14} />
                   </button>
                   <button
                     onClick={dismissNotification}
@@ -372,7 +372,7 @@ export function DashboardPage() {
                   </div>
                   <div>
                     <div style={{ fontSize: '11px', fontWeight: 700, color: '#ea580c', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
-                      IMPORTANT NOTIFICATION
+                      {t('dashboard.importantNotif', 'IMPORTANT NOTIFICATION')}
                     </div>
                     <div style={{ fontSize: '14px', fontWeight: 600, color: '#173b57' }}>
                       {importantNotice.title}: {importantNotice.desc}
@@ -401,7 +401,7 @@ export function DashboardPage() {
                       border: 'none'
                     }}
                   >
-                    View Details <ArrowRight size={14} />
+                    {t('dashboard.viewDetails', 'View Details')} <ArrowRight size={14} />
                   </button>
                   <button
                     onClick={() => {
@@ -450,10 +450,10 @@ export function DashboardPage() {
                   </div>
                   <div>
                     <span style={{ fontSize: '11px', fontWeight: 700, color: '#476179', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
-                      UPCOMING TEST APPOINTMENT
+                      {t('dashboard.upcomingAppointment', 'UPCOMING TEST APPOINTMENT')}
                     </span>
                     <div style={{ fontSize: '14px', fontWeight: 600, color: '#173b57' }}>
-                      RTO Practical Test: {upcomingVisit.vehicleClass || 'LMV'} · {upcomingVisit.date}, {upcomingVisit.time || upcomingVisit.slot || '10:30 AM'}
+                      {t('dashboard.rtoTest', 'RTO Practical Test')}: {upcomingVisit.vehicleClass || 'LMV'} · {upcomingVisit.date}, {upcomingVisit.time || upcomingVisit.slot || '10:30 AM'}
                     </div>
                   </div>
                 </div>
@@ -474,7 +474,7 @@ export function DashboardPage() {
                     borderRadius: '8px'
                   }}
                 >
-                  View appointment <ArrowRight size={14} />
+                  {t('dashboard.viewAppointment', 'View appointment')} <ArrowRight size={14} />
                 </button>
               </div>
             </div>
@@ -513,7 +513,7 @@ export function DashboardPage() {
           </h1>
 
           <div style={{ fontSize: '18px', color: 'var(--color-primary-navy)', fontWeight: 600, lineHeight: 1.4 }}>
-            Welcome to Indian Drives.
+            {t('dashboard.welcome', 'Welcome to Indian Drives.')}
             <div style={{ color: 'var(--color-text-secondary)', fontWeight: 400, fontSize: '15.5px', marginTop: '4px' }}>
               {t('dashboard.subtitle')}
             </div>
@@ -538,7 +538,7 @@ export function DashboardPage() {
                 marginBottom: '6px'
               }}
             >
-              WHERE ARE YOU IN YOUR DRIVING JOURNEY?
+              {t('landing.journeysEyebrow', 'WHERE ARE YOU IN YOUR DRIVING JOURNEY?')}
             </div>
             <h2
               style={{
@@ -549,7 +549,7 @@ export function DashboardPage() {
                 letterSpacing: '-0.5px'
               }}
             >
-              {"Tell us where you are, and we'll take you from there."}
+              {t('landing.journeysSubtitle', "Tell us where you are, and we'll take you from there.")}
             </h2>
           </div>
 
@@ -565,10 +565,10 @@ export function DashboardPage() {
             {/* CARD 01: STARTING FRESH */}
             <DestinationCard
               step="01"
-              tag="STARTING FRESH"
-              title="I'm starting from scratch"
-              desc="I don't have a Learner Licence yet. Start your online Form 2 application with Aadhaar."
-              cta="Start with LL process"
+              tag={t('dashboard.tag1', 'STARTING FRESH')}
+              title={t('landing.journey1Title', "I'm starting from scratch")}
+              desc={t('dashboard.card1Desc', "I don't have a Learner Licence yet. Start your online Form 2 application with Aadhaar.")}
+              cta={t('dashboard.cta1', 'Start with LL process')}
               icon={Car}
               onClick={() => navigate('/journey?stage=ll')}
             />
@@ -576,10 +576,10 @@ export function DashboardPage() {
             {/* CARD 02: CONTINUE YOUR JOURNEY */}
             <DestinationCard
               step="02"
-              tag="CONTINUE YOUR JOURNEY"
-              title="I have a Learner Licence"
-              desc="Continue towards your Driving Licence and schedule your practical driving test."
-              cta="Start with DL process"
+              tag={t('dashboard.tag2', 'CONTINUE YOUR JOURNEY')}
+              title={t('landing.journey2Title', 'I have a Learner Licence')}
+              desc={t('dashboard.card2Desc', 'Continue towards your Driving Licence and schedule your practical driving test.')}
+              cta={t('dashboard.cta2', 'Start with DL process')}
               icon={FileText}
               onClick={() => navigate('/journey?stage=dl')}
             />
@@ -587,10 +587,10 @@ export function DashboardPage() {
             {/* CARD 03: EXISTING LICENCE */}
             <DestinationCard
               step="03"
-              tag="EXISTING LICENCE"
-              title="I already have a Driving Licence"
-              desc="Manage renewals, duplicate Smart Cards, address updates and citizen services."
-              cta="Manage Licence Services"
+              tag={t('dashboard.tag3', 'EXISTING LICENCE')}
+              title={t('landing.journey3Title', 'I already have a Driving Licence')}
+              desc={t('dashboard.card3Desc', 'Manage renewals, duplicate Smart Cards, address updates and citizen services.')}
+              cta={t('dashboard.cta3', 'Manage Licence Services')}
               icon={Shield}
               onClick={() => navigate('/licence-services')}
             />

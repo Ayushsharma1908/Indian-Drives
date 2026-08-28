@@ -78,14 +78,14 @@ export function DLIntroPage() {
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
               <label style={{ fontSize: '11px', fontWeight: 800, color: '#476179', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
-                LEARNER LICENCE NUMBER
+                {t('dl.llNumberLabel', 'LEARNER LICENCE NUMBER')}
               </label>
               <button
                 type="button"
                 onClick={() => alert("Your Learner Licence number is printed on your Form 3 digital copy (e.g. LLA20260012345).")}
                 style={{ background: 'none', border: 'none', color: '#002542', fontSize: '11px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '2px' }}
               >
-                WHERE TO FIND THIS →
+                {t('dl.whereToFind', 'WHERE TO FIND THIS →')}
               </button>
             </div>
 
@@ -94,7 +94,7 @@ export function DLIntroPage() {
                 type="text"
                 value={llNumber}
                 onChange={(e) => setLlNumber(e.target.value)}
-                placeholder="E.G., LLA20260012345"
+                placeholder={t('dl.llPlaceholder', 'E.G., LLA20260012345')}
                 required
                 style={{
                   width: '100%',
@@ -115,7 +115,7 @@ export function DLIntroPage() {
           {/* Field 2: Date of Birth */}
           <div>
             <label style={{ fontSize: '11px', fontWeight: 800, color: '#476179', textTransform: 'uppercase', letterSpacing: '0.6px', display: 'block', marginBottom: '8px' }}>
-              DATE OF BIRTH
+              {t('dl.dobLabel', 'DATE OF BIRTH')}
             </label>
 
             <div style={{ position: 'relative' }}>
@@ -162,14 +162,14 @@ export function DLIntroPage() {
               boxShadow: '0 4px 14px rgba(0, 37, 66, 0.2)'
             }}
           >
-            Verify & Continue <ArrowRight size={18} />
+            {t('dl.verifyContinue', 'Verify & Continue')} <ArrowRight size={18} />
           </button>
         </form>
       </div>
 
       {/* Footer Security Tag */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#94a3b8', fontSize: '12px', fontWeight: 600, marginTop: '24px' }}>
-        <Lock size={14} /> Secured via National Register
+        <Lock size={14} /> {t('dl.securedNotice', 'Secured via National Register')}
       </div>
 
     </div>

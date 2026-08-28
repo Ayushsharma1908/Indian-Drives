@@ -45,13 +45,13 @@ export function PaymentsPage() {
       <div className="page-header" style={{ marginBottom: '28px' }}>
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: 'var(--color-warm-amber)', fontSize: '11px', fontWeight: 800, letterSpacing: '1.2px', textTransform: 'uppercase', marginBottom: '6px' }}>
           <CreditCard size={13} />
-          FINANCIAL RECORDS & OFFICIAL INVOICES
+          {t('payments.eyebrow', 'FINANCIAL SUMMARY & REVENUE RECEIPTS')}
         </div>
         <h1 style={{ color: 'var(--color-deep-navy)', fontSize: '36px', fontWeight: 700, margin: 0, letterSpacing: '-0.8px' }}>
-          Payments & Receipts
+          {t('payments.title', 'Payment History & Treasury Receipts')}
         </h1>
         <p style={{ color: 'var(--color-text-secondary)', fontSize: '15px', margin: '6px 0 0 0' }}>
-          View your verified Indian Drives fee transactions and download official RTO tax receipts.
+          {t('payments.subtitle', 'View verified treasury receipts, transaction status, and payment breakdowns.')}
         </p>
       </div>
 

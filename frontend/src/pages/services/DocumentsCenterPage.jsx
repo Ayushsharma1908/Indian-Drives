@@ -57,13 +57,13 @@ export function DocumentsCenterPage() {
         <div>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: '#0284c7', fontSize: '11px', fontWeight: 800, letterSpacing: '1.2px', textTransform: 'uppercase', marginBottom: '6px' }}>
             <FileCheck2 size={13} />
-            DOCUMENT VAULT & EKYC VERIFICATION
+            {t('documents.eyebrow', 'DOCUMENT VAULT & EKYC VERIFICATION')}
           </div>
           <h1 style={{ color: 'var(--color-deep-navy)', fontSize: '36px', fontWeight: 700, margin: 0, letterSpacing: '-0.8px' }}>
-            Documents Center
+            {t('documents.title', 'Documents Center')}
           </h1>
           <p style={{ color: 'var(--color-text-secondary)', fontSize: '15px', margin: '6px 0 0 0' }}>
-            Manage the verified proofs used across your Indian Drives applications.
+            {t('documents.subtitle', 'Manage the verified proofs used across your Indian Drives applications.')}
           </p>
         </div>
 
@@ -72,7 +72,7 @@ export function DocumentsCenterPage() {
           className="primary-button"
           style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', fontSize: '14px' }}
         >
-          <Upload size={16} /> Upload New Document
+          <Upload size={16} /> {t('documents.uploadBtn', 'Upload New Document')}
         </button>
       </div>
 
@@ -80,19 +80,19 @@ export function DocumentsCenterPage() {
       <div className="console-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '28px' }}>
         <div className="card-standard" style={{ padding: '20px' }}>
           <div style={{ fontSize: '26px', fontWeight: 800, color: 'var(--color-deep-navy)' }}>{totalDocs}</div>
-          <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-secondary)', marginTop: '4px' }}>All Documents</div>
+          <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-secondary)', marginTop: '4px' }}>{t('documents.allDocs', 'All Documents')}</div>
         </div>
         <div className="card-standard" style={{ padding: '20px' }}>
           <div style={{ fontSize: '26px', fontWeight: 800, color: 'var(--color-teal)' }}>{verifiedDocs}</div>
-          <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-secondary)', marginTop: '4px' }}>Verified & Cleared</div>
+          <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-secondary)', marginTop: '4px' }}>{t('documents.verifiedCleared', 'Verified & Cleared')}</div>
         </div>
         <div className="card-standard" style={{ padding: '20px' }}>
           <div style={{ fontSize: '26px', fontWeight: 800, color: 'var(--color-indigo)' }}>{pendingDocs}</div>
-          <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-secondary)', marginTop: '4px' }}>Pending Scrutiny</div>
+          <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-secondary)', marginTop: '4px' }}>{t('documents.pendingScrutiny', 'Pending Scrutiny')}</div>
         </div>
         <div className="card-standard" style={{ padding: '20px' }}>
           <div style={{ fontSize: '26px', fontWeight: 800, color: 'var(--color-text-muted)' }}>{needsUpdateDocs}</div>
-          <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-secondary)', marginTop: '4px' }}>Needs Update</div>
+          <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-secondary)', marginTop: '4px' }}>{t('documents.needsUpdate', 'Needs Update')}</div>
         </div>
       </div>
 

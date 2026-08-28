@@ -1,346 +1,408 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Car, ShieldCheck, CheckCircle2, ArrowRight, Sparkles, Laptop, Calendar,
-  CreditCard, Truck, Award, HelpCircle, Lock, User, FileText, Search, Phone,
-  Check, X, Zap, ChevronRight, MapPin, Eye, Info, Menu
+  ArrowRight, Sparkles, User, Bookmark, Car, CheckCircle2,
+  Clock, Calendar, FileText, Send, X, Shield, Layers, Check,
+  ChevronDown
 } from 'lucide-react';
-import { AuthContext, LanguageContext } from '../../main';
+import { AuthContext, useLanguage } from '../../main';
 import { LanguageSelector } from '../../components/layout/LanguageSelector';
 import './LandingPage.css';
 
 export function LandingPage() {
   const navigate = useNavigate();
   const auth = useContext(AuthContext);
-  const { language, setLanguage, tr } = useContext(LanguageContext) || {};
-  const t = (key) => (tr ? tr(key) : key);
+  const { language, setLanguage, t } = useLanguage();
 
-  const [showLoginModal, setShowLoginModal] = useState(false);
+  // Modals & Drawers
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showAiDrawer, setShowAiDrawer] = useState(false);
+  const [selectedJourneyModal, setSelectedJourneyModal] = useState(null); // 'll', 'dl', 'services'
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [loginMethod, setLoginMethod] = useState('phone'); // 'phone' or 'aadhaar'
+  const [pendingRedirect, setPendingRedirect] = useState('/dashboard');
+
+  // AI Chat States (localized dynamically)
+  const [chatMessages, setChatMessages] = useState([]);
+  const [chatInput, setChatInput] = useState('');
+
+  // Update initial greeting when language changes
+  useEffect(() => {
+    setChatMessages([
+      {
+        sender: 'bot',
+        text: t('ask.greeting', 'Namaste! I am DriveSEVA, your assistant for Indian Drives. How can I help you today?'),
+        time: 'Just now'
+      }
+    ]);
+  }, [language, t]);
+
+  // Auth Form states
+  const [authMethod, setAuthMethod] = useState('phone');
   const [phoneNum, setPhoneNum] = useState('');
   const [aadhaarNum, setAadhaarNum] = useState('');
-  const [otpSent, setOtpSent] = useState(false);
-  const [otpCode, setOtpCode] = useState('');
 
-  const handleStartJourney = () => {
+  // Auth Trigger
+  const handleOpenAuth = (targetPath = '/dashboard') => {
+    setSelectedJourneyModal(null);
     setMobileMenuOpen(false);
     const isAuth = localStorage.getItem('indian-drives-authenticated') === 'true' || localStorage.getItem('indian-drives-token');
     if (isAuth) {
-      navigate('/dashboard');
+      navigate(targetPath);
     } else {
-      setShowLoginModal(true);
+      setPendingRedirect(targetPath);
+      setShowAuthModal(true);
     }
   };
 
-  const handleLoginSubmit = (e) => {
+  const handleAuthSubmit = (e) => {
     if (e) e.preventDefault();
     localStorage.setItem('indian-drives-authenticated', 'true');
     localStorage.setItem('indian-drives-token', 'demo-token-' + Date.now());
     if (auth && auth.login) {
       auth.login({ email: 'raj.kumar@example.com' }).catch(() => {});
     }
-    setShowLoginModal(false);
-    navigate('/dashboard');
+    setShowAuthModal(false);
+    navigate(pendingRedirect || '/dashboard');
   };
 
-  const handleDemoLogin = () => {
-    handleLoginSubmit();
+  const handleDemoLogin = (targetPath) => {
+    localStorage.setItem('indian-drives-authenticated', 'true');
+    localStorage.setItem('indian-drives-token', 'demo-token-' + Date.now());
+    if (auth && auth.login) {
+      auth.login({ email: 'yanshi.chauhan@example.com' }).catch(() => {});
+    }
+    setShowAuthModal(false);
+    navigate(targetPath || pendingRedirect || '/dashboard');
+  };
+
+  const handleSendMessage = (textToSend) => {
+    const text = textToSend || chatInput.trim();
+    if (!text) return;
+
+    const newMsgs = [...chatMessages, { sender: 'user', text, time: 'Just now' }];
+    setChatMessages(newMsgs);
+    setChatInput('');
+
+    setTimeout(() => {
+      const lower = text.toLowerCase();
+      let botResponse = '';
+      let requiresAuth = false;
+
+      if (lower.includes('status') || lower.includes('track') || lower.includes('my application') || lower.includes('slot')) {
+        botResponse = t('ask.statusResponse', 'To check your real-time application status or view booked test slot passes, please sign in to your Indian Drives account.');
+        requiresAuth = true;
+      } else if (lower.includes('document') || lower.includes('require') || lower.includes('doc')) {
+        botResponse = t('ask.docResponse', 'For a Learner Licence (LL), you only need your Aadhaar Number for contactless online verification. For a permanent Driving Licence (DL), your active LL number is required.');
+      } else if (lower.includes('ll') || lower.includes('learner')) {
+        botResponse = t('ask.llResponse', 'You can apply for your Learner Licence completely online through Indian Drives, practice with official test simulators, and receive your digital licence without paperwork.');
+      } else if (lower.includes('dl') || lower.includes('driving test') || lower.includes('track')) {
+        botResponse = t('ask.dlResponse', 'After holding your Learner Licence for 30 days, you can book a practical driving test at your nearest automated RTO test track directly through Indian Drives.');
+      } else if (lower.includes('renew') || lower.includes('address') || lower.includes('duplicate') || lower.includes('service')) {
+        botResponse = t('ask.servicesResponse', 'Existing licence holders can renew expiring licences, update residential addresses, or request duplicate smart cards directly from the Licence Services hub.');
+      } else {
+        botResponse = t('landing.heroSubtitle', 'Apply, track and manage your driving licence in one place.');
+      }
+
+      setChatMessages(prev => [
+        ...prev,
+        {
+          sender: 'bot',
+          text: botResponse,
+          time: 'Just now',
+          requiresAuth
+        }
+      ]);
+    }, 500);
+  };
+
+  // Three Journey Summaries
+  const journeySummaries = {
+    ll: {
+      stepNum: '01',
+      accentColor: '#0284c7',
+      title: t('landing.journey1Title', "I'm starting from scratch"),
+      subtitle: t('landing.journey1Desc', "Get your Learner Licence."),
+      desc: t('landing.path1Desc', 'Complete online Aadhaar verification, practice with computerized knowledge test simulators, and obtain your digital Learner Licence from home.'),
+      steps: [
+        t('landing.howStep1', 'Online identity verification'),
+        t('landing.howStep2', 'Theory knowledge test preparation'),
+        t('landing.howStep4', 'Digital Learner Licence issuance')
+      ],
+      cta: t('landing.journey1Cta', 'Start Learner Licence Journey →'),
+      target: '/journey?stage=ll'
+    },
+    dl: {
+      stepNum: '02',
+      accentColor: '#ea580c',
+      title: t('landing.journey2Title', 'I have a Learner Licence'),
+      subtitle: t('landing.journey2Desc', 'Continue towards your Driving Licence.'),
+      desc: t('landing.path2Desc', 'Hold an active Learner Licence for at least 30 days. Select your nearest automated RTO test track, book a convenient morning or afternoon slot, and clear your driving test.'),
+      steps: [
+        t('landing.journey2Desc', 'Learner Licence validation'),
+        t('landing.serviceTestTitle', 'Automated test track slot booking'),
+        t('landing.serviceTestDesc', 'Practical test evaluation & smart card dispatch')
+      ],
+      cta: t('landing.journey2Cta', 'Book Driving Test Slot →'),
+      target: '/journey?stage=dl'
+    },
+    services: {
+      stepNum: '03',
+      accentColor: '#16a34a',
+      title: t('landing.journey3Title', 'I already have a Driving Licence'),
+      subtitle: t('landing.journey3Desc', 'Manage your existing licence.'),
+      desc: t('landing.path3Desc', 'Renew expiring licences, update your registered residential address, or request duplicate smart cards without visiting physical transport offices.'),
+      steps: [
+        t('landing.serviceManageTitle', 'Existing licence details lookup'),
+        t('landing.serviceManageDesc', 'Service selection & document upload'),
+        t('landing.serviceTrackDesc', 'Online fee settlement & tracking')
+      ],
+      cta: t('landing.journey3Cta', 'Manage Licence Services →'),
+      target: '/licence-services'
+    }
+  };
+
+  const scrollToSection = (id) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   return (
-    <div className="landing-page-root">
+    <div className="premium-landing-root">
       
-      {/* 1. TOP PUBLIC NAVIGATION BAR */}
-      <header className="landing-header">
-        {/* Brand Logo */}
-        <div className="landing-brand" onClick={() => navigate('/')}>
-          <img src="/indian-drives-logo.png" alt="Indian Drives Logo" className="brand-logo-img" style={{ height: '42px', width: 'auto' }} />
-        </div>
-
-        {/* Center Desktop Nav Links */}
-        <nav className="landing-desktop-nav">
-          <a href="#how-it-works" className="landing-nav-link">{t('nav.howItWorks')}</a>
-          <a href="#features" className="landing-nav-link">{t('nav.keyFeatures')}</a>
-          <a href="#paths" className="landing-nav-link">{t('nav.citizenJourneys')}</a>
-          <a
-            href="#ask-ai"
-            onClick={(e) => { e.preventDefault(); navigate('/ask'); }}
-            className="landing-ai-link"
-          >
-            ✦ {t('nav.ask')}
-          </a>
-        </nav>
-
-        {/* Right CTA Actions & Language Selector */}
-        <div className="landing-nav-actions">
-          {setLanguage && (
-            <LanguageSelector currentLanguage={language || 'en'} onSelectLanguage={setLanguage} />
-          )}
-
-          <button onClick={handleStartJourney} className="landing-start-btn">
-            {t('nav.startJourney')} <ArrowRight size={16} />
-          </button>
-          
-          <button
-            className="landing-mobile-toggle"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Toggle Navigation Menu"
-          >
-            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
-        </div>
-
-        {/* Mobile Slide-Down Menu Drawer */}
-        <div className={`landing-mobile-drawer ${mobileMenuOpen ? 'open' : ''}`}>
-          <a href="#how-it-works" className="landing-nav-link" onClick={() => setMobileMenuOpen(false)}>{t('nav.howItWorks')}</a>
-          <a href="#features" className="landing-nav-link" onClick={() => setMobileMenuOpen(false)}>{t('nav.keyFeatures')}</a>
-          <a href="#paths" className="landing-nav-link" onClick={() => setMobileMenuOpen(false)}>{t('nav.citizenJourneys')}</a>
-          <a
-            href="#ask-ai"
-            onClick={(e) => { e.preventDefault(); setMobileMenuOpen(false); navigate('/ask'); }}
-            className="landing-ai-link"
-          >
-            ✦ {t('nav.ask')}
-          </a>
-          <button onClick={handleStartJourney} className="landing-start-btn" style={{ width: '100%', justifyContent: 'center', marginTop: '8px' }}>
-            {t('nav.startJourney')} <ArrowRight size={16} />
-          </button>
-        </div>
-      </header>
-
-      {/* 2. HERO SECTION */}
-      <section className="landing-hero-container">
-        {/* Left Column Text */}
-        <div>
-          <div className="landing-hero-badge">
-            <Sparkles size={14} color="#f97316" /> {t('landing.badge')}
+      {/* ─────────────────────────────────────────────────────────────
+          1. CLEAN NAVBAR (WHITE / TRANSLUCENT PREMIUM)
+          ───────────────────────────────────────────────────────────── */}
+      <header className="premium-navbar">
+        <div className="navbar-inner">
+          {/* Logo & Brand Name (Official Brand Asset) */}
+          <div className="brand-link" onClick={() => navigate('/')}>
+            <img
+              src="/indian-drives-logo.png"
+              alt="Indian Drives"
+              className="official-brand-logo"
+            />
+            <span className="brand-text">
+              <span className="brand-navy">Indian</span> <span className="brand-orange">Drives</span>
+            </span>
           </div>
 
-          <h1 className="landing-hero-title">
-            {t('landing.title')} <span style={{ color: '#e88a2d' }}>{t('landing.titleHighlight')}</span>
-          </h1>
+          {/* Navigation Links */}
+          <nav className="navbar-links">
+            <a href="#how-it-works" className="nav-link">{t('nav.howItWorks', 'How It Works')}</a>
+            <a href="#services" className="nav-link">{t('nav.services', 'Services')}</a>
+            <a href="#journeys" className="nav-link">{t('nav.myJourney', 'My Journey')}</a>
+            <button onClick={() => setShowAiDrawer(true)} className="nav-ai-link">
+              <span className="sparkle-icon">✦</span> {t('nav.ask', 'Ask DriveSEVA')}
+            </button>
+          </nav>
 
-          <p className="landing-hero-subtitle">
-            {t('landing.subtitle')}
-          </p>
+          {/* Right Action: Language, Sign In, Primary CTA */}
+          <div className="navbar-right">
+            <LanguageSelector currentLanguage={language} onSelectLanguage={setLanguage} />
 
-          {/* Action Buttons */}
-          <div className="landing-hero-actions">
-            <button onClick={handleStartJourney} className="landing-hero-btn-primary">
-              {t('landing.startJourney')} <ArrowRight size={18} />
+            <button onClick={() => handleOpenAuth('/dashboard')} className="navbar-signin-btn">
+              {t('common.login', 'Sign In')}
+            </button>
+
+            <button onClick={() => handleOpenAuth('/dashboard')} className="navbar-primary-btn">
+              {t('landing.heroStartBtn', 'Start Your Journey →')}
+            </button>
+
+            <button
+              className="navbar-mobile-toggle"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle Navigation"
+            >
+              {mobileMenuOpen ? <X size={20} /> : <span style={{ fontSize: '18px' }}>☰</span>}
             </button>
           </div>
-
-          {/* Trust Badges Bar */}
-          <div className="landing-trust-badges">
-            <span className="landing-trust-item">
-              <ShieldCheck size={16} color="#16a34a" /> {t('landing.trustAadhaar')}
-            </span>
-            <span className="landing-trust-item">
-              <Laptop size={16} color="#0369a1" /> {t('landing.trustRemote')}
-            </span>
-            <span className="landing-trust-item">
-              <Truck size={16} color="#e88a2d" /> {t('landing.trustTracking')}
-            </span>
-          </div>
         </div>
 
-        {/* Right Column Hero Mockup Graphic */}
-        <div className="landing-hero-mockup-wrapper">
-          {/* Card Mockup Showcase */}
-          <div className="landing-hero-mockup-card">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#ef4444' }} />
-                <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#f59e0b' }} />
-                <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#10b981' }} />
-              </div>
-              <span style={{ background: '#f1f5f9', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: 800, color: '#0a2540' }}>
-                LIVE PORTAL PREVIEW
-              </span>
+        {/* Mobile Dropdown */}
+        {mobileMenuOpen && (
+          <div className="navbar-mobile-menu">
+            <a href="#how-it-works" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>
+              {t('nav.howItWorks', 'How It Works')}
+            </a>
+            <a href="#services" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>
+              {t('nav.services', 'Services')}
+            </a>
+            <a href="#journeys" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>
+              {t('nav.myJourney', 'My Journey')}
+            </a>
+            <button
+              onClick={() => { setMobileMenuOpen(false); setShowAiDrawer(true); }}
+              className="mobile-nav-ai-btn"
+            >
+              ✦ {t('nav.ask', 'Ask DriveSEVA')}
+            </button>
+            <button onClick={() => handleOpenAuth('/dashboard')} className="navbar-primary-btn" style={{ width: '100%', justifyContent: 'center', marginTop: '10px' }}>
+              {t('landing.heroStartBtn', 'Start Your Journey →')}
+            </button>
+          </div>
+        )}
+      </header>
+
+      {/* ─────────────────────────────────────────────────────────────
+          2. HERO — CINEMATIC FULL VIEWPORT
+          ───────────────────────────────────────────────────────────── */}
+      <section className="premium-hero-viewport">
+        <div className="hero-content-wrapper">
+          
+          {/* Main Headline & Supporting Copy */}
+          <div className="hero-text-block">
+            <div className="hero-eyebrow-tag">
+              {t('landing.servicesEyebrow', 'DRIVING LICENCE SERVICES')}
             </div>
 
-            {/* Dashboard Speedometer Track Preview */}
-            <div className="landing-speedometer-preview">
-              <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', letterSpacing: '0.8px', textTransform: 'uppercase', marginBottom: '8px' }}>
-                {t('landing.speedometerTitle')}
-              </div>
-              <div style={{ fontSize: '16px', fontWeight: 800, color: '#ffffff', marginBottom: '12px' }}>
-                {t('landing.speedometerSub')}
-              </div>
+            <h1 className="hero-headline">
+              {t('landing.heroTitle', 'Your driving licence journey,')}<br />
+              <span className="hero-highlight-orange">{t('landing.heroHighlight', 'simplified.')}</span>
+            </h1>
 
-              {/* Progress Line */}
-              <div style={{ background: '#1e3a8a', height: '6px', borderRadius: '3px', position: 'relative', overflow: 'hidden' }}>
-                <div style={{ width: '65%', height: '100%', background: '#f97316', borderRadius: '3px' }} />
-              </div>
+            <p className="hero-supporting-text">
+              {t('landing.heroSubtitle', 'Apply, track and manage your driving licence in one place.')}
+            </p>
 
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '12px', fontSize: '11px', fontWeight: 700, flexWrap: 'wrap', gap: '6px' }}>
-                <span style={{ color: '#10b981' }}>{t('landing.llIssued')}</span>
-                <span style={{ color: '#f97316' }}>{t('landing.testScheduled')}</span>
-                <span style={{ color: '#94a3b8' }}>{t('landing.smartcardDispatch')}</span>
-              </div>
-            </div>
+            <div className="hero-action-buttons">
+              <button onClick={() => handleOpenAuth('/dashboard')} className="hero-btn-primary">
+                {t('landing.heroStartBtn', 'Start Your Journey →')}
+              </button>
 
-            {/* Quick Cards Stack */}
-            <div className="landing-quick-cards-grid">
-              <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                <div style={{ fontSize: '11px', fontWeight: 800, color: '#0369a1', marginBottom: '4px' }}>{t('landing.onlineTest')}</div>
-                <div style={{ fontSize: '13px', fontWeight: 800, color: '#0a2540' }}>{t('landing.onlineTestDesc')}</div>
-              </div>
-
-              <div style={{ background: '#fff7ed', padding: '16px', borderRadius: '12px', border: '1px solid #fed7aa' }}>
-                <div style={{ fontSize: '11px', fontWeight: 800, color: '#c2410c', marginBottom: '4px' }}>{t('landing.slotBooking')}</div>
-                <div style={{ fontSize: '13px', fontWeight: 800, color: '#0a2540' }}>{t('landing.slotBookingDesc')}</div>
-              </div>
+              <button onClick={() => setShowAiDrawer(true)} className="hero-btn-secondary">
+                <span className="btn-sparkle">✦</span> {t('landing.heroAskBtn', 'Ask DriveSEVA')}
+              </button>
             </div>
           </div>
 
-          {/* Floating Backdrop Decorative Accent */}
-          <div className="landing-backdrop-blur" />
+          {/* Integrated Road Journey Line (Minimal Glowing Nodes on the Road) */}
+          <div className="road-journey-tracker-row">
+            <div className="road-node-item">
+              <div className="road-node-dot dot-navy" />
+              <span className="road-node-label">{t('landing.roadmapStart', 'START')}</span>
+            </div>
+
+            <div className="road-connector-line">
+              <div className="connector-glow" />
+            </div>
+
+            <div className="road-node-item">
+              <div className="road-node-dot dot-blue" />
+              <span className="road-node-label label-blue">{t('landing.roadmapLL', 'LEARNER LICENCE')}</span>
+            </div>
+
+            <div className="road-connector-line">
+              <div className="connector-glow" />
+            </div>
+
+            <div className="road-node-item">
+              <div className="road-node-dot dot-orange" />
+              <span className="road-node-label label-orange">{t('landing.roadmapTest', 'TEST')}</span>
+            </div>
+
+            <div className="road-connector-line">
+              <div className="connector-glow" />
+            </div>
+
+            <div className="road-node-item">
+              <div className="road-node-dot dot-green" />
+              <span className="road-node-label label-green">{t('landing.roadmapDL', 'DRIVING LICENCE')}</span>
+            </div>
+          </div>
+
+          {/* Subtle Scroll Down Prompt */}
+          <div className="hero-scroll-prompt" onClick={() => scrollToSection('journeys')}>
+            <span>{t('common.scroll', 'Scroll')}</span>
+            <ChevronDown size={14} className="scroll-icon-bounce" />
+          </div>
+
         </div>
       </section>
 
-      {/* 3. "HOW IT MANAGES USER FLOW EFFICIENTLY (ZERO MISGUIDANCE)" SECTION */}
-      <section id="how-it-works" className="landing-section-white">
-        <div style={{ maxWidth: '1240px', margin: '0 auto' }}>
+      {/* ─────────────────────────────────────────────────────────────
+          3. YOUR JOURNEY — "WHERE ARE YOU?" (THREE CARDS ONLY)
+          ───────────────────────────────────────────────────────────── */}
+      <section id="journeys" className="section-journeys-clean">
+        <div className="premium-container">
           
-          <div className="landing-section-header">
-            <span className="landing-section-tag">
-              {t('landing.pathsTag')}
-            </span>
-            <h2 className="landing-section-title">
-              {t('landing.pathsTitle')}
+          <div className="section-header-clean">
+            <span className="section-eyebrow-orange">{t('landing.journeysEyebrow', 'YOUR JOURNEY')}</span>
+            <h2 className="section-title-navy">
+              {t('landing.journeysTitle', 'Where are you in your driving journey?')}
             </h2>
-            <p className="landing-section-desc">
-              {t('landing.pathsDesc')}
+            <p className="section-subtitle-muted">
+              {t('landing.journeysSubtitle', "Choose where you are. We'll guide you from there.")}
             </p>
           </div>
 
-          {/* 3 Citizen Paths Cards */}
-          <div id="paths" className="landing-paths-grid">
+          <div className="three-cards-row">
             
-            {/* Path 1: Learner Licence */}
-            <div className="landing-path-card">
-              <div>
-                <div style={{
-                  width: '48px',
-                  height: '48px',
-                  borderRadius: '12px',
-                  background: '#0a2540',
-                  color: '#ffffff',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginBottom: '20px'
-                }}>
-                  <Laptop size={24} color="#f97316" />
-                </div>
-
-                <span style={{ background: '#e0f2fe', color: '#0369a1', fontSize: '11px', fontWeight: 800, padding: '4px 10px', borderRadius: '6px' }}>
-                  {t('landing.path1Tag')}
-                </span>
-
-                <h3 style={{ fontSize: '22px', fontWeight: 800, color: '#0a2540', margin: '12px 0 10px 0' }}>
-                  {t('landing.path1Title')}
-                </h3>
-
-                <p style={{ fontSize: '14px', color: '#64748b', lineHeight: 1.5, marginBottom: '24px' }}>
-                  {t('landing.path1Desc')}
-                </p>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '13px', fontWeight: 700, color: '#0a2540' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><CheckCircle2 size={16} color="#16a34a" /> {t('landing.path1Check1')}</div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><CheckCircle2 size={16} color="#16a34a" /> {t('landing.path1Check2')}</div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><CheckCircle2 size={16} color="#16a34a" /> {t('landing.path1Check3')}</div>
+            {/* Card 01: Starting Fresh */}
+            <div
+              className="journey-card-clean card-blue-border"
+              onClick={() => setSelectedJourneyModal('ll')}
+            >
+              <div className="card-top-indicator">
+                <span className="index-number index-blue">01</span>
+                <div className="icon-circle icon-bg-blue">
+                  <User size={18} color="#0284c7" />
                 </div>
               </div>
 
-              <button onClick={handleDemoLogin} className="landing-path-card-btn-outlined">
-                {t('landing.path1Btn')} <ArrowRight size={16} />
-              </button>
+              <div className="card-center-text">
+                <h3 className="card-heading">{t('landing.journey1Title', "I'm starting from scratch")}</h3>
+                <p className="card-description">{t('landing.journey1Desc', "Get your Learner Licence.")}</p>
+              </div>
+
+              <div className="card-bottom-cta">
+                <span className="cta-link cta-blue">{t('landing.journey1Cta', 'Start →')}</span>
+              </div>
             </div>
 
-            {/* Path 2: Driving Licence */}
-            <div className="landing-path-card" style={{ border: '1px solid #bae6fd', boxShadow: '0 4px 20px rgba(3, 105, 161, 0.06)' }}>
-              <div>
-                <div style={{
-                  width: '48px',
-                  height: '48px',
-                  borderRadius: '12px',
-                  background: '#0a2540',
-                  color: '#ffffff',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginBottom: '20px'
-                }}>
-                  <Car size={24} color="#f97316" />
-                </div>
-
-                <span style={{ background: '#ffedd5', color: '#c2410c', fontSize: '11px', fontWeight: 800, padding: '4px 10px', borderRadius: '6px' }}>
-                  {t('landing.path2Tag')}
-                </span>
-
-                <h3 style={{ fontSize: '22px', fontWeight: 800, color: '#0a2540', margin: '12px 0 10px 0' }}>
-                  {t('landing.path2Title')}
-                </h3>
-
-                <p style={{ fontSize: '14px', color: '#64748b', lineHeight: 1.5, marginBottom: '24px' }}>
-                  {t('landing.path2Desc')}
-                </p>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '13px', fontWeight: 700, color: '#0a2540' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><CheckCircle2 size={16} color="#16a34a" /> {t('landing.path2Check1')}</div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><CheckCircle2 size={16} color="#16a34a" /> {t('landing.path2Check2')}</div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><CheckCircle2 size={16} color="#16a34a" /> {t('landing.path2Check3')}</div>
+            {/* Card 02: I have a Learner Licence */}
+            <div
+              className="journey-card-clean card-orange-border"
+              onClick={() => setSelectedJourneyModal('dl')}
+            >
+              <div className="card-top-indicator">
+                <span className="index-number index-orange">02</span>
+                <div className="icon-circle icon-bg-orange">
+                  <Bookmark size={18} color="#ea580c" />
                 </div>
               </div>
 
-              <button onClick={handleDemoLogin} className="landing-path-card-btn-filled">
-                {t('landing.path2Btn')} <ArrowRight size={16} />
-              </button>
+              <div className="card-center-text">
+                <h3 className="card-heading">{t('landing.journey2Title', 'I have a Learner Licence')}</h3>
+                <p className="card-description">{t('landing.journey2Desc', 'Continue towards your Driving Licence.')}</p>
+              </div>
+
+              <div className="card-bottom-cta">
+                <span className="cta-link cta-orange">{t('landing.journey2Cta', 'Continue →')}</span>
+              </div>
             </div>
 
-            {/* Path 3: Licence Maintenance */}
-            <div className="landing-path-card">
-              <div>
-                <div style={{
-                  width: '48px',
-                  height: '48px',
-                  borderRadius: '12px',
-                  background: '#0a2540',
-                  color: '#ffffff',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginBottom: '20px'
-                }}>
-                  <Award size={24} color="#f97316" />
-                </div>
-
-                <span style={{ background: '#dcfce7', color: '#16a34a', fontSize: '11px', fontWeight: 800, padding: '4px 10px', borderRadius: '6px' }}>
-                  {t('landing.path3Tag')}
-                </span>
-
-                <h3 style={{ fontSize: '22px', fontWeight: 800, color: '#0a2540', margin: '12px 0 10px 0' }}>
-                  {t('landing.path3Title')}
-                </h3>
-
-                <p style={{ fontSize: '14px', color: '#64748b', lineHeight: 1.5, marginBottom: '24px' }}>
-                  {t('landing.path3Desc')}
-                </p>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '13px', fontWeight: 700, color: '#0a2540' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><CheckCircle2 size={16} color="#16a34a" /> {t('landing.path3Check1')}</div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><CheckCircle2 size={16} color="#16a34a" /> {t('landing.path3Check2')}</div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><CheckCircle2 size={16} color="#16a34a" /> {t('landing.path3Check3')}</div>
+            {/* Card 03: I already have a Driving Licence */}
+            <div
+              className="journey-card-clean card-green-border"
+              onClick={() => setSelectedJourneyModal('services')}
+            >
+              <div className="card-top-indicator">
+                <span className="index-number index-green">03</span>
+                <div className="icon-circle icon-bg-green">
+                  <Car size={18} color="#16a34a" />
                 </div>
               </div>
 
-              <button onClick={handleDemoLogin} className="landing-path-card-btn-outlined">
-                {t('landing.path3Btn')} <ArrowRight size={16} />
-              </button>
+              <div className="card-center-text">
+                <h3 className="card-heading">{t('landing.journey3Title', 'I already have a Driving Licence')}</h3>
+                <p className="card-description">{t('landing.journey3Desc', 'Manage your existing licence.')}</p>
+              </div>
+
+              <div className="card-bottom-cta">
+                <span className="cta-link cta-green">{t('landing.journey3Cta', 'Manage →')}</span>
+              </div>
             </div>
 
           </div>
@@ -348,336 +410,341 @@ export function LandingPage() {
         </div>
       </section>
 
-      {/* 4. COMPREHENSIVE FEATURES GRID SECTION */}
-      <section id="features" className="landing-section-alt">
-        <div className="landing-section-header">
-          <span className="landing-section-tag">
-            {t('landing.featTag')}
-          </span>
-          <h2 className="landing-section-title">
-            {t('landing.featTitle')}
-          </h2>
-          <p className="landing-section-desc">
-            {t('landing.featDesc')}
-          </p>
-        </div>
+      {/* ─────────────────────────────────────────────────────────────
+          4. SERVICES — "WHAT YOU CAN DO" (COMPACT)
+          ───────────────────────────────────────────────────────────── */}
+      <section id="services" className="section-services-clean">
+        <div className="premium-container">
+          
+          <div className="section-header-clean">
+            <span className="section-eyebrow-orange">{t('landing.servicesEyebrow', 'WHAT YOU CAN DO')}</span>
+            <h2 className="section-title-navy">
+              {t('landing.servicesTitle', 'Core platform capabilities')}
+            </h2>
+            <p className="section-subtitle-muted">
+              {t('landing.servicesSubtitle', 'Everything you need at every stage of your licence journey.')}
+            </p>
+          </div>
 
-        <div className="landing-features-grid">
-          {[
-            {
-              icon: Laptop,
-              title: t('landing.feat1Title'),
-              desc: t('landing.feat1Desc'),
-              color: '#0369a1',
-              bg: '#e0f2fe'
-            },
-            {
-              icon: Calendar,
-              title: t('landing.feat2Title'),
-              desc: t('landing.feat2Desc'),
-              color: '#c2410c',
-              bg: '#ffedd5'
-            },
-            {
-              icon: Truck,
-              title: t('landing.feat3Title'),
-              desc: t('landing.feat3Desc'),
-              color: '#15803d',
-              bg: '#dcfce7'
-            },
-            {
-              icon: FileText,
-              title: t('landing.feat4Title'),
-              desc: t('landing.feat4Desc'),
-              color: '#7c3aed',
-              bg: '#f3e8ff'
-            },
-            {
-              icon: Award,
-              title: t('landing.feat5Title'),
-              desc: t('landing.feat5Desc'),
-              color: '#b45309',
-              bg: '#fef3c7'
-            },
-            {
-              icon: Sparkles,
-              title: t('landing.feat6Title'),
-              desc: t('landing.feat6Desc'),
-              color: '#0a2540',
-              bg: '#f1f5f9'
-            }
-          ].map((feat, idx) => {
-            const Icon = feat.icon;
-            return (
-              <div key={idx} className="landing-feature-card">
-                <div style={{
-                  width: '44px',
-                  height: '44px',
-                  borderRadius: '12px',
-                  background: feat.bg,
-                  color: feat.color,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0
-                }}>
-                  <Icon size={22} />
-                </div>
-
-                <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#0a2540', margin: 0 }}>
-                  {feat.title}
-                </h3>
-
-                <p style={{ fontSize: '14px', color: '#64748b', margin: 0, lineHeight: 1.5 }}>
-                  {feat.desc}
-                </p>
+          <div className="services-quad-row">
+            
+            <div className="service-item-box">
+              <div className="service-icon-wrap wrap-blue">
+                <User size={19} color="#0284c7" />
               </div>
-            );
-          })}
+              <h4 className="service-title">{t('landing.serviceApplyTitle', 'Apply')}</h4>
+              <p className="service-desc">{t('landing.serviceApplyDesc', 'Start a new licence application with guided online steps.')}</p>
+            </div>
+
+            <div className="service-item-box">
+              <div className="service-icon-wrap wrap-orange">
+                <Clock size={19} color="#ea580c" />
+              </div>
+              <h4 className="service-title">{t('landing.serviceTrackTitle', 'Track')}</h4>
+              <p className="service-desc">{t('landing.serviceTrackDesc', 'See your current application progress and verified milestones.')}</p>
+            </div>
+
+            <div className="service-item-box">
+              <div className="service-icon-wrap wrap-teal">
+                <Calendar size={19} color="#0f766e" />
+              </div>
+              <h4 className="service-title">{t('landing.serviceTestTitle', 'Test & Appointments')}</h4>
+              <p className="service-desc">{t('landing.serviceTestDesc', 'Manage driving test slots and automated track appointments.')}</p>
+            </div>
+
+            <div className="service-item-box">
+              <div className="service-icon-wrap wrap-green">
+                <Layers size={19} color="#16a34a" />
+              </div>
+              <h4 className="service-title">{t('landing.serviceManageTitle', 'Manage Licence')}</h4>
+              <p className="service-desc">{t('landing.serviceManageDesc', 'Handle renewals, address updates, and duplicate smart cards.')}</p>
+            </div>
+
+          </div>
 
         </div>
       </section>
 
-      {/* 5. CALL TO ACTION BANNER */}
-      <section className="landing-cta-banner">
-        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-          <h2 className="landing-cta-title">
-            {t('landing.ctaTitle')}
-          </h2>
-          <p className="landing-cta-desc">
-            {t('landing.ctaDesc')}
-          </p>
+      {/* ─────────────────────────────────────────────────────────────
+          5. HOW IT WORKS (FOUR CLEAR MILESTONES)
+          ───────────────────────────────────────────────────────────── */}
+      <section id="how-it-works" className="section-how-clean">
+        <div className="premium-container">
+          
+          <div className="section-header-clean">
+            <span className="section-eyebrow-orange">{t('landing.howEyebrow', 'HOW IT WORKS')}</span>
+            <h2 className="section-title-navy">
+              {t('landing.howTitle', 'Four clear milestones')}
+            </h2>
+          </div>
 
-          <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
-            <button onClick={handleStartJourney} className="landing-cta-btn">
-              {t('landing.ctaBtn')} <ArrowRight size={18} />
+          <div className="how-milestones-track">
+            <div className="milestone-step">
+              <div className="step-circle">1</div>
+              <div className="step-label">{t('landing.howStep1', 'Online Application')}</div>
+            </div>
+            <div className="step-line" />
+            <div className="milestone-step">
+              <div className="step-circle">2</div>
+              <div className="step-label">{t('landing.howStep2', 'Knowledge Test')}</div>
+            </div>
+            <div className="step-line" />
+            <div className="milestone-step">
+              <div className="step-circle">3</div>
+              <div className="step-label">{t('landing.howStep3', 'Driving Test Slot')}</div>
+            </div>
+            <div className="step-line" />
+            <div className="milestone-step">
+              <div className="step-circle">4</div>
+              <div className="step-label">{t('landing.howStep4', 'Licence Issued')}</div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* ─────────────────────────────────────────────────────────────
+          6. DRIVESEVA ASSISTANT — "NEED HELP?"
+          ───────────────────────────────────────────────────────────── */}
+      <section className="section-driveseva-clean">
+        <div className="premium-container">
+          <div className="driveseva-minimal-banner">
+            <div className="driveseva-left-copy">
+              <span className="driveseva-eyebrow-tag">{t('landing.helpEyebrow', 'NEED HELP?')}</span>
+              <h3 className="driveseva-headline">{t('landing.helpTitle', 'Ask DriveSEVA')}</h3>
+              <p className="driveseva-body">
+                {t('landing.helpDesc', 'Get guidance about your driving licence journey, applications and next steps.')}
+              </p>
+            </div>
+            <button onClick={() => setShowAiDrawer(true)} className="driveseva-cta-button">
+              {t('landing.helpCta', 'Ask DriveSEVA →')}
             </button>
           </div>
         </div>
       </section>
 
-      {/* 6. PUBLIC FOOTER */}
-      <footer className="landing-footer">
-        <div className="landing-footer-container">
-          <div>
-            <strong style={{ color: '#ffffff' }}>Indian Drives (DriveSeva)</strong> — {t('landing.footerText')}
+      {/* ─────────────────────────────────────────────────────────────
+          7. FINAL CALL TO ACTION
+          ───────────────────────────────────────────────────────────── */}
+      <section className="section-final-cta-clean">
+        <div className="premium-container">
+          <div className="final-cta-container">
+            <h2 className="final-cta-heading">
+              {t('landing.ctaTitle', 'Ready to start your journey?')}
+            </h2>
+            <p className="final-cta-sub">
+              {t('landing.ctaDesc', 'Sign in to access your personalized driving licence journey.')}
+            </p>
+            <button onClick={() => handleOpenAuth('/dashboard')} className="final-cta-button">
+              {t('landing.ctaButton', 'Start Your Journey →')}
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* ─────────────────────────────────────────────────────────────
+          8. CLEAN MINIMAL FOOTER
+          ───────────────────────────────────────────────────────────── */}
+      <footer className="premium-footer">
+        <div className="premium-container footer-content-row">
+          <div className="footer-left">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <img src="/indian-drives-logo.png" alt="Indian Drives" className="footer-logo-img" />
+              <span className="footer-brand-title">
+                <span className="brand-navy">INDIAN</span> <span className="brand-orange">DRIVES</span>
+              </span>
+            </div>
+            <span className="footer-copyright">
+              © {new Date().getFullYear()} {t('landing.footerRights', 'Indian Drives. All rights reserved.')}
+            </span>
           </div>
 
-          <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
-            <span style={{ cursor: 'pointer' }} onClick={() => navigate('/help')}>{t('nav.help')}</span>
-            <span style={{ cursor: 'pointer' }} onClick={handleStartJourney}>{t('nav.startJourney')}</span>
+          <div className="footer-right-links">
+            <a href="#how-it-works">{t('nav.howItWorks', 'How It Works')}</a>
+            <a href="#services">{t('nav.services', 'Services')}</a>
+            <a href="#journeys">{t('nav.myJourney', 'My Journey')}</a>
+            <button onClick={() => setShowAiDrawer(true)} className="footer-ai-btn">
+              ✦ {t('nav.ask', 'Ask DriveSEVA')}
+            </button>
+            <button onClick={() => handleOpenAuth('/dashboard')} className="footer-signin-btn">
+              {t('common.login', 'Sign In')}
+            </button>
           </div>
         </div>
       </footer>
 
-      {/* 7. INTERACTIVE LOGIN / SIGN IN MODAL */}
-      {showLoginModal && (
-        <div className="landing-modal-overlay">
-          <div className="landing-modal-card">
-            {/* Close Icon */}
-            <button
-              onClick={() => setShowLoginModal(false)}
-              style={{
-                position: 'absolute',
-                top: '20px',
-                right: '20px',
-                background: '#f1f5f9',
-                border: 'none',
-                borderRadius: '50%',
-                width: '32px',
-                height: '32px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer'
-              }}
-            >
-              <X size={18} color="#64748b" />
-            </button>
-
-            {/* Modal Header */}
-            <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-              <div style={{
-                width: '52px',
-                height: '52px',
-                borderRadius: '16px',
-                background: '#0a2540',
-                color: '#ffffff',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                margin: '0 auto 16px auto'
-              }}>
-                <Lock size={24} color="#f97316" />
-              </div>
-
-              <h2 style={{ fontSize: '24px', fontWeight: 900, color: '#0a2540', margin: '0 0 6px 0' }}>
-                {t('landing.loginTitle')}
-              </h2>
-              <p style={{ fontSize: '14px', color: '#64748b', margin: 0 }}>
-                {t('landing.loginSub')}
-              </p>
-            </div>
-
-            {/* Login Method Tabs */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', background: '#f1f5f9', borderRadius: '12px', padding: '4px', marginBottom: '24px' }}>
-              <button
-                type="button"
-                onClick={() => { setLoginMethod('phone'); setOtpSent(false); }}
-                style={{
-                  background: loginMethod === 'phone' ? '#ffffff' : 'transparent',
-                  color: loginMethod === 'phone' ? '#0a2540' : '#64748b',
-                  border: 'none',
-                  padding: '10px',
-                  borderRadius: '10px',
-                  fontWeight: 800,
-                  fontSize: '13px',
-                  cursor: 'pointer',
-                  boxShadow: loginMethod === 'phone' ? '0 2px 6px rgba(0, 37, 66, 0.06)' : 'none'
-                }}
-              >
-                {t('landing.mobileTab')}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => { setLoginMethod('aadhaar'); setOtpSent(false); }}
-                style={{
-                  background: loginMethod === 'aadhaar' ? '#ffffff' : 'transparent',
-                  color: loginMethod === 'aadhaar' ? '#0a2540' : '#64748b',
-                  border: 'none',
-                  padding: '10px',
-                  borderRadius: '10px',
-                  fontWeight: 800,
-                  fontSize: '13px',
-                  cursor: 'pointer',
-                  boxShadow: loginMethod === 'aadhaar' ? '0 2px 6px rgba(0, 37, 66, 0.06)' : 'none'
-                }}
-              >
-                {t('landing.aadhaarTab')}
-              </button>
-            </div>
-
-            {/* Form */}
-            <form onSubmit={handleLoginSubmit} style={{ display: 'grid', gap: '16px' }}>
-              {loginMethod === 'phone' ? (
+      {/* ─────────────────────────────────────────────────────────────
+          9. MODALS & AI DRAWER
+          ───────────────────────────────────────────────────────────── */}
+      {selectedJourneyModal && journeySummaries[selectedJourneyModal] && (
+        <div className="modal-overlay-backdrop" onClick={() => setSelectedJourneyModal(null)}>
+          <div className="journey-summary-dialog" onClick={(e) => e.stopPropagation()}>
+            {(() => {
+              const j = journeySummaries[selectedJourneyModal];
+              return (
                 <div>
-                  <label style={{ fontSize: '12px', fontWeight: 800, color: '#476179', display: 'block', marginBottom: '6px' }}>
-                    {t('landing.mobileLabel')}
-                  </label>
-                  <div style={{ position: 'relative' }}>
-                    <span style={{ position: 'absolute', left: '14px', top: '12px', fontSize: '14px', fontWeight: 700, color: '#64748b' }}>+91</span>
-                    <input
-                      type="text"
-                      placeholder="98765 43210"
-                      value={phoneNum}
-                      onChange={(e) => setPhoneNum(e.target.value)}
-                      style={{ width: '100%', padding: '12px 14px 12px 50px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '14px', fontWeight: 700, color: '#0a2540' }}
-                    />
+                  <div className="dialog-header-row">
+                    <div>
+                      <span className="dialog-stage-tag" style={{ color: j.accentColor }}>
+                        STAGE {j.stepNum}
+                      </span>
+                      <h3 className="dialog-title">{j.title}</h3>
+                      <div className="dialog-subtitle">{j.subtitle}</div>
+                    </div>
+                    <button onClick={() => setSelectedJourneyModal(null)} className="dialog-close-btn">
+                      ✕
+                    </button>
                   </div>
-                </div>
-              ) : (
-                <div>
-                  <label style={{ fontSize: '12px', fontWeight: 800, color: '#476179', display: 'block', marginBottom: '6px' }}>
-                    {t('landing.aadhaarLabel')}
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="xxxx-xxxx-xxxx"
-                    value={aadhaarNum}
-                    onChange={(e) => setAadhaarNum(e.target.value)}
-                    style={{ width: '100%', padding: '12px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '14px', fontWeight: 700, color: '#0a2540' }}
-                  />
-                </div>
-              )}
 
-              {otpSent && (
-                <div>
-                  <label style={{ fontSize: '12px', fontWeight: 800, color: '#16a34a', display: 'block', marginBottom: '6px' }}>
-                    {t('landing.enterOtpLabel')}
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="4492"
-                    value={otpCode}
-                    onChange={(e) => setOtpCode(e.target.value)}
-                    style={{ width: '100%', padding: '12px 14px', borderRadius: '10px', border: '1px solid #16a34a', fontSize: '16px', fontWeight: 800, color: '#0a2540', letterSpacing: '4px', textAlign: 'center' }}
-                  />
-                </div>
-              )}
+                  <p className="dialog-description">{j.desc}</p>
 
-              {!otpSent ? (
+                  <div className="dialog-steps-card">
+                    <div className="steps-card-title">{t('common.keySteps', 'Key Steps:')}</div>
+                    <div className="steps-card-list">
+                      {j.steps.map((st, idx) => (
+                        <div key={idx} className="step-bullet-item">
+                          <CheckCircle2 size={15} color={j.accentColor} />
+                          <span>{st}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => handleOpenAuth(j.target)}
+                    className="dialog-primary-action"
+                  >
+                    {j.cta}
+                  </button>
+                </div>
+              );
+            })()}
+          </div>
+        </div>
+      )}
+
+      {/* DriveSEVA Assistant Drawer */}
+      {showAiDrawer && (
+        <div className="modal-overlay-backdrop" onClick={() => setShowAiDrawer(false)}>
+          <div className="driveseva-slide-drawer" onClick={(e) => e.stopPropagation()}>
+            <div className="drawer-header-bar">
+              <div className="drawer-bot-info">
+                <div className="drawer-avatar">✦</div>
+                <div>
+                  <div className="drawer-bot-title">{t('ask.title', 'DriveSEVA Assistant')}</div>
+                  <div className="drawer-bot-status">● {t('common.online', 'Online')}</div>
+                </div>
+              </div>
+              <button onClick={() => setShowAiDrawer(false)} className="drawer-close-btn">✕</button>
+            </div>
+
+            <div className="drawer-quick-prompts">
+              <button onClick={() => handleSendMessage(t('ask.chip1', 'How do I apply for a Learner Licence?'))}>
+                {t('landing.roadmapLL', 'Learner Licence')}
+              </button>
+              <button onClick={() => handleSendMessage(t('ask.chip2', 'How does driving test slot booking work?'))}>
+                {t('landing.roadmapTest', 'Driving Test Slot')}
+              </button>
+              <button onClick={() => handleSendMessage(t('ask.chip3', 'What services can I manage?'))}>
+                {t('landing.serviceManageTitle', 'Licence Services')}
+              </button>
+            </div>
+
+            <div className="drawer-messages-area">
+              {chatMessages.map((msg, idx) => (
+                <div key={idx} className={`drawer-bubble ${msg.sender === 'user' ? 'user-bubble' : 'bot-bubble'}`}>
+                  <div>{msg.text}</div>
+                  {msg.requiresAuth && (
+                    <button
+                      onClick={() => handleOpenAuth('/dashboard')}
+                      className="bubble-signin-btn"
+                    >
+                      {t('common.login', 'Sign In')} →
+                    </button>
+                  )}
+                  <div className="bubble-timestamp">{msg.time}</div>
+                </div>
+              ))}
+            </div>
+
+            <div className="drawer-input-row">
+              <input
+                type="text"
+                placeholder={t('ask.placeholder', 'Ask DriveSEVA anything...')}
+                value={chatInput}
+                onChange={(e) => setChatInput(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') handleSendMessage(); }}
+              />
+              <button onClick={() => handleSendMessage()} className="drawer-send-btn">
+                <Send size={15} />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Authentication Gateway Modal */}
+      {showAuthModal && (
+        <div className="modal-overlay-backdrop" onClick={() => setShowAuthModal(false)}>
+          <div className="auth-gateway-card" onClick={(e) => e.stopPropagation()}>
+            <div className="auth-card-top">
+              <div>
+                <span className="auth-card-eyebrow">{t('auth.eyebrow', 'CITIZEN ACCESS')}</span>
+                <h3 className="auth-card-title">{t('auth.title', 'Sign in to Indian Drives')}</h3>
+              </div>
+              <button onClick={() => setShowAuthModal(false)} className="dialog-close-btn">✕</button>
+            </div>
+
+            {/* One-Click Demo Access */}
+            <div className="demo-login-box">
+              <div className="demo-box-title">{t('auth.demoTitle', 'Quick Demo Access')}</div>
+              <p className="demo-box-sub">
+                {t('auth.demoDesc', 'Explore the verified applicant cockpit as Yanshi Chauhan.')}
+              </p>
+              <button
+                onClick={() => handleDemoLogin(pendingRedirect)}
+                className="demo-action-button"
+              >
+                {t('auth.demoBtn', 'Continue as Yanshi Chauhan →')}
+              </button>
+            </div>
+
+            {/* OTP Form */}
+            <form onSubmit={handleAuthSubmit}>
+              <div className="auth-tab-buttons">
                 <button
                   type="button"
-                  onClick={() => setOtpSent(true)}
-                  style={{
-                    width: '100%',
-                    background: '#0a2540',
-                    color: '#ffffff',
-                    border: 'none',
-                    padding: '14px',
-                    borderRadius: '10px',
-                    fontWeight: 800,
-                    fontSize: '15px',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '8px',
-                    marginTop: '8px'
-                  }}
+                  onClick={() => setAuthMethod('phone')}
+                  className={`auth-tab-btn ${authMethod === 'phone' ? 'active' : ''}`}
                 >
-                  {t('landing.sendOtpBtn')} <ArrowRight size={16} />
+                  {t('auth.phoneTab', 'Mobile Number')}
                 </button>
-              ) : (
                 <button
-                  type="submit"
-                  style={{
-                    width: '100%',
-                    background: '#16a34a',
-                    color: '#ffffff',
-                    border: 'none',
-                    padding: '14px',
-                    borderRadius: '10px',
-                    fontWeight: 800,
-                    fontSize: '15px',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '8px',
-                    marginTop: '8px'
-                  }}
+                  type="button"
+                  onClick={() => setAuthMethod('aadhaar')}
+                  className={`auth-tab-btn ${authMethod === 'aadhaar' ? 'active' : ''}`}
                 >
-                  {t('landing.verifyBtn')} <Check size={18} />
+                  {t('auth.aadhaarTab', 'Aadhaar Number')}
                 </button>
-              )}
+              </div>
+
+              <div className="auth-field-group">
+                <label className="auth-field-label">
+                  {authMethod === 'phone' ? t('auth.phoneLabel', '10-Digit Mobile Number') : t('auth.aadhaarLabel', '12-Digit Aadhaar Number')}
+                </label>
+                <input
+                  type={authMethod === 'phone' ? 'tel' : 'text'}
+                  placeholder={authMethod === 'phone' ? 'e.g. 98765 43210' : 'XXXX XXXX XXXX'}
+                  value={authMethod === 'phone' ? phoneNum : aadhaarNum}
+                  onChange={(e) => authMethod === 'phone' ? setPhoneNum(e.target.value) : setAadhaarNum(e.target.value)}
+                  className="auth-input-control"
+                />
+              </div>
+
+              <button type="submit" className="auth-submit-action">
+                {t('auth.sendOtp', 'Send OTP & Sign In')}
+              </button>
             </form>
-
-            <div style={{ borderTop: '1px dashed #e2e8f0', margin: '20px 0 16px 0' }} />
-
-            {/* Quick Demo Login Option */}
-            <button
-              onClick={handleDemoLogin}
-              style={{
-                width: '100%',
-                background: '#f8fafc',
-                color: '#0a2540',
-                border: '1px solid #cbd5e1',
-                padding: '12px',
-                borderRadius: '10px',
-                fontWeight: 800,
-                fontSize: '13px',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px'
-              }}
-            >
-              {t('landing.demoLoginBtn')}
-            </button>
-
           </div>
         </div>
       )}

@@ -20,25 +20,25 @@ export function LicenceServicesHubPage() {
   const services = [
     {
       id: 'renew',
-      title: t('servicesFlow.renewalTitle'),
-      desc: 'Renew your licence and continue driving legally.',
-      buttonText: 'Renew Licence →',
+      title: t('servicesFlow.renewalTitle', 'Driving Licence Renewal'),
+      desc: t('servicesFlow.renewalDesc', 'Renew your licence and continue driving legally.'),
+      buttonText: t('servicesFlow.renewalBtn', 'Renew Licence →'),
       path: '/renew-licence',
       icon: RefreshCw
     },
     {
       id: 'duplicate',
-      title: 'Duplicate Driving Licence',
-      desc: 'Request a duplicate licence if your licence is lost or damaged.',
-      buttonText: 'Get Duplicate →',
+      title: t('servicesFlow.duplicateTitle', 'Duplicate Driving Licence'),
+      desc: t('servicesFlow.duplicateDesc', 'Request a duplicate licence if your licence is lost or damaged.'),
+      buttonText: t('servicesFlow.duplicateBtn', 'Get Duplicate →'),
       path: '/duplicate-licence',
       icon: FileText
     },
     {
       id: 'update',
-      title: 'Update Licence Details',
-      desc: 'Update eligible personal or licence information.',
-      buttonText: 'Update Details →',
+      title: t('servicesFlow.updateTitle', 'Update Licence Details'),
+      desc: t('servicesFlow.updateDesc', 'Update eligible personal or licence information.'),
+      buttonText: t('servicesFlow.updateBtn', 'Update Details →'),
       path: '/update-licence',
       icon: Edit3
     }
@@ -50,10 +50,10 @@ export function LicenceServicesHubPage() {
       {/* Page Title Header */}
       <div style={{ marginBottom: '36px' }}>
         <h1 style={{ fontSize: '38px', fontWeight: 800, color: '#173b57', margin: '0 0 8px 0', letterSpacing: '-0.8px' }}>
-          How can we help with your licence?
+          {t('servicesFlow.hubTitle', 'How can we help with your licence?')}
         </h1>
         <p style={{ color: '#64748b', fontSize: '16px', margin: 0 }}>
-          Choose a service for your existing Driving Licence.
+          {t('servicesFlow.hubSubtitle', 'Choose a service for your existing Driving Licence.')}
         </p>
       </div>
 
@@ -1754,10 +1754,10 @@ export function MyJourneyTimelinePage({ initialStage }) {
       {/* Title Header */}
       <div>
         <h1 style={{ fontSize: '44px', fontWeight: 800, color: '#173b57', margin: '0 0 6px 0', letterSpacing: '-1.2px', textTransform: 'uppercase' }}>
-          {t('journey.title')}
+          {t('journey.title', 'MY JOURNEY')}
         </h1>
         <p style={{ color: '#476179', fontSize: '16px', margin: 0 }}>
-          {t('journey.subtitle')}
+          {t('journey.subtitle', 'Track your progress through the complete digital licensing pipeline.')}
         </p>
       </div>
 
@@ -1768,7 +1768,7 @@ export function MyJourneyTimelinePage({ initialStage }) {
         <div className="card-standard" style={{ padding: '36px 28px', display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative' }}>
           
           <div style={{ fontSize: '11px', fontWeight: 800, color: 'var(--color-indigo)', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '8px' }}>
-            AUTOMOTIVE DASHBOARD GAUGE
+            {t('journey.gaugeTitle', 'AUTOMOTIVE DASHBOARD GAUGE')}
           </div>
 
           {/* SVG Speedometer Dial Cluster */}
@@ -1842,22 +1842,22 @@ export function MyJourneyTimelinePage({ initialStage }) {
               {/* 4 Major Milestone Node Labels around Dial: 0 at Start, 100 at DL Issued */}
               <g transform="translate(85, 265)">
                 <circle r="6" fill={stage === 'll' ? 'var(--color-saffron)' : 'var(--color-teal)'} />
-                <text x="0" y="18" fill="var(--color-saffron)" fontSize="10.5" fontWeight="800" textAnchor="middle">0 (START)</text>
+                <text x="0" y="18" fill="var(--color-saffron)" fontSize="10.5" fontWeight="800" textAnchor="middle">{t('journey.start', '0 (START)')}</text>
               </g>
 
               <g transform="translate(68, 80)">
                 <circle r="6" fill={stage !== 'll' ? 'var(--color-teal)' : 'var(--color-border)'} />
-                <text x="-10" y="-12" fill="var(--color-deep-navy)" fontSize="10.5" fontWeight="800" textAnchor="end">LL ISSUED</text>
+                <text x="-10" y="-12" fill="var(--color-deep-navy)" fontSize="10.5" fontWeight="800" textAnchor="end">{t('journey.llIssued', 'LL ISSUED')}</text>
               </g>
 
               <g transform="translate(272, 80)">
                 <circle r="6" fill={stage === 'dl' ? 'var(--color-saffron)' : stage === 'completed' ? 'var(--color-teal)' : 'var(--color-border)'} />
-                <text x="10" y="-12" fill="var(--color-deep-navy)" fontSize="10.5" fontWeight="800" textAnchor="start">DL TEST</text>
+                <text x="10" y="-12" fill="var(--color-deep-navy)" fontSize="10.5" fontWeight="800" textAnchor="start">{t('journey.dlTest', 'DL TEST')}</text>
               </g>
 
               <g transform="translate(255, 265)">
                 <circle r="6" fill={stage === 'completed' ? 'var(--color-teal)' : 'var(--color-border)'} />
-                <text x="0" y="18" fill="var(--color-teal)" fontSize="10.5" fontWeight="800" textAnchor="middle">100 (DL ISSUED)</text>
+                <text x="0" y="18" fill="var(--color-teal)" fontSize="10.5" fontWeight="800" textAnchor="middle">{t('journey.dlIssued', '100 (DL ISSUED)')}</text>
               </g>
 
               {/* ROTATING SPEEDOMETER NEEDLE / ARROW */}
@@ -1900,12 +1900,12 @@ export function MyJourneyTimelinePage({ initialStage }) {
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: percentage === 0 ? 'var(--color-saffron)' : 'var(--color-teal)' }} />
               <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-deep-navy)' }}>
-                {percentage === 0 ? 'SPEEDOMETER REST POSITION (0%)' : `SPEEDOMETER GAUGING (${percentage}%)`}
+                {percentage === 0 ? t('journey.speedometerRest', 'SPEEDOMETER REST POSITION (0%)') : `${t('journey.speedometerGauging', 'SPEEDOMETER GAUGING')} (${percentage}%)`}
               </span>
             </div>
 
             <span style={{ fontSize: '11px', background: 'var(--color-pale-indigo)', color: 'var(--color-primary-navy)', padding: '3px 10px', borderRadius: '6px', fontWeight: 700 }}>
-              {labelText}
+              {stage === 'll' ? t('journey.llApp', 'LL APPLICATION') : stage === 'completed' ? t('journey.dlIssued', 'DL ISSUED') : t('journey.dlAppInProgress', 'DL APPLICATION · IN PROGRESS')}
             </span>
           </div>
 
@@ -1917,12 +1917,12 @@ export function MyJourneyTimelinePage({ initialStage }) {
           {/* Card 1: YOUR NEXT STEP */}
           <div className="card-current" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', fontWeight: 800, color: 'var(--color-deep-navy)', letterSpacing: '0.6px', textTransform: 'uppercase' }}>
-              <span style={{ color: 'var(--color-saffron)', fontSize: '16px' }}>●</span> YOUR NEXT STEP
+              <span style={{ color: 'var(--color-saffron)', fontSize: '16px' }}>●</span> {t('journey.nextStep', 'YOUR NEXT STEP')}
             </div>
             <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', margin: 0, lineHeight: 1.55 }}>
               {stage === 'll'
-                ? 'Begin your Learner Licence application. Upload your Aadhaar identity proof and complete the online traffic rules test.'
-                : 'Complete your DL application. Your Learner Licence has been issued. You can now continue with your Driving Licence application.'}
+                ? t('journey.nextStepDescLL', 'Begin your Learner Licence application. Upload your Aadhaar identity proof and complete the online traffic rules test.')
+                : t('journey.nextStepDescDL', 'Complete your DL application. Your Learner Licence has been issued. You can now continue with your Driving Licence application.')}
             </p>
             <button
               onClick={() => navigate(stage === 'll' ? '/ll/intro' : '/dl/intro')}
@@ -1936,7 +1936,7 @@ export function MyJourneyTimelinePage({ initialStage }) {
                 gap: '8px'
               }}
             >
-              <span>{stage === 'll' ? 'Start LL Application' : 'Continue DL Application'}</span>
+              <span>{stage === 'll' ? t('journey.startLLBtn', 'Start LL Application') : t('journey.continueDLBtn', 'Continue DL Application')}</span>
               <ArrowRight size={16} />
             </button>
           </div>
@@ -1944,7 +1944,7 @@ export function MyJourneyTimelinePage({ initialStage }) {
           {/* Card 2: Journey Checklist */}
           <div style={{ background: '#ffffff', borderRadius: '20px', padding: '28px', border: '1px solid #e2e8f0', boxShadow: '0 4px 16px rgba(0, 37, 66, 0.04)', display: 'flex', flexDirection: 'column', gap: '20px' }}>
             <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#173b57', margin: 0 }}>
-              Journey Checklist
+              {t('journey.checklistTitle', 'Journey Checklist')}
             </h3>
 
             {stage === 'll' ? (
@@ -1954,8 +1954,8 @@ export function MyJourneyTimelinePage({ initialStage }) {
                     ⊙
                   </div>
                   <div>
-                    <div style={{ fontSize: '14px', fontWeight: 700, color: '#173b57' }}>Aadhaar Identity Verification</div>
-                    <div style={{ fontSize: '12px', color: '#e88a2d', fontWeight: 600 }}>Ready to start</div>
+                    <div style={{ fontSize: '14px', fontWeight: 700, color: '#173b57' }}>{t('journey.aadhaarVerify', 'Aadhaar Identity Verification')}</div>
+                    <div style={{ fontSize: '12px', color: '#e88a2d', fontWeight: 600 }}>{t('journey.readyToStart', 'Ready to start')}</div>
                   </div>
                 </div>
 
@@ -1964,8 +1964,8 @@ export function MyJourneyTimelinePage({ initialStage }) {
                     <Clock size={14} />
                   </div>
                   <div>
-                    <div style={{ fontSize: '14px', fontWeight: 700, color: '#94a3b8' }}>LL Computer Exam</div>
-                    <div style={{ fontSize: '12px', color: '#94a3b8' }}>Not started</div>
+                    <div style={{ fontSize: '14px', fontWeight: 700, color: '#94a3b8' }}>{t('journey.llExam', 'LL Computer Exam')}</div>
+                    <div style={{ fontSize: '12px', color: '#94a3b8' }}>{t('journey.notStarted', 'Not started')}</div>
                   </div>
                 </div>
 
@@ -1974,8 +1974,8 @@ export function MyJourneyTimelinePage({ initialStage }) {
                     <Clock size={14} />
                   </div>
                   <div>
-                    <div style={{ fontSize: '14px', fontWeight: 700, color: '#94a3b8' }}>Learner Licence Issuance</div>
-                    <div style={{ fontSize: '12px', color: '#94a3b8' }}>Pending</div>
+                    <div style={{ fontSize: '14px', fontWeight: 700, color: '#94a3b8' }}>{t('journey.llIssuance', 'Learner Licence Issuance')}</div>
+                    <div style={{ fontSize: '12px', color: '#94a3b8' }}>{t('journey.pending', 'Pending')}</div>
                   </div>
                 </div>
               </div>
@@ -1986,8 +1986,8 @@ export function MyJourneyTimelinePage({ initialStage }) {
                     <Check size={14} strokeWidth={3} />
                   </div>
                   <div>
-                    <div style={{ fontSize: '14px', fontWeight: 700, color: '#173b57' }}>Learner Licence Issued</div>
-                    <div style={{ fontSize: '12px', color: '#64748b' }}>Completed on 12 Aug 2026</div>
+                    <div style={{ fontSize: '14px', fontWeight: 700, color: '#173b57' }}>{t('journey.llIssuedTitle', 'Learner Licence Issued')}</div>
+                    <div style={{ fontSize: '12px', color: '#64748b' }}>{t('journey.completedOn', 'Completed on 12 Aug 2026')}</div>
                   </div>
                 </div>
 
@@ -1996,8 +1996,8 @@ export function MyJourneyTimelinePage({ initialStage }) {
                     <Check size={14} strokeWidth={3} />
                   </div>
                   <div>
-                    <div style={{ fontSize: '14px', fontWeight: 700, color: '#173b57' }}>Medical Certificate Uploaded</div>
-                    <div style={{ fontSize: '12px', color: '#64748b' }}>Verified</div>
+                    <div style={{ fontSize: '14px', fontWeight: 700, color: '#173b57' }}>{t('journey.medicalUploaded', 'Medical Certificate Uploaded')}</div>
+                    <div style={{ fontSize: '12px', color: '#64748b' }}>{t('journey.verified', 'Verified')}</div>
                   </div>
                 </div>
 
@@ -2006,8 +2006,8 @@ export function MyJourneyTimelinePage({ initialStage }) {
                     ⊙
                   </div>
                   <div>
-                    <div style={{ fontSize: '14px', fontWeight: 700, color: '#173b57' }}>DL Application Form</div>
-                    <div style={{ fontSize: '12px', color: '#e88a2d', fontWeight: 600 }}>In progress</div>
+                    <div style={{ fontSize: '14px', fontWeight: 700, color: '#173b57' }}>{t('journey.dlAppForm', 'DL Application Form')}</div>
+                    <div style={{ fontSize: '12px', color: '#e88a2d', fontWeight: 600 }}>{t('journey.inProgress', 'In progress')}</div>
                   </div>
                 </div>
               </div>
@@ -2019,12 +2019,12 @@ export function MyJourneyTimelinePage({ initialStage }) {
             <Shield size={20} color="#476179" style={{ marginTop: '2px', flexShrink: 0 }} />
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
               <span style={{ fontSize: '11px', fontWeight: 800, color: '#476179', letterSpacing: '0.6px', textTransform: 'uppercase' }}>
-                GOVERNMENT RECORD
+                {t('journey.govRecord', 'GOVERNMENT RECORD')}
               </span>
               <span style={{ fontSize: '12px', color: '#476179', lineHeight: 1.5 }}>
                 {stage === 'll'
-                  ? 'LL Application Status: Not Started · Ready to Begin'
-                  : 'DL Application Status: Under Review · Last updated: 25 Aug 2026 · 4:32 PM'}
+                  ? t('journey.govRecordLL', 'LL Application Status: Not Started · Ready to Begin')
+                  : t('journey.govRecordDL', 'DL Application Status: Under Review · Last updated: 25 Aug 2026 · 4:32 PM')}
               </span>
             </div>
           </div>

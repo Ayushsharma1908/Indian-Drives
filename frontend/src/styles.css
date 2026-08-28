@@ -2572,6 +2572,30 @@ img, svg, canvas, video {
     transform-origin: center top;
   }
 
+  /* Dashboard Hero Card Mobile */
+  .dashboard-hero-card {
+    flex-direction: column !important;
+    min-height: auto !important;
+  }
+
+  .dashboard-hero-content {
+    padding: 24px 20px !important;
+    max-width: 100% !important;
+  }
+
+  .dashboard-hero-image-wrap {
+    width: 100% !important;
+    min-height: 200px !important;
+    height: 200px !important;
+  }
+
+  .dashboard-hero-image-wrap img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center right !important;
+  }
+
   /* Tables horizontal touch scrolling */
   table {
     display: block !important;

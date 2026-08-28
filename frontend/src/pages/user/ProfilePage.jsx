@@ -112,7 +112,7 @@ export function ProfilePage() {
               transition: 'all 0.15s ease'
             }}
           >
-            <Edit3 size={16} /> {t('userFlow.profileTitle')}
+            <Edit3 size={16} /> {t('profile.editProfileBtn', 'Edit Profile')}
           </button>
 
           <button
@@ -140,7 +140,7 @@ export function ProfilePage() {
               e.currentTarget.style.borderColor = '#fecdd3';
             }}
           >
-            <LogOut size={16} /> Logout
+            <LogOut size={16} /> {t('common.logout', 'Logout')}
           </button>
         </div>
 
@@ -159,7 +159,7 @@ export function ProfilePage() {
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '18px', fontWeight: 800, color: '#173b57', marginBottom: '24px' }}>
             <User size={20} color="#173b57" />
-            <span>Personal Information</span>
+            <span>{t('profile.personalInfo', 'Personal Information')}</span>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -167,7 +167,7 @@ export function ProfilePage() {
             {/* FULL NAME */}
             <div>
               <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', letterSpacing: '0.5px', textTransform: 'uppercase', marginBottom: '4px' }}>
-                FULL NAME
+                {t('profile.fullName', 'FULL NAME')}
               </div>
               <div style={{ fontSize: '15px', fontWeight: 800, color: '#173b57' }}>
                 {profile.fullName}
@@ -178,7 +178,7 @@ export function ProfilePage() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
               <div>
                 <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', letterSpacing: '0.5px', textTransform: 'uppercase', marginBottom: '4px' }}>
-                  DATE OF BIRTH
+                  {t('profile.dob', 'DATE OF BIRTH')}
                 </div>
                 <div style={{ fontSize: '14px', fontWeight: 700, color: '#173b57' }}>
                   {profile.dob}
@@ -187,7 +187,7 @@ export function ProfilePage() {
 
               <div>
                 <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', letterSpacing: '0.5px', textTransform: 'uppercase', marginBottom: '4px' }}>
-                  GENDER
+                  {t('profile.gender', 'GENDER')}
                 </div>
                 <div style={{ fontSize: '14px', fontWeight: 700, color: '#173b57' }}>
                   {profile.gender}
@@ -198,7 +198,7 @@ export function ProfilePage() {
             {/* BLOOD GROUP */}
             <div>
               <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', letterSpacing: '0.5px', textTransform: 'uppercase', marginBottom: '6px' }}>
-                BLOOD GROUP
+                {t('profile.bloodGroup', 'BLOOD GROUP')}
               </div>
               <span style={{ background: '#e0f2fe', color: '#0369a1', fontSize: '13px', fontWeight: 800, padding: '4px 12px', borderRadius: '6px', display: 'inline-block' }}>
                 {profile.bloodGroup}
@@ -210,7 +210,7 @@ export function ProfilePage() {
             {/* PERMANENT ADDRESS */}
             <div>
               <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', letterSpacing: '0.5px', textTransform: 'uppercase', marginBottom: '6px' }}>
-                PERMANENT ADDRESS
+                {t('profile.permanentAddress', 'PERMANENT ADDRESS')}
               </div>
               <div style={{ fontSize: '14px', fontWeight: 700, color: '#173b57', lineHeight: 1.5 }}>
                 {profile.address}
@@ -248,7 +248,7 @@ export function ProfilePage() {
                 e.currentTarget.style.borderColor = '#fecdd3';
               }}
             >
-              <LogOut size={15} /> Logout Account
+              <LogOut size={15} /> {t('profile.logoutAccount', 'Logout Account')}
             </button>
 
           </div>
@@ -268,14 +268,14 @@ export function ProfilePage() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '18px', fontWeight: 800, color: '#173b57' }}>
                 <FileText size={20} color="#173b57" />
-                <span>My Applications</span>
+                <span>{t('profile.myApplications', 'My Applications')}</span>
               </div>
 
               <span
                 onClick={() => navigate('/journey')}
                 style={{ fontSize: '14px', fontWeight: 800, color: '#c2410c', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
               >
-                View All <ArrowRight size={14} />
+                {t('common.viewAll', 'View All')} <ArrowRight size={14} />
               </span>
             </div>
 
@@ -289,13 +289,13 @@ export function ProfilePage() {
               marginBottom: '16px'
             }}>
               <div style={{ fontSize: '10px', fontWeight: 800, color: '#c2410c', letterSpacing: '0.5px', textTransform: 'uppercase', marginBottom: '6px' }}>
-                CURRENT APPLICATION
+                {t('profile.currentApp', 'CURRENT APPLICATION')}
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
                 <div>
                   <div style={{ fontSize: '16px', fontWeight: 800, color: '#173b57' }}>
-                    Driving Licence (DL) Application
+                    {t('profile.dlAppTitle', 'Driving Licence (DL) Application')}
                   </div>
                   <div style={{ fontSize: '13px', fontWeight: 600, color: '#64748b', marginTop: '2px' }}>
                     Appl. No: 9876543210
@@ -304,10 +304,10 @@ export function ProfilePage() {
 
                 <div style={{ textAlign: 'right' }}>
                   <span style={{ background: '#e0f2fe', color: '#0369a1', fontSize: '11px', fontWeight: 800, padding: '4px 10px', borderRadius: '6px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                    📂 In Progress
+                    📂 {t('journey.inProgress', 'In Progress')}
                   </span>
                   <div style={{ fontSize: '11px', fontWeight: 600, color: '#94a3b8', marginTop: '4px' }}>
-                    Last updated: 2 days ago
+                    {t('profile.lastUpdated2Days', 'Last updated: 2 days ago')}
                   </div>
                 </div>
               </div>
@@ -323,7 +323,7 @@ export function ProfilePage() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
                 <div>
                   <div style={{ fontSize: '16px', fontWeight: 800, color: '#173b57' }}>
-                    Learner Licence (LL) Application
+                    {t('profile.llAppTitle', 'Learner Licence (LL) Application')}
                   </div>
                   <div style={{ fontSize: '13px', fontWeight: 600, color: '#64748b', marginTop: '2px' }}>
                     Appl. No: 1234567890
@@ -331,7 +331,7 @@ export function ProfilePage() {
                 </div>
 
                 <span style={{ background: '#dcfce7', color: '#16a34a', fontSize: '12px', fontWeight: 800, padding: '4px 12px', borderRadius: '6px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                  ✓ Completed
+                  ✓ {t('common.verified', 'Completed')}
                 </span>
               </div>
             </div>
@@ -351,7 +351,7 @@ export function ProfilePage() {
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '18px', fontWeight: 800, color: '#173b57', marginBottom: '20px' }}>
                 <Award size={20} color="#173b57" />
-                <span>My Licences</span>
+                <span>{t('profile.myLicences', 'My Licences')}</span>
               </div>
 
               {/* Dark Navy Licence Preview Badge */}
@@ -366,10 +366,10 @@ export function ProfilePage() {
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <span style={{ fontSize: '10px', fontWeight: 800, letterSpacing: '0.8px', color: '#94a3b8' }}>
-                    LEARNER LICENCE
+                    {t('landing.roadmapLL', 'LEARNER LICENCE')}
                   </span>
                   <span style={{ background: '#ffffff', color: '#173b57', fontSize: '11px', fontWeight: 800, padding: '2px 8px', borderRadius: '4px' }}>
-                    Active
+                    {t('profile.active', 'Active')}
                   </span>
                 </div>
 
@@ -377,7 +377,7 @@ export function ProfilePage() {
                   LL-DL-2023-9876
                 </div>
                 <div style={{ fontSize: '12px', color: '#94a3b8' }}>
-                  Valid till: 14 Feb 2024
+                  {t('profile.validTill', 'Valid till')}: 14 Feb 2024
                 </div>
               </div>
 
@@ -395,7 +395,7 @@ export function ProfilePage() {
                   cursor: 'pointer'
                 }}
               >
-                View Details
+                {t('common.view', 'View Details')}
               </button>
             </div>
 
@@ -413,7 +413,7 @@ export function ProfilePage() {
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '18px', fontWeight: 800, color: '#173b57', marginBottom: '20px' }}>
                   <FolderCheck size={20} color="#173b57" />
-                  <span>My Documents</span>
+                  <span>{t('profile.myDocuments', 'My Documents')}</span>
                 </div>
 
                 {/* Circular Donut Gauge */}
@@ -424,7 +424,7 @@ export function ProfilePage() {
                   </svg>
                   <div style={{ position: 'absolute', textAlign: 'center' }}>
                     <div style={{ fontSize: '26px', fontWeight: 800, color: '#173b57', lineHeight: 1 }}>4</div>
-                    <div style={{ fontSize: '9px', fontWeight: 800, color: '#94a3b8', letterSpacing: '0.5px' }}>VERIFIED</div>
+                    <div style={{ fontSize: '9px', fontWeight: 800, color: '#94a3b8', letterSpacing: '0.5px' }}>{t('common.verified', 'VERIFIED')}</div>
                   </div>
                 </div>
               </div>
@@ -443,7 +443,7 @@ export function ProfilePage() {
                   marginTop: '12px'
                 }}
               >
-                Manage Documents <ArrowRight size={14} />
+                {t('profile.manageDocs', 'Manage Documents')} <ArrowRight size={14} />
               </div>
             </div>
 
@@ -482,7 +482,7 @@ export function ProfilePage() {
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <Edit3 size={22} color="#173b57" />
                 <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#173b57', margin: 0 }}>
-                  Edit Profile Details
+                  {t('profile.editTitle', 'Edit Profile Details')}
                 </h2>
               </div>
 
@@ -497,7 +497,7 @@ export function ProfilePage() {
             <form onSubmit={handleSave} style={{ display: 'grid', gap: '16px' }}>
               
               <div>
-                <label style={{ fontSize: '12px', fontWeight: 800, color: '#476179', display: 'block', marginBottom: '6px' }}>FULL NAME</label>
+                <label style={{ fontSize: '12px', fontWeight: 800, color: '#476179', display: 'block', marginBottom: '6px' }}>{t('profile.fullName', 'FULL NAME')}</label>
                 <input
                   type="text"
                   value={editForm.fullName}
@@ -509,7 +509,7 @@ export function ProfilePage() {
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div>
-                  <label style={{ fontSize: '12px', fontWeight: 800, color: '#476179', display: 'block', marginBottom: '6px' }}>PHONE NUMBER</label>
+                  <label style={{ fontSize: '12px', fontWeight: 800, color: '#476179', display: 'block', marginBottom: '6px' }}>{t('forms.phone', 'PHONE NUMBER')}</label>
                   <input
                     type="text"
                     value={editForm.phone}
@@ -520,7 +520,7 @@ export function ProfilePage() {
                 </div>
 
                 <div>
-                  <label style={{ fontSize: '12px', fontWeight: 800, color: '#476179', display: 'block', marginBottom: '6px' }}>EMAIL ADDRESS</label>
+                  <label style={{ fontSize: '12px', fontWeight: 800, color: '#476179', display: 'block', marginBottom: '6px' }}>{t('forms.email', 'EMAIL ADDRESS')}</label>
                   <input
                     type="email"
                     value={editForm.email}
@@ -533,7 +533,7 @@ export function ProfilePage() {
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px' }}>
                 <div>
-                  <label style={{ fontSize: '12px', fontWeight: 800, color: '#476179', display: 'block', marginBottom: '6px' }}>DATE OF BIRTH</label>
+                  <label style={{ fontSize: '12px', fontWeight: 800, color: '#476179', display: 'block', marginBottom: '6px' }}>{t('profile.dob', 'DATE OF BIRTH')}</label>
                   <input
                     type="text"
                     value={editForm.dob}
@@ -544,20 +544,20 @@ export function ProfilePage() {
                 </div>
 
                 <div>
-                  <label style={{ fontSize: '12px', fontWeight: 800, color: '#476179', display: 'block', marginBottom: '6px' }}>GENDER</label>
+                  <label style={{ fontSize: '12px', fontWeight: 800, color: '#476179', display: 'block', marginBottom: '6px' }}>{t('profile.gender', 'GENDER')}</label>
                   <select
                     value={editForm.gender}
                     onChange={(e) => setEditForm({ ...editForm, gender: e.target.value })}
                     style={{ width: '100%', padding: '12px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '14px', fontWeight: 600, color: '#173b57', background: '#ffffff' }}
                   >
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                    <option value="Other">Other</option>
+                    <option value="Male">{t('common.male', 'Male')}</option>
+                    <option value="Female">{t('common.female', 'Female')}</option>
+                    <option value="Other">{t('common.other', 'Other')}</option>
                   </select>
                 </div>
 
                 <div>
-                  <label style={{ fontSize: '12px', fontWeight: 800, color: '#476179', display: 'block', marginBottom: '6px' }}>BLOOD GROUP</label>
+                  <label style={{ fontSize: '12px', fontWeight: 800, color: '#476179', display: 'block', marginBottom: '6px' }}>{t('profile.bloodGroup', 'BLOOD GROUP')}</label>
                   <input
                     type="text"
                     value={editForm.bloodGroup}
@@ -569,7 +569,7 @@ export function ProfilePage() {
               </div>
 
               <div>
-                <label style={{ fontSize: '12px', fontWeight: 800, color: '#476179', display: 'block', marginBottom: '6px' }}>PERMANENT ADDRESS</label>
+                <label style={{ fontSize: '12px', fontWeight: 800, color: '#476179', display: 'block', marginBottom: '6px' }}>{t('profile.permanentAddress', 'PERMANENT ADDRESS')}</label>
                 <textarea
                   value={editForm.address}
                   onChange={(e) => setEditForm({ ...editForm, address: e.target.value })}
@@ -585,14 +585,14 @@ export function ProfilePage() {
                   onClick={() => setIsEditing(false)}
                   style={{ background: '#f1f5f9', color: '#173b57', border: 'none', padding: '12px 20px', borderRadius: '10px', fontWeight: 700, fontSize: '14px', cursor: 'pointer' }}
                 >
-                  Cancel
+                  {t('common.cancel', 'Cancel')}
                 </button>
 
                 <button
                   type="submit"
                   style={{ background: '#0a2540', color: '#ffffff', border: 'none', padding: '12px 24px', borderRadius: '10px', fontWeight: 800, fontSize: '14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
                 >
-                  <Check size={16} /> Save Changes
+                  <Check size={16} /> {t('common.save', 'Save Changes')}
                 </button>
               </div>
 
