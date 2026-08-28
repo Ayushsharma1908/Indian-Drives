@@ -54,6 +54,7 @@ export const hi = {
     female: "महिला",
     other: "अन्य",
     currentStep: "वर्तमान चरण",
+    notificationSent: "सूचना भेजी गई",
     footerNote: "Indian Drives — ड्राइविंग लाइसेंस सेवाओं के लिए नागरिक अनुभव मंच।"
   },
   landing: {

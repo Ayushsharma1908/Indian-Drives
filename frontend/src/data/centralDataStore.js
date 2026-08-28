@@ -500,10 +500,16 @@ class CentralDataStore {
       dateGroup: 'Today',
       timeAgo: 'Just now',
       unread: true,
+      badgeText: noteData.badgeText || 'Notification sent',
       ...noteData
     };
     this.state.notifications.unshift(newNote);
     this.saveToStorage();
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('indian-drives-notification-popup', { detail: newNote }));
+    }
+
     return newNote;
   }
 

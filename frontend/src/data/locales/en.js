@@ -54,6 +54,7 @@ export const en = {
     female: "Female",
     other: "Other",
     currentStep: "CURRENT STEP",
+    notificationSent: "Notification sent",
     footerNote: "Indian Drives — A citizen experience concept for driving licence services."
   },
   landing: {

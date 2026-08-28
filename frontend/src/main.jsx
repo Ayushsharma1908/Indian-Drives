@@ -176,6 +176,7 @@ function App() {
       <AuthContext.Provider value={auth}>
         <JourneyContext.Provider value={{ journey, journeyLoading, refreshJourney }}>
           <Router>
+            <InAppNotificationToast />
             <AnimatedRoutes />
           </Router>
         </JourneyContext.Provider>
@@ -187,6 +188,7 @@ function App() {
 import { centralDataStore } from "./data/centralDataStore";
 import { ScreenSwitcher } from "./components/layout/ScreenSwitcher";
 import { LanguageSelector } from "./components/layout/LanguageSelector";
+import { InAppNotificationToast } from "./components/ui/InAppNotificationToast";
 import { DashboardPage } from "./pages/dashboard";
 import { DocumentsCenterPage, GovernmentServicesPage } from "./pages/services";
 import {

@@ -2846,6 +2846,17 @@ img, svg, canvas, video {
   animation: sparkleTwinkle 1.8s infinite ease-in-out;
 }
 
+@keyframes inAppSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 /* ─────────────────────────────────────────────────────────────
    SKELETON SHIMMER ANIMATION & UTILITIES
 ───────────────────────────────────────────────────────────── */
@@ -2864,5 +2875,3 @@ img, svg, canvas, video {
   animation: skeletonShimmer 1.6s ease-in-out infinite;
   border-radius: 8px;
 }
-
-
