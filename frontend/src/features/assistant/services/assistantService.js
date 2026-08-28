@@ -14,7 +14,8 @@ export async function sendAssistantQuery(message, context, history = []) {
     if (res && res.answer) {
       return {
         ...localAnalysis,
-        // If backend provided sources or custom response, attach them
+        answer: res.answer,
+        actions: res.actions || localAnalysis.actions,
         sources: res.sources || [
           { name: 'Ministry of Road Transport and Highways (MoRTH)', url: 'https://morth.nic.in' },
           { name: 'Sarathi Parivahan Citizen Portal', url: 'https://sarathi.parivahan.gov.in' }

@@ -4,36 +4,24 @@ function isRelevantQuery(userMessage = '') {
   const query = (userMessage || '').toLowerCase().trim();
   if (!query) return true;
 
-  // 1. Explicitly unrelated markers (Checked FIRST)
-  const unrelatedMarkers = [
-    'facebook', 'meta', 'google', 'apple', 'microsoft', 'amazon', 'twitter', 'instagram',
-    'founder of', 'ceo of', 'who is', 'capital of', 'weather in', 'recipe', 'python', 'java',
-    'code', 'coding', 'programming', 'cricket', 'football', 'movie', 'actor', 'actress',
-    'president', 'prime minister', 'math', 'equation', 'solve', 'physics', 'chemistry',
-    'joke', 'song', 'sing', 'dance', 'who won', 'what is the capital', 'how to cook',
-    'how to make', 'meaning of life'
+  const unrelated = [
+    'facebook', 'meta', 'apple', 'microsoft', 'amazon', 'twitter', 'instagram',
+    'founder of', 'ceo of', 'who is president', 'capital of france', 'recipe',
+    'python', 'java', 'c++', 'html', 'javascript', 'coding', 'programming',
+    'cricket', 'football', 'ipl', 'movie', 'actor', 'actress', 'president of',
+    'equation', 'physics', 'chemistry', 'joke', 'sing a song'
   ];
 
-  if (unrelatedMarkers.some(m => query.includes(m))) {
+  if (unrelated.some(m => query.includes(m))) {
     return false;
   }
 
-  // 2. Casual greetings & domain starters
-  const greetings = ['hi', 'hello', 'hey', 'namaste', 'good morning', 'good afternoon', 'thanks', 'thank you', 'who are you', 'what can you do', 'help'];
-  if (greetings.some(g => query === g || query.startsWith(g + ' ') || query.endsWith(' ' + g))) {
-    return true;
-  }
-
-  // 3. Driving & RTO Domain Keywords with Strict Word Boundaries (\b)
-  const domainPattern = /\b(licence|license|dl|ll|learner|driving|rto|parivahan|sarathi|test|slot|track|document|documents|aadhaar|proof|fee|fees|payment|renew|renewal|duplicate|address|vehicle|car|bike|lmv|mcwg|traffic|signal|exam|quiz|smartcard|speedpost|rc|puc|form|ekyc|appointment|status|challan|chalan)\b/i;
-
-  return domainPattern.test(query);
+  return true;
 }
 
 function getSmartKnowledgeResponse(userMessage = '') {
-  const query = (userMessage || '').toLowerCase();
+  const query = (userMessage || '').toLowerCase().trim();
 
-  // Check if the query is unrelated / invalid for Driving Licence & RTO domain
   if (!isRelevantQuery(userMessage)) {
     return `I am **DriveSeva AI**, an assistant specialized specifically for **Indian Drives - Driving Licence & RTO Citizen Services**.
 
@@ -48,69 +36,146 @@ Please ask a question related to your driving licence journey or RTO services!
 [[SUGGESTIONS: How do I apply for a Learner Licence? | What documents do I need for DL? | How to book a driving test slot?]]`;
   }
 
-  if (query.includes('document') || query.includes('proof') || query.includes('aadhaar')) {
-    return `For your Driving Licence & RTO services, here are the required documents:
+  if (/^(hi|hello|namaste|hey|good\s*(morning|afternoon|evening))\b/i.test(query)) {
+    return `Namaste! 👋 Welcome to **Indian Drives**. I am your DriveSEVA Assistant.
 
-1. **Identity & Address Proof**: Aadhaar Card (with eKYC verification), Voter ID, or Passport.
-2. **Learner Licence (LL)**: Form 3 Learner Licence copy (valid for 6 months).
-3. **Medical Certificate**: Form 1A signed by a registered medical practitioner (mandatory for applicants aged 50+ or Commercial licences).
-4. **Fee Payment Receipt**: Proof of application & smartcard payment.
+I can help you with:
+- 📄 **Learner Licence (LL)**: Application steps, rules & 15-min online test
+- 🚗 **Driving Test Slots**: Booking RTO automated track appointments
+- 📂 **Document Vault**: Aadhaar eKYC, address proof & Form 1A medical certs
+- 💳 **Payments & Receipts**: Fee structure & instant tax receipts
+- 🔄 **Citizen Services**: Licence renewal, duplicate smartcard & address change
 
-All documents can be uploaded digitally on Indian Drives for instant verification without physical queues.`;
+How can I help you today?
+[[SUGGESTIONS: What is my next step? | What documents do I need? | How much is the licence fee?]]`;
+  }
+
+  if (query.includes('fail') || query.includes('retest') || query.includes('retry') || query.includes('score') || query.includes('marks')) {
+    return `RTO Assessment & Retest Rules:
+
+1. **Learner Licence (LL) Online Test**:
+   - Format: 15 Multiple-Choice Questions on road signs & safety.
+   - Passing Score: **9 out of 15** (60%).
+   - If you don't pass on your first attempt, you can retake the online assessment after 24 hours.
+
+2. **Driving Licence (DL) Practical Track Test**:
+   - Evaluates 4 automated track maneuvers: Parallel Parking, 8-Track, S-Track, and Gradient Hill Stop & Start.
+   - If you do not qualify on test day, you can re-book a fresh test slot after 7 days from the portal.
+[[ACTION:BOOK_APPOINTMENT]]
+[[SUGGESTIONS: What should I bring to the RTO? | How to book a driving test slot? | What are the 4 track tests?]]`;
+  }
+
+  if (query.includes('age') || query.includes('eligible') || query.includes('eligibility')) {
+    return `Official Age & Eligibility Criteria for Indian Driving Licences:
+
+- **16 Years**: Learner Licence for non-geared 2-wheelers up to 50cc (with parental consent).
+- **18 Years**: Learner & Permanent Licence for Light Motor Vehicles (LMV - Cars) and Geared Motor Cycles (MCWG).
+- **20 Years**: Commercial & Transport Vehicles (requires valid LMV licence for 1+ year).
+
+All applicants must pass the mandatory Aadhaar eKYC verification and Form 1A medical self-declaration.
+[[ACTION:START_LL_APPLICATION]]
+[[SUGGESTIONS: What documents do I need? | How to apply for Learner Licence? | What is the LL fee?]]`;
+  }
+
+  if (query.includes('valid') || query.includes('expire') || query.includes('duration') || query.includes('how long')) {
+    return `Licence Validity Terms:
+
+- **Learner Licence (LL)**: Valid for **6 months** across all states in India. Non-renewable; must apply for permanent DL within 6 months.
+- **Driving Licence (DL)**: Valid for **20 years** or until age 40 (whichever comes earlier). After age 40, DL is renewed in 5-year increments.
+- **International Driving Permit (IDP)**: Valid for **1 year** from date of issue.
+[[ACTION:RENEW_LICENCE]]
+[[SUGGESTIONS: How to apply for DL? | How to renew my licence? | What documents are needed for DL?]]`;
+  }
+
+  if (query.includes('document') || query.includes('proof') || query.includes('aadhaar') || query.includes('upload') || query.includes('photo')) {
+    return `Required Documents for Indian Driving Licence:
+
+1. **Identity Proof**: Aadhaar Card (with instant eKYC verification), Passport, or Voter ID.
+2. **Address Proof**: Aadhaar Card, Electricity Bill, or Utility Bill matching your RTO jurisdiction.
+3. **Age Proof**: Birth Certificate, 10th School Certificate, or Passport.
+4. **Form 3 Learner Licence**: Copy of active LL (for permanent DL applications).
+5. **Form 1A Medical Cert**: Mandatory for applicants aged 50+ or Commercial licences.
+
+All documents are stored and verified securely in your digital Document Vault on Indian Drives.
+[[ACTION:OPEN_DOCUMENT_CENTER]]
+[[SUGGESTIONS: What is my next step? | How much is the licence fee? | Show my appointment]]`;
   }
 
   if (query.includes('test') || query.includes('slot') || query.includes('track') || query.includes('booking') || query.includes('appointment')) {
     return `To prepare for and book your RTO Practical Driving Test:
 
-1. **Eligibility**: You can book a driving test slot 30 days after your Learner Licence (LL) issuance.
+1. **Eligibility**: You can book a test slot 30 days after your Learner Licence issuance.
 2. **Automated Track Exercises**:
-   - **LMV (Car)**: Parallel Parking, 8-Track Steering, S-Track, and Gradient Stop & Start.
+   - **LMV (Car)**: Parallel Parking, 8-Track Steering, S-Track, and Gradient Hill Stop & Start.
    - **MCWG (Two-Wheeler)**: Figure-8 balance track and emergency braking zone.
-3. **What to Carry on Test Day**:
-   - Original Learner Licence (Form 3)
-   - Printed Appointment Pass & Fee Receipt
-   - Valid Original ID Proof (Aadhaar/Passport)
-   - Vehicle with valid RC, Insurance, PUC & 'L' plates attached.`;
+3. **Slot Booking**: Select your local RTO track, preferred date, and morning/afternoon time slot.
+4. **Rescheduling**: You can reschedule your slot online for free up to 48 hours before your appointment.
+[[ACTION:VIEW_APPOINTMENT]]
+[[SUGGESTIONS: What should I bring to the RTO? | Can I reschedule my appointment? | What documents do I need?]]`;
   }
 
-  if (query.includes('fee') || query.includes('pay') || query.includes('cost') || query.includes('charge') || query.includes('price')) {
+  if (query.includes('bring') || query.includes('carry') || query.includes('rto visit') || query.includes('prepare') || query.includes('checklist')) {
+    return `RTO Test Day Checklist:
+
+Please bring the following to your testing track:
+1. **Printed Appointment Pass**: With QR code from Indian Drives.
+2. **Original Identity Proof**: Original Aadhaar Card / Passport.
+3. **Form 3 Learner Licence**: Original or printed copy.
+4. **Fee Payment Receipt**: Proof of application & test fee.
+5. **Test Vehicle**: Roadworthy vehicle with valid RC, Insurance, PUC certificate, and prominent red 'L' plates on front and rear.
+[[ACTION:VIEW_APPOINTMENT]]
+[[SUGGESTIONS: Show my appointment | What are the 4 track tests? | What happens if I fail?]]`;
+  }
+
+  if (query.includes('fee') || query.includes('pay') || query.includes('cost') || query.includes('charge') || query.includes('price') || query.includes('receipt')) {
     return `Official RTO Licence Fee Structure:
 
-- **Learner Licence (LL)**: ₹150 (Form fee) + ₹50 (Online test fee) = **₹200**
-- **Driving Licence (DL)**: ₹200 (Form 7) + ₹300 (Automated track test) + ₹200 (Smartcard printing) = **₹700**
-- **Renewal / Address Change**: ₹200 to ₹400 based on service type.
+- **Learner Licence (LL)**: ₹150 (Application Form) + ₹50 (Online Assessment) = **₹200**
+- **Driving Licence (DL)**: ₹200 (Form 7) + ₹300 (Automated Track Test) + ₹200 (Smartcard Printing) = **₹700**
+- **Licence Renewal**: **₹200**
+- **Address / Name Change**: **₹200**
+- **Duplicate Smartcard**: **₹200**
 
-All payments can be made securely via UPI, Net Banking, or Credit/Debit Card on Indian Drives.`;
+All payments include official tax receipts with Treasury GRN numbers, payable via UPI, Credit/Debit Card, or Net Banking.
+[[ACTION:OPEN_PAYMENTS]]
+[[SUGGESTIONS: Show my payment receipt | What do I do next? | How to book a test slot?]]`;
   }
 
   if (query.includes('learner') || query.includes('ll') || query.includes('exam') || query.includes('quiz')) {
-    return `Learner Licence (LL) Rules & Online Assessment:
+    return `Learner Licence (LL) Process & Online Quiz:
 
-1. **Assessment Format**: 15 Multiple-Choice Questions covering traffic signals, road signs, and driving safety.
-2. **Passing Score**: Minimum **9 / 15** correct answers.
-3. **Validity**: Valid for 6 months across India.
-4. **Next Step**: Eligible to take the practical driving test after 30 days of LL issuance.`;
+1. **Form 2 Submission**: Complete your online application with Aadhaar eKYC.
+2. **Online Assessment**: Take the 15-minute proctored traffic rules & road sign quiz.
+3. **Passing Score**: Score **9 out of 15** correct answers.
+4. **Instant Download**: Upon passing, your Form 3 Learner Licence is instantly generated.
+5. **Validity**: Valid for 6 months across India.
+[[ACTION:START_LL_APPLICATION]]
+[[SUGGESTIONS: What documents do I need? | How much is the LL fee? | What is my next step?]]`;
   }
 
-  if (query.includes('renew') || query.includes('duplicate') || query.includes('address') || query.includes('service')) {
-    return `Licence Services & Smartcard Maintenance:
+  if (query.includes('renew') || query.includes('duplicate') || query.includes('address') || query.includes('change') || query.includes('international') || query.includes('service')) {
+    return `Citizen Licence Services & Smartcard Updates:
 
-- **DL Renewal**: Can be applied up to 1 year prior to expiry or within 1 year post expiry.
-- **Address Change**: Upload proof of new address with Aadhaar eKYC.
-- **Duplicate Smartcard**: Instant request if original card is lost, damaged, or torn.
-- **Status Tracking**: Track Speed Post delivery status live from your dashboard.`;
+- **DL Renewal**: Apply up to 1 year prior to expiry or within 1 year post expiry.
+- **Address Change**: Upload updated address proof with Aadhaar eKYC.
+- **Duplicate Smartcard**: Instant request if original card is lost, damaged, or stolen.
+- **International Driving Permit (IDP)**: Apply with valid passport, visa, and Form 1A medical cert.
+- **Speed Post Tracking**: Track your smartcard delivery live from your dashboard.
+[[ACTION:RENEW_LICENCE]]
+[[SUGGESTIONS: How to renew my licence? | What documents are needed for renewal? | Track my smartcard]]`;
   }
 
   return `Namaste! I am DriveSeva AI, your digital assistant for Indian driving licence & RTO citizen services.
 
-I can help you with:
-- **Learner Licence (LL)**: Rules, eligibility & online practice test
-- **Driving Test**: Automated track guidance & slot booking
-- **Documents & Verification**: Aadhaar eKYC & Form 1A rules
-- **Fee Payments**: Receipt downloads & fee breakdown
-- **Smartcard Tracking**: Speed Post dispatch status
+I can assist you with:
+- **Learner Licence (LL)**: Form 2 application, rules & online test prep
+- **Driving Licence (DL)**: Practical test booking & automated track exercises
+- **Documents**: Aadhaar eKYC & Form 1A medical certificates
+- **Payments**: Official fee receipts & smartcard payment tracking
+- **Citizen Services**: DL renewal, duplicate smartcard & address change
 
-How can I assist you today?`;
+How can I help you today?
+[[SUGGESTIONS: What is my next step? | What documents do I need? | How to book a driving test slot?]]`;
 }
 
 async function streamFallbackKnowledge({ userMessage, res }) {
@@ -146,21 +211,8 @@ export async function streamChatCompletion({ messages = [], userMessage = '', co
   );
 
   if (!isRealKey) {
-    // Send structured setup error so frontend triggers ApiKeySetupModal
-    const errorPayload = {
-      type: 'error',
-      code: 'API_KEY_MISSING',
-      message: 'AI API Key is not configured in backend/.env',
-      details: {
-        envLocation: 'backend/.env',
-        variables: ['GEMINI_API_KEY', 'OPENAI_API_KEY', 'AI_API_KEY'],
-        instructions: 'Please add your API key to backend/.env and restart the server.\nExample: GEMINI_API_KEY=AQ.Ab8RN6...\nGet free Gemini key at: https://aistudio.google.com/app/apikey'
-      }
-    };
-
-    res.write(`data: ${JSON.stringify(errorPayload)}\n\n`);
-    res.write('data: [DONE]\n\n');
-    res.end();
+    // Gracefully stream smart knowledge responses when no external API key is set
+    await streamFallbackKnowledge({ userMessage, res });
     return;
   }
 
