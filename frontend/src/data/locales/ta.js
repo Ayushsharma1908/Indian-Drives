@@ -54,6 +54,7 @@ export const ta = {
     female: "பெண்",
     other: "மற்றவை",
     currentStep: "தற்போதைய படி",
+    notificationSent: "அறிவிப்பு அனுப்பப்பட்டது",
     footerNote: "Indian Drives — ஓட்டுநர் உரிம சேவைகளுக்கான குடிமக்கள் அனுபவ தளம்."
   },
   landing: {

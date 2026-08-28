@@ -121,6 +121,8 @@ export const dictionary = {
     "No notifications available": "कोई सूचना उपलब्ध नहीं है",
     "Mark all as read": "सभी को पढ़ा हुआ चिह्नित करें",
     "Clear All": "सभी साफ़ करें",
+    "Notification sent": "सूचना भेजी गई",
+    "Notification Sent": "सूचना भेजी गई",
     "UPCOMING APPOINTMENT": "आगामी अपॉइंटमेंट",
     "View Pass": "पास देखें",
 
@@ -427,6 +429,8 @@ export const dictionary = {
     "No notifications available": "ಯಾವುದೇ ಅಧಿಸೂಚನೆಗಳು ಲಭ್ಯವಿಲ್ಲ",
     "Mark all as read": "ಎಲ್ಲವನ್ನೂ ಓದಿದ್ದೀರಿ ಎಂದು ಗುರುತಿಸಿ",
     "Clear All": "ಎಲ್ಲವನ್ನೂ ತೆರವುಗೊಳಿಸಿ",
+    "Notification sent": "ಅಧಿಸೂಚನೆ ಕಳುಹಿಸಲಾಗಿದೆ",
+    "Notification Sent": "ಅಧಿಸೂಚನೆ ಕಳುಹಿಸಲಾಗಿದೆ",
     "UPCOMING APPOINTMENT": "ಮುಂಬರುವ ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್",
     "View Pass": "ಪಾಸ್ ವೀಕ್ಷಿಸಿ",
 
@@ -733,6 +737,8 @@ export const dictionary = {
     "No notifications available": "কোনও বিজ্ঞপ্তি নেই",
     "Mark all as read": "সব পঠিত হিসেবে চিহ্নিত করুন",
     "Clear All": "সব মুছে ফেলুন",
+    "Notification sent": "বিজ্ঞপ্তি পাঠানো হয়েছে",
+    "Notification Sent": "বিজ্ঞপ্তি পাঠানো হয়েছে",
     "UPCOMING APPOINTMENT": "আসন্ন অ্যাপয়েন্টমেন্ট",
     "View Pass": "পাস দেখুন",
 
@@ -1039,6 +1045,8 @@ export const dictionary = {
     "No notifications available": "அறிவிப்புகள் எதுவும் கிடைக்கவில்லை",
     "Mark all as read": "அனைத்தையும் படித்ததாகக் குறிக்கவும்",
     "Clear All": "அனைத்தையும் அழிக்கவும்",
+    "Notification sent": "அறிவிப்பு அனுப்பப்பட்டது",
+    "Notification Sent": "அறிவிப்பு அனுப்பப்பட்டது",
     "UPCOMING APPOINTMENT": "வரவிருக்கும் முன்பதிவு",
     "View Pass": "பாஸ் பார்க்கவும்",
 

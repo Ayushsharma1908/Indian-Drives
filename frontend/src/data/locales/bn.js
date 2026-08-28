@@ -54,6 +54,7 @@ export const bn = {
     female: "মহিলা",
     other: "অন্যান্য",
     currentStep: "বর্তমান ধাপ",
+    notificationSent: "বিজ্ঞপ্তি পাঠানো হয়েছে",
     footerNote: "Indian Drives — ড্রাইভিং লাইসেন্স পরিষেবার নাগরিক অভিজ্ঞতা প্ল্যাটফর্ম।"
   },
   landing: {

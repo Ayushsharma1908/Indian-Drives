@@ -54,6 +54,7 @@ export const kn = {
     female: "ಮಹಿಳೆ",
     other: "ಇತರೆ",
     currentStep: "ಪ್ರಸ್ತುತ ಹಂತ",
+    notificationSent: "ಅಧಿಸೂಚನೆ ಕಳುಹಿಸಲಾಗಿದೆ",
     footerNote: "Indian Drives — ಚಾಲನಾ ಪರವಾನಗಿ ಸೇವೆಗಳ ನಾಗರಿಕ ಅನುಭವ ವೇದಿಕೆ."
   },
   landing: {
