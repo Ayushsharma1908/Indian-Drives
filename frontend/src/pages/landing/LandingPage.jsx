@@ -1,18 +1,18 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowRight, Sparkles, User, Bookmark, Car, CheckCircle2,
   Clock, Calendar, FileText, Send, X, Shield, Layers, Check,
   ChevronDown
 } from 'lucide-react';
-import { AuthContext, LanguageContext } from '../../main';
+import { AuthContext, useLanguage } from '../../main';
 import { LanguageSelector } from '../../components/layout/LanguageSelector';
 import './LandingPage.css';
 
 export function LandingPage() {
   const navigate = useNavigate();
   const auth = useContext(AuthContext);
-  const { language, setLanguage } = useContext(LanguageContext) || {};
+  const { language, setLanguage, t } = useLanguage();
 
   // Modals & Drawers
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -21,15 +21,20 @@ export function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [pendingRedirect, setPendingRedirect] = useState('/dashboard');
 
-  // AI Chat States
-  const [chatMessages, setChatMessages] = useState([
-    {
-      sender: 'bot',
-      text: 'Namaste! I am DriveSEVA, your assistant for Indian Drives. How can I help you today?',
-      time: 'Just now'
-    }
-  ]);
+  // AI Chat States (localized dynamically)
+  const [chatMessages, setChatMessages] = useState([]);
   const [chatInput, setChatInput] = useState('');
+
+  // Update initial greeting when language changes
+  useEffect(() => {
+    setChatMessages([
+      {
+        sender: 'bot',
+        text: t('ask.greeting', 'Namaste! I am DriveSEVA, your assistant for Indian Drives. How can I help you today?'),
+        time: 'Just now'
+      }
+    ]);
+  }, [language, t]);
 
   // Auth Form states
   const [authMethod, setAuthMethod] = useState('phone');
@@ -84,18 +89,18 @@ export function LandingPage() {
       let requiresAuth = false;
 
       if (lower.includes('status') || lower.includes('track') || lower.includes('my application') || lower.includes('slot')) {
-        botResponse = 'To check your real-time application status or view booked test slot passes, please sign in to your Indian Drives account.';
+        botResponse = t('ask.statusResponse', 'To check your real-time application status or view booked test slot passes, please sign in to your Indian Drives account.');
         requiresAuth = true;
       } else if (lower.includes('document') || lower.includes('require') || lower.includes('doc')) {
-        botResponse = 'For a Learner Licence (LL), you only need your Aadhaar Number for contactless online verification. For a permanent Driving Licence (DL), your active LL number is required.';
+        botResponse = t('ask.docResponse', 'For a Learner Licence (LL), you only need your Aadhaar Number for contactless online verification. For a permanent Driving Licence (DL), your active LL number is required.');
       } else if (lower.includes('ll') || lower.includes('learner')) {
-        botResponse = 'You can apply for your Learner Licence completely online through Indian Drives, practice with official test simulators, and receive your digital licence without paperwork.';
+        botResponse = t('ask.llResponse', 'You can apply for your Learner Licence completely online through Indian Drives, practice with official test simulators, and receive your digital licence without paperwork.');
       } else if (lower.includes('dl') || lower.includes('driving test') || lower.includes('track')) {
-        botResponse = 'After holding your Learner Licence for 30 days, you can book a practical driving test at your nearest automated RTO test track directly through Indian Drives.';
+        botResponse = t('ask.dlResponse', 'After holding your Learner Licence for 30 days, you can book a practical driving test at your nearest automated RTO test track directly through Indian Drives.');
       } else if (lower.includes('renew') || lower.includes('address') || lower.includes('duplicate') || lower.includes('service')) {
-        botResponse = 'Existing licence holders can renew expiring licences, update residential addresses, or request duplicate smart cards directly from the Licence Services hub.';
+        botResponse = t('ask.servicesResponse', 'Existing licence holders can renew expiring licences, update residential addresses, or request duplicate smart cards directly from the Licence Services hub.');
       } else {
-        botResponse = 'Indian Drives simplifies applying for, tracking, and managing your driving licence journey in one place.';
+        botResponse = t('landing.heroSubtitle', 'Apply, track and manage your driving licence in one place.');
       }
 
       setChatMessages(prev => [
@@ -115,43 +120,43 @@ export function LandingPage() {
     ll: {
       stepNum: '01',
       accentColor: '#0284c7',
-      title: "I'm starting from scratch",
-      subtitle: 'Get your Learner Licence',
-      desc: 'Complete online Aadhaar verification, practice with computerized knowledge test simulators, and obtain your digital Learner Licence from home.',
+      title: t('landing.journey1Title', "I'm starting from scratch"),
+      subtitle: t('landing.journey1Desc', "Get your Learner Licence."),
+      desc: t('landing.path1Desc', 'Complete online Aadhaar verification, practice with computerized knowledge test simulators, and obtain your digital Learner Licence from home.'),
       steps: [
-        'Online identity verification',
-        'Theory knowledge test preparation',
-        'Digital Learner Licence issuance'
+        t('landing.howStep1', 'Online identity verification'),
+        t('landing.howStep2', 'Theory knowledge test preparation'),
+        t('landing.howStep4', 'Digital Learner Licence issuance')
       ],
-      cta: 'Start Learner Licence Journey →',
+      cta: t('landing.journey1Cta', 'Start Learner Licence Journey →'),
       target: '/journey?stage=ll'
     },
     dl: {
       stepNum: '02',
       accentColor: '#ea580c',
-      title: 'I have a Learner Licence',
-      subtitle: 'Continue towards your Driving Licence',
-      desc: 'Hold an active Learner Licence for at least 30 days. Select your nearest automated RTO test track, book a convenient morning or afternoon slot, and clear your driving test.',
+      title: t('landing.journey2Title', 'I have a Learner Licence'),
+      subtitle: t('landing.journey2Desc', 'Continue towards your Driving Licence.'),
+      desc: t('landing.path2Desc', 'Hold an active Learner Licence for at least 30 days. Select your nearest automated RTO test track, book a convenient morning or afternoon slot, and clear your driving test.'),
       steps: [
-        'Learner Licence validation',
-        'Automated test track slot booking',
-        'Practical test evaluation & smart card dispatch'
+        t('landing.journey2Desc', 'Learner Licence validation'),
+        t('landing.serviceTestTitle', 'Automated test track slot booking'),
+        t('landing.serviceTestDesc', 'Practical test evaluation & smart card dispatch')
       ],
-      cta: 'Book Driving Test Slot →',
+      cta: t('landing.journey2Cta', 'Book Driving Test Slot →'),
       target: '/journey?stage=dl'
     },
     services: {
       stepNum: '03',
       accentColor: '#16a34a',
-      title: 'I already have a Driving Licence',
-      subtitle: 'Manage your existing licence',
-      desc: 'Renew expiring licences, update your registered residential address, or request duplicate smart cards without visiting physical transport offices.',
+      title: t('landing.journey3Title', 'I already have a Driving Licence'),
+      subtitle: t('landing.journey3Desc', 'Manage your existing licence.'),
+      desc: t('landing.path3Desc', 'Renew expiring licences, update your registered residential address, or request duplicate smart cards without visiting physical transport offices.'),
       steps: [
-        'Existing licence details lookup',
-        'Service selection & document upload',
-        'Online fee settlement & tracking'
+        t('landing.serviceManageTitle', 'Existing licence details lookup'),
+        t('landing.serviceManageDesc', 'Service selection & document upload'),
+        t('landing.serviceTrackDesc', 'Online fee settlement & tracking')
       ],
-      cta: 'Manage Licence Services →',
+      cta: t('landing.journey3Cta', 'Manage Licence Services →'),
       target: '/licence-services'
     }
   };
@@ -182,26 +187,24 @@ export function LandingPage() {
 
           {/* Navigation Links */}
           <nav className="navbar-links">
-            <a href="#how-it-works" className="nav-link">How It Works</a>
-            <a href="#services" className="nav-link">Services</a>
-            <a href="#journeys" className="nav-link">My Journey</a>
+            <a href="#how-it-works" className="nav-link">{t('nav.howItWorks', 'How It Works')}</a>
+            <a href="#services" className="nav-link">{t('nav.services', 'Services')}</a>
+            <a href="#journeys" className="nav-link">{t('nav.myJourney', 'My Journey')}</a>
             <button onClick={() => setShowAiDrawer(true)} className="nav-ai-link">
-              <span className="sparkle-icon">✦</span> Ask DriveSEVA
+              <span className="sparkle-icon">✦</span> {t('nav.ask', 'Ask DriveSEVA')}
             </button>
           </nav>
 
           {/* Right Action: Language, Sign In, Primary CTA */}
           <div className="navbar-right">
-            {setLanguage && (
-              <LanguageSelector currentLanguage={language || 'en'} onSelectLanguage={setLanguage} />
-            )}
+            <LanguageSelector currentLanguage={language} onSelectLanguage={setLanguage} />
 
             <button onClick={() => handleOpenAuth('/dashboard')} className="navbar-signin-btn">
-              Sign In
+              {t('common.login', 'Sign In')}
             </button>
 
             <button onClick={() => handleOpenAuth('/dashboard')} className="navbar-primary-btn">
-              Start Your Journey →
+              {t('landing.heroStartBtn', 'Start Your Journey →')}
             </button>
 
             <button
@@ -217,17 +220,23 @@ export function LandingPage() {
         {/* Mobile Dropdown */}
         {mobileMenuOpen && (
           <div className="navbar-mobile-menu">
-            <a href="#how-it-works" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>How It Works</a>
-            <a href="#services" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>Services</a>
-            <a href="#journeys" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>My Journey</a>
+            <a href="#how-it-works" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>
+              {t('nav.howItWorks', 'How It Works')}
+            </a>
+            <a href="#services" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>
+              {t('nav.services', 'Services')}
+            </a>
+            <a href="#journeys" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>
+              {t('nav.myJourney', 'My Journey')}
+            </a>
             <button
               onClick={() => { setMobileMenuOpen(false); setShowAiDrawer(true); }}
               className="mobile-nav-ai-btn"
             >
-              ✦ Ask DriveSEVA
+              ✦ {t('nav.ask', 'Ask DriveSEVA')}
             </button>
             <button onClick={() => handleOpenAuth('/dashboard')} className="navbar-primary-btn" style={{ width: '100%', justifyContent: 'center', marginTop: '10px' }}>
-              Start Your Journey →
+              {t('landing.heroStartBtn', 'Start Your Journey →')}
             </button>
           </div>
         )}
@@ -242,21 +251,21 @@ export function LandingPage() {
           {/* Main Headline & Supporting Copy */}
           <div className="hero-text-block">
             <h1 className="hero-headline">
-              Your driving licence journey,<br />
-              <span className="hero-highlight-orange">simplified.</span>
+              {t('landing.heroTitle', 'Your driving licence journey,')}<br />
+              <span className="hero-highlight-orange">{t('landing.heroHighlight', 'simplified.')}</span>
             </h1>
 
             <p className="hero-supporting-text">
-              Apply, track and manage your driving licence in one place.
+              {t('landing.heroSubtitle', 'Apply, track and manage your driving licence in one place.')}
             </p>
 
             <div className="hero-action-buttons">
               <button onClick={() => handleOpenAuth('/dashboard')} className="hero-btn-primary">
-                Start Your Journey →
+                {t('landing.heroStartBtn', 'Start Your Journey →')}
               </button>
 
               <button onClick={() => setShowAiDrawer(true)} className="hero-btn-secondary">
-                <span className="btn-sparkle">✦</span> Ask DriveSEVA
+                <span className="btn-sparkle">✦</span> {t('landing.heroAskBtn', 'Ask DriveSEVA')}
               </button>
             </div>
           </div>
@@ -265,7 +274,7 @@ export function LandingPage() {
           <div className="road-journey-tracker-row">
             <div className="road-node-item">
               <div className="road-node-dot dot-navy" />
-              <span className="road-node-label">START</span>
+              <span className="road-node-label">{t('landing.roadmapStart', 'START')}</span>
             </div>
 
             <div className="road-connector-line">
@@ -274,7 +283,7 @@ export function LandingPage() {
 
             <div className="road-node-item">
               <div className="road-node-dot dot-blue" />
-              <span className="road-node-label label-blue">LEARNER LICENCE</span>
+              <span className="road-node-label label-blue">{t('landing.roadmapLL', 'LEARNER LICENCE')}</span>
             </div>
 
             <div className="road-connector-line">
@@ -283,7 +292,7 @@ export function LandingPage() {
 
             <div className="road-node-item">
               <div className="road-node-dot dot-orange" />
-              <span className="road-node-label label-orange">TEST</span>
+              <span className="road-node-label label-orange">{t('landing.roadmapTest', 'TEST')}</span>
             </div>
 
             <div className="road-connector-line">
@@ -292,13 +301,13 @@ export function LandingPage() {
 
             <div className="road-node-item">
               <div className="road-node-dot dot-green" />
-              <span className="road-node-label label-green">DRIVING LICENCE</span>
+              <span className="road-node-label label-green">{t('landing.roadmapDL', 'DRIVING LICENCE')}</span>
             </div>
           </div>
 
           {/* Subtle Scroll Down Prompt */}
           <div className="hero-scroll-prompt" onClick={() => scrollToSection('journeys')}>
-            <span>Scroll</span>
+            <span>{t('common.scroll', 'Scroll')}</span>
             <ChevronDown size={14} className="scroll-icon-bounce" />
           </div>
 
@@ -312,12 +321,12 @@ export function LandingPage() {
         <div className="premium-container">
           
           <div className="section-header-clean">
-            <span className="section-eyebrow-orange">YOUR JOURNEY</span>
+            <span className="section-eyebrow-orange">{t('landing.journeysEyebrow', 'YOUR JOURNEY')}</span>
             <h2 className="section-title-navy">
-              Where are you in your driving journey?
+              {t('landing.journeysTitle', 'Where are you in your driving journey?')}
             </h2>
             <p className="section-subtitle-muted">
-              Choose where you are. We'll guide you from there.
+              {t('landing.journeysSubtitle', "Choose where you are. We'll guide you from there.")}
             </p>
           </div>
 
@@ -336,12 +345,12 @@ export function LandingPage() {
               </div>
 
               <div className="card-center-text">
-                <h3 className="card-heading">I'm starting from scratch</h3>
-                <p className="card-description">Get your Learner Licence.</p>
+                <h3 className="card-heading">{t('landing.journey1Title', "I'm starting from scratch")}</h3>
+                <p className="card-description">{t('landing.journey1Desc', "Get your Learner Licence.")}</p>
               </div>
 
               <div className="card-bottom-cta">
-                <span className="cta-link cta-blue">Start →</span>
+                <span className="cta-link cta-blue">{t('landing.journey1Cta', 'Start →')}</span>
               </div>
             </div>
 
@@ -358,12 +367,12 @@ export function LandingPage() {
               </div>
 
               <div className="card-center-text">
-                <h3 className="card-heading">I have a Learner Licence</h3>
-                <p className="card-description">Continue towards your Driving Licence.</p>
+                <h3 className="card-heading">{t('landing.journey2Title', 'I have a Learner Licence')}</h3>
+                <p className="card-description">{t('landing.journey2Desc', 'Continue towards your Driving Licence.')}</p>
               </div>
 
               <div className="card-bottom-cta">
-                <span className="cta-link cta-orange">Continue →</span>
+                <span className="cta-link cta-orange">{t('landing.journey2Cta', 'Continue →')}</span>
               </div>
             </div>
 
@@ -380,12 +389,12 @@ export function LandingPage() {
               </div>
 
               <div className="card-center-text">
-                <h3 className="card-heading">I already have a Driving Licence</h3>
-                <p className="card-description">Manage your existing licence.</p>
+                <h3 className="card-heading">{t('landing.journey3Title', 'I already have a Driving Licence')}</h3>
+                <p className="card-description">{t('landing.journey3Desc', 'Manage your existing licence.')}</p>
               </div>
 
               <div className="card-bottom-cta">
-                <span className="cta-link cta-green">Manage →</span>
+                <span className="cta-link cta-green">{t('landing.journey3Cta', 'Manage →')}</span>
               </div>
             </div>
 
@@ -401,12 +410,12 @@ export function LandingPage() {
         <div className="premium-container">
           
           <div className="section-header-clean">
-            <span className="section-eyebrow-orange">WHAT YOU CAN DO</span>
+            <span className="section-eyebrow-orange">{t('landing.servicesEyebrow', 'WHAT YOU CAN DO')}</span>
             <h2 className="section-title-navy">
-              Core platform capabilities
+              {t('landing.servicesTitle', 'Core platform capabilities')}
             </h2>
             <p className="section-subtitle-muted">
-              Everything you need at every stage of your licence journey.
+              {t('landing.servicesSubtitle', 'Everything you need at every stage of your licence journey.')}
             </p>
           </div>
 
@@ -416,32 +425,32 @@ export function LandingPage() {
               <div className="service-icon-wrap wrap-blue">
                 <User size={19} color="#0284c7" />
               </div>
-              <h4 className="service-title">Apply</h4>
-              <p className="service-desc">Start a new licence application with guided online steps.</p>
+              <h4 className="service-title">{t('landing.serviceApplyTitle', 'Apply')}</h4>
+              <p className="service-desc">{t('landing.serviceApplyDesc', 'Start a new licence application with guided online steps.')}</p>
             </div>
 
             <div className="service-item-box">
               <div className="service-icon-wrap wrap-orange">
                 <Clock size={19} color="#ea580c" />
               </div>
-              <h4 className="service-title">Track</h4>
-              <p className="service-desc">See your current application progress and verified milestones.</p>
+              <h4 className="service-title">{t('landing.serviceTrackTitle', 'Track')}</h4>
+              <p className="service-desc">{t('landing.serviceTrackDesc', 'See your current application progress and verified milestones.')}</p>
             </div>
 
             <div className="service-item-box">
               <div className="service-icon-wrap wrap-teal">
                 <Calendar size={19} color="#0f766e" />
               </div>
-              <h4 className="service-title">Test & Appointments</h4>
-              <p className="service-desc">Manage driving test slots and automated track appointments.</p>
+              <h4 className="service-title">{t('landing.serviceTestTitle', 'Test & Appointments')}</h4>
+              <p className="service-desc">{t('landing.serviceTestDesc', 'Manage driving test slots and automated track appointments.')}</p>
             </div>
 
             <div className="service-item-box">
               <div className="service-icon-wrap wrap-green">
                 <Layers size={19} color="#16a34a" />
               </div>
-              <h4 className="service-title">Manage Licence</h4>
-              <p className="service-desc">Handle renewals, address updates, and duplicate smart cards.</p>
+              <h4 className="service-title">{t('landing.serviceManageTitle', 'Manage Licence')}</h4>
+              <p className="service-desc">{t('landing.serviceManageDesc', 'Handle renewals, address updates, and duplicate smart cards.')}</p>
             </div>
 
           </div>
@@ -456,31 +465,31 @@ export function LandingPage() {
         <div className="premium-container">
           
           <div className="section-header-clean">
-            <span className="section-eyebrow-orange">HOW IT WORKS</span>
+            <span className="section-eyebrow-orange">{t('landing.howEyebrow', 'HOW IT WORKS')}</span>
             <h2 className="section-title-navy">
-              Four clear milestones
+              {t('landing.howTitle', 'Four clear milestones')}
             </h2>
           </div>
 
           <div className="how-milestones-track">
             <div className="milestone-step">
               <div className="step-circle">1</div>
-              <div className="step-label">Online Application</div>
+              <div className="step-label">{t('landing.howStep1', 'Online Application')}</div>
             </div>
             <div className="step-line" />
             <div className="milestone-step">
               <div className="step-circle">2</div>
-              <div className="step-label">Knowledge Test</div>
+              <div className="step-label">{t('landing.howStep2', 'Knowledge Test')}</div>
             </div>
             <div className="step-line" />
             <div className="milestone-step">
               <div className="step-circle">3</div>
-              <div className="step-label">Driving Test Slot</div>
+              <div className="step-label">{t('landing.howStep3', 'Driving Test Slot')}</div>
             </div>
             <div className="step-line" />
             <div className="milestone-step">
               <div className="step-circle">4</div>
-              <div className="step-label">Licence Issued</div>
+              <div className="step-label">{t('landing.howStep4', 'Licence Issued')}</div>
             </div>
           </div>
 
@@ -494,14 +503,14 @@ export function LandingPage() {
         <div className="premium-container">
           <div className="driveseva-minimal-banner">
             <div className="driveseva-left-copy">
-              <span className="driveseva-eyebrow-tag">NEED HELP?</span>
-              <h3 className="driveseva-headline">Ask DriveSEVA</h3>
+              <span className="driveseva-eyebrow-tag">{t('landing.helpEyebrow', 'NEED HELP?')}</span>
+              <h3 className="driveseva-headline">{t('landing.helpTitle', 'Ask DriveSEVA')}</h3>
               <p className="driveseva-body">
-                Get guidance about your driving licence journey, applications and next steps.
+                {t('landing.helpDesc', 'Get guidance about your driving licence journey, applications and next steps.')}
               </p>
             </div>
             <button onClick={() => setShowAiDrawer(true)} className="driveseva-cta-button">
-              Ask DriveSEVA →
+              {t('landing.helpCta', 'Ask DriveSEVA →')}
             </button>
           </div>
         </div>
@@ -514,13 +523,13 @@ export function LandingPage() {
         <div className="premium-container">
           <div className="final-cta-container">
             <h2 className="final-cta-heading">
-              Ready to start your journey?
+              {t('landing.ctaTitle', 'Ready to start your journey?')}
             </h2>
             <p className="final-cta-sub">
-              Sign in to access your personalized driving licence journey.
+              {t('landing.ctaDesc', 'Sign in to access your personalized driving licence journey.')}
             </p>
             <button onClick={() => handleOpenAuth('/dashboard')} className="final-cta-button">
-              Start Your Journey →
+              {t('landing.ctaButton', 'Start Your Journey →')}
             </button>
           </div>
         </div>
@@ -534,19 +543,19 @@ export function LandingPage() {
           <div className="footer-left">
             <img src="/indian-drives-logo.png" alt="Indian Drives" className="footer-logo-img" />
             <span className="footer-copyright">
-              © {new Date().getFullYear()} Indian Drives. All rights reserved.
+              © {new Date().getFullYear()} {t('landing.footerRights', 'Indian Drives. All rights reserved.')}
             </span>
           </div>
 
           <div className="footer-right-links">
-            <a href="#how-it-works">How It Works</a>
-            <a href="#services">Services</a>
-            <a href="#journeys">My Journey</a>
+            <a href="#how-it-works">{t('nav.howItWorks', 'How It Works')}</a>
+            <a href="#services">{t('nav.services', 'Services')}</a>
+            <a href="#journeys">{t('nav.myJourney', 'My Journey')}</a>
             <button onClick={() => setShowAiDrawer(true)} className="footer-ai-btn">
-              ✦ Ask DriveSEVA
+              ✦ {t('nav.ask', 'Ask DriveSEVA')}
             </button>
             <button onClick={() => handleOpenAuth('/dashboard')} className="footer-signin-btn">
-              Sign In
+              {t('common.login', 'Sign In')}
             </button>
           </div>
         </div>
@@ -578,7 +587,7 @@ export function LandingPage() {
                   <p className="dialog-description">{j.desc}</p>
 
                   <div className="dialog-steps-card">
-                    <div className="steps-card-title">Key Steps:</div>
+                    <div className="steps-card-title">{t('common.keySteps', 'Key Steps:')}</div>
                     <div className="steps-card-list">
                       {j.steps.map((st, idx) => (
                         <div key={idx} className="step-bullet-item">
@@ -610,22 +619,22 @@ export function LandingPage() {
               <div className="drawer-bot-info">
                 <div className="drawer-avatar">✦</div>
                 <div>
-                  <div className="drawer-bot-title">DriveSEVA Assistant</div>
-                  <div className="drawer-bot-status">● Online</div>
+                  <div className="drawer-bot-title">{t('ask.title', 'DriveSEVA Assistant')}</div>
+                  <div className="drawer-bot-status">● {t('common.online', 'Online')}</div>
                 </div>
               </div>
               <button onClick={() => setShowAiDrawer(false)} className="drawer-close-btn">✕</button>
             </div>
 
             <div className="drawer-quick-prompts">
-              <button onClick={() => handleSendMessage('How do I apply for a Learner Licence?')}>
-                Learner Licence
+              <button onClick={() => handleSendMessage(t('ask.chip1', 'How do I apply for a Learner Licence?'))}>
+                {t('landing.roadmapLL', 'Learner Licence')}
               </button>
-              <button onClick={() => handleSendMessage('How does driving test slot booking work?')}>
-                Driving Test Slot
+              <button onClick={() => handleSendMessage(t('ask.chip2', 'How does driving test slot booking work?'))}>
+                {t('landing.roadmapTest', 'Driving Test Slot')}
               </button>
-              <button onClick={() => handleSendMessage('What services can I manage?')}>
-                Licence Services
+              <button onClick={() => handleSendMessage(t('ask.chip3', 'What services can I manage?'))}>
+                {t('landing.serviceManageTitle', 'Licence Services')}
               </button>
             </div>
 
@@ -638,7 +647,7 @@ export function LandingPage() {
                       onClick={() => handleOpenAuth('/dashboard')}
                       className="bubble-signin-btn"
                     >
-                      Sign In to View →
+                      {t('common.login', 'Sign In')} →
                     </button>
                   )}
                   <div className="bubble-timestamp">{msg.time}</div>
@@ -649,7 +658,7 @@ export function LandingPage() {
             <div className="drawer-input-row">
               <input
                 type="text"
-                placeholder="Ask DriveSEVA anything..."
+                placeholder={t('ask.placeholder', 'Ask DriveSEVA anything...')}
                 value={chatInput}
                 onChange={(e) => setChatInput(e.target.value)}
                 onKeyDown={(e) => { if (e.key === 'Enter') handleSendMessage(); }}
@@ -668,23 +677,23 @@ export function LandingPage() {
           <div className="auth-gateway-card" onClick={(e) => e.stopPropagation()}>
             <div className="auth-card-top">
               <div>
-                <span className="auth-card-eyebrow">CITIZEN ACCESS</span>
-                <h3 className="auth-card-title">Sign in to Indian Drives</h3>
+                <span className="auth-card-eyebrow">{t('auth.eyebrow', 'CITIZEN ACCESS')}</span>
+                <h3 className="auth-card-title">{t('auth.title', 'Sign in to Indian Drives')}</h3>
               </div>
               <button onClick={() => setShowAuthModal(false)} className="dialog-close-btn">✕</button>
             </div>
 
             {/* One-Click Demo Access */}
             <div className="demo-login-box">
-              <div className="demo-box-title">Quick Demo Access</div>
+              <div className="demo-box-title">{t('auth.demoTitle', 'Quick Demo Access')}</div>
               <p className="demo-box-sub">
-                Explore the verified applicant cockpit as <strong>Yanshi Chauhan</strong>.
+                {t('auth.demoDesc', 'Explore the verified applicant cockpit as Yanshi Chauhan.')}
               </p>
               <button
                 onClick={() => handleDemoLogin(pendingRedirect)}
                 className="demo-action-button"
               >
-                Continue as Yanshi Chauhan →
+                {t('auth.demoBtn', 'Continue as Yanshi Chauhan →')}
               </button>
             </div>
 
@@ -696,20 +705,20 @@ export function LandingPage() {
                   onClick={() => setAuthMethod('phone')}
                   className={`auth-tab-btn ${authMethod === 'phone' ? 'active' : ''}`}
                 >
-                  Mobile Number
+                  {t('auth.phoneTab', 'Mobile Number')}
                 </button>
                 <button
                   type="button"
                   onClick={() => setAuthMethod('aadhaar')}
                   className={`auth-tab-btn ${authMethod === 'aadhaar' ? 'active' : ''}`}
                 >
-                  Aadhaar Number
+                  {t('auth.aadhaarTab', 'Aadhaar Number')}
                 </button>
               </div>
 
               <div className="auth-field-group">
                 <label className="auth-field-label">
-                  {authMethod === 'phone' ? '10-Digit Mobile Number' : '12-Digit Aadhaar Number'}
+                  {authMethod === 'phone' ? t('auth.phoneLabel', '10-Digit Mobile Number') : t('auth.aadhaarLabel', '12-Digit Aadhaar Number')}
                 </label>
                 <input
                   type={authMethod === 'phone' ? 'tel' : 'text'}
@@ -721,7 +730,7 @@ export function LandingPage() {
               </div>
 
               <button type="submit" className="auth-submit-action">
-                Send OTP & Sign In
+                {t('auth.sendOtp', 'Send OTP & Sign In')}
               </button>
             </form>
           </div>

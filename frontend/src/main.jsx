@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { api } from "./services/api";
 import { translations } from "./data/translations";
+import { applyDOMTranslation } from "./services/autoTranslator";
 import "./styles.css";
 
 export const AuthContext = createContext(null);
@@ -37,7 +38,12 @@ export const JourneyContext = createContext(null);
 export function useLanguage() {
   const context = useContext(LanguageContext);
   if (!context) {
-    const fallbackTr = (key) => key.split(".").reduce((v, p) => v?.[p], translations.en) || '';
+    const fallbackTr = (key, defaultVal) => {
+      if (!key) return defaultVal || '';
+      const val = key.split(".").reduce((v, p) => v?.[p], translations.en);
+      if (val !== undefined && val !== null && val !== '') return val;
+      return defaultVal !== undefined ? defaultVal : '';
+    };
     return { language: 'en', setLanguage: () => {}, tr: fallbackTr, t: fallbackTr };
   }
   return context;
@@ -79,7 +85,14 @@ const fadeUp = {
 function App() {
   const [language, setLanguage] = useState(localStorage.getItem("indian-drives-language") || "en");
   const copy = translations[language] || translations.en;
-  const tr = (key) => key.split(".").reduce((value, part) => value?.[part], copy) || key.split(".").reduce((value, part) => value?.[part], translations.en) || '';
+  const tr = (key, defaultVal) => {
+    if (!key) return defaultVal || '';
+    let val = key.split(".").reduce((value, part) => value?.[part], copy);
+    if (val !== undefined && val !== null && val !== '') return val;
+    val = key.split(".").reduce((value, part) => value?.[part], translations.en);
+    if (val !== undefined && val !== null && val !== '') return val;
+    return defaultVal !== undefined ? defaultVal : '';
+  };
   const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [journey, setJourney] = useState(null);
@@ -88,6 +101,22 @@ function App() {
   useEffect(() => {
     localStorage.setItem("indian-drives-language", language);
     document.documentElement.lang = language;
+
+    // Apply immediate translation across entire DOM
+    applyDOMTranslation(document.body, language);
+
+    // Watch for React re-renders and page navigation to translate newly mounted elements
+    const observer = new MutationObserver(() => {
+      applyDOMTranslation(document.body, language);
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      characterData: true
+    });
+
+    return () => observer.disconnect();
   }, [language]);
 
   useEffect(() => {
