@@ -515,7 +515,7 @@ function Login() {
   const { login } = useContext(AuthContext);
   const { tr } = useContext(LanguageContext);
   const navigate = useNavigate();
-  const [form, setForm] = useState({ email: "yanshi.chauhan@example.com", password: "demo123" });
+  const [form, setForm] = useState({ email: "raj.kumar@example.com", password: "demo123" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -679,7 +679,7 @@ function ApplicationForm({ type }) {
   const { tr } = useContext(LanguageContext);
   const navigate = useNavigate();
   const { refreshJourney } = useContext(JourneyContext);
-  const [form, setForm] = useState({ type, applicantName: "Yanshi Chauhan", vehicleClass: "LMV", rto: "Jamshedpur RTO" });
+  const [form, setForm] = useState({ type, applicantName: "Raj Kumar", vehicleClass: "LMV", rto: "Jamshedpur RTO" });
   const [loading, setLoading] = useState(false);
 
   async function submit(event) {
@@ -1199,7 +1199,67 @@ function StatusBadge({ status }) {
 }
 
 function FullPageLoading() {
-  return <div className="login-page"><div className="auth-card"><p>Loading Indian Drives...</p></div></div>;
+  return (
+    <div style={{ background: '#f8fafc', minHeight: '100vh', padding: '24px 0', fontFamily: 'Inter, system-ui, sans-serif' }}>
+      {/* Header bar skeleton */}
+      <div style={{ maxWidth: '1184px', margin: '0 auto 36px auto', padding: '0 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div className="skeleton-box" style={{ width: '40px', height: '40px', borderRadius: '10px' }} />
+          <div className="skeleton-box" style={{ width: '160px', height: '24px', borderRadius: '6px' }} />
+        </div>
+        <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+          <div className="skeleton-box" style={{ width: '80px', height: '20px', borderRadius: '6px' }} />
+          <div className="skeleton-box" style={{ width: '80px', height: '20px', borderRadius: '6px' }} />
+          <div className="skeleton-box" style={{ width: '38px', height: '38px', borderRadius: '50%' }} />
+        </div>
+      </div>
+
+      {/* Main Skeleton Layout */}
+      <div style={{ maxWidth: '1184px', margin: '0 auto', padding: '0 24px', display: 'flex', flexDirection: 'column', gap: '32px' }}>
+        {/* Banner Skeleton */}
+        <div className="skeleton-box" style={{ width: '100%', height: '64px', borderRadius: '14px' }} />
+
+        {/* Hero Header Skeleton */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <div className="skeleton-box" style={{ width: '36px', height: '4px', borderRadius: '2px' }} />
+          <div className="skeleton-box" style={{ width: '360px', height: '44px', borderRadius: '10px' }} />
+          <div className="skeleton-box" style={{ width: '260px', height: '20px', borderRadius: '6px' }} />
+        </div>
+
+        <div style={{ height: '1px', background: '#e2e8f0', width: '100%' }} />
+
+        {/* Section Heading Skeleton */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <div className="skeleton-box" style={{ width: '220px', height: '12px', borderRadius: '4px' }} />
+          <div className="skeleton-box" style={{ width: '400px', height: '26px', borderRadius: '6px' }} />
+        </div>
+
+        {/* 3 Destination Cards Skeleton Grid */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(310px, 1fr))', gap: '24px' }}>
+          {[1, 2, 3].map((item) => (
+            <div
+              key={item}
+              style={{
+                background: '#ffffff',
+                borderRadius: '20px',
+                border: '1px solid #e2e8f0',
+                padding: '32px 28px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px'
+              }}
+            >
+              <div className="skeleton-box" style={{ width: '46px', height: '46px', borderRadius: '12px' }} />
+              <div className="skeleton-box" style={{ width: '130px', height: '12px', borderRadius: '4px' }} />
+              <div className="skeleton-box" style={{ width: '75%', height: '22px', borderRadius: '6px' }} />
+              <div className="skeleton-box" style={{ width: '100%', height: '36px', borderRadius: '6px' }} />
+              <div className="skeleton-box" style={{ width: '140px', height: '16px', borderRadius: '4px', marginTop: '12px' }} />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function useAsync(loader, initialValue) {

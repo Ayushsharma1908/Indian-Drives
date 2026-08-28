@@ -27,6 +27,14 @@ export function DashboardPage() {
   const [activeFlow, setActiveFlow] = useState(null);
   const [flowTitle, setFlowTitle] = useState('');
   const [flowFee, setFlowFee] = useState('250');
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 450);
+    return () => clearTimeout(timer);
+  }, []);
 
   const dismissNotification = () => {
     setShowProcessedNotification(false);
@@ -100,6 +108,10 @@ export function DashboardPage() {
 
     return () => window.removeEventListener('indian-drives-state-change', handleStateChange);
   }, []);
+
+  if (isLoading) {
+    return <DashboardSkeleton />;
+  }
 
   return (
     <div
@@ -497,7 +509,7 @@ export function DashboardPage() {
               letterSpacing: '-1.2px'
             }}
           >
-            {t('dashboard.title')}, {profile.firstName || 'Yanshi'} 🙏
+            {t('dashboard.title')}, {profile.firstName || 'Raj'} 🙏
           </h1>
 
           <div style={{ fontSize: '18px', color: 'var(--color-primary-navy)', fontWeight: 600, lineHeight: 1.4 }}>
@@ -691,6 +703,78 @@ function DestinationCard({ step, tag, title, desc, cta, icon: Icon, onClick }) {
         >
           <ArrowRight size={16} />
         </span>
+      </div>
+    </div>
+  );
+}
+
+function DashboardSkeleton() {
+  return (
+    <div
+      className="page-dashboard-container"
+      style={{
+        position: 'relative',
+        background: '#f8fafc',
+        minHeight: 'calc(100vh - 72px)',
+        padding: '36px 0 64px 0',
+        fontFamily: 'Inter, system-ui, sans-serif'
+      }}
+    >
+      <div
+        style={{
+          position: 'relative',
+          zIndex: 1,
+          maxWidth: '1184px',
+          margin: '0 auto',
+          padding: '0 24px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '40px'
+        }}
+      >
+        {/* Banner Skeleton */}
+        <div className="skeleton-box" style={{ width: '100%', height: '64px', borderRadius: '14px' }} />
+
+        {/* Hero Section Skeleton */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <div className="skeleton-box" style={{ width: '36px', height: '4px', borderRadius: '2px' }} />
+          <div className="skeleton-box" style={{ width: '380px', height: '46px', borderRadius: '10px' }} />
+          <div className="skeleton-box" style={{ width: '280px', height: '22px', borderRadius: '6px' }} />
+        </div>
+
+        {/* Section Divider */}
+        <div style={{ height: '1px', background: '#e2e8f0', width: '100%' }} />
+
+        {/* Heading Skeleton */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <div className="skeleton-box" style={{ width: '240px', height: '12px', borderRadius: '4px' }} />
+          <div className="skeleton-box" style={{ width: '420px', height: '28px', borderRadius: '8px' }} />
+        </div>
+
+        {/* 3 Cards Skeleton Grid */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(310px, 1fr))', gap: '24px' }}>
+          {[1, 2, 3].map((idx) => (
+            <div
+              key={idx}
+              style={{
+                background: '#ffffff',
+                borderRadius: '20px',
+                border: '1px solid #e2e8f0',
+                padding: '32px 28px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px',
+                boxShadow: '0 2px 8px rgba(0, 37, 66, 0.02)'
+              }}
+            >
+              <div className="skeleton-box" style={{ width: '46px', height: '46px', borderRadius: '12px' }} />
+              <div className="skeleton-box" style={{ width: '140px', height: '12px', borderRadius: '4px' }} />
+              <div className="skeleton-box" style={{ width: '80%', height: '24px', borderRadius: '6px' }} />
+              <div className="skeleton-box" style={{ width: '100%', height: '44px', borderRadius: '6px' }} />
+              <div className="skeleton-box" style={{ width: '150px', height: '16px', borderRadius: '4px', marginTop: '12px' }} />
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
