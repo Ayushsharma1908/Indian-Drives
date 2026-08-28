@@ -55,23 +55,23 @@ export function SettingsPage() {
 
         <div className="services-panel" style={{ padding: '24px' }}>
           <h3 style={{ margin: '0 0 16px 0', fontSize: '18px', display: 'flex', alignItems: 'center', gap: '10px', color: '#102d43' }}>
-            <Bell size={20} color="#ea580c" /> Notifications & Alerts
+            <Bell size={20} color="#ea580c" /> {t('settings.notifTitle', 'Notifications & Alerts')}
           </h3>
 
           <div style={{ display: 'grid', gap: '14px' }}>
             <label style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}>
               <input type="checkbox" defaultChecked style={{ width: '18px', height: '18px' }} />
               <div>
-                <div style={{ fontWeight: 700, fontSize: '14px', color: '#102d43' }}>SMS & WhatsApp Test Slot Reminders</div>
-                <div style={{ fontSize: '12px', color: '#64748b' }}>Receive instant reminders 24h before scheduled RTO driving tests.</div>
+                <div style={{ fontWeight: 700, fontSize: '14px', color: '#102d43' }}>{t('settings.smsReminder', 'SMS & WhatsApp Test Slot Reminders')}</div>
+                <div style={{ fontSize: '12px', color: '#64748b' }}>{t('settings.smsReminderDesc', 'Receive instant reminders 24h before scheduled RTO driving tests.')}</div>
               </div>
             </label>
 
             <label style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}>
               <input type="checkbox" defaultChecked style={{ width: '18px', height: '18px' }} />
               <div>
-                <div style={{ fontWeight: 700, fontSize: '14px', color: '#102d43' }}>Email Application Status Updates</div>
-                <div style={{ fontSize: '12px', color: '#64748b' }}>Receive email alerts when RTO officers approve or update your application.</div>
+                <div style={{ fontWeight: 700, fontSize: '14px', color: '#102d43' }}>{t('settings.emailUpdates', 'Email Application Status Updates')}</div>
+                <div style={{ fontSize: '12px', color: '#64748b' }}>{t('settings.emailUpdatesDesc', 'Receive email alerts when RTO officers approve or update your application.')}</div>
               </div>
             </label>
           </div>
@@ -79,11 +79,11 @@ export function SettingsPage() {
 
         <div className="services-panel" style={{ padding: '24px' }}>
           <h3 style={{ margin: '0 0 16px 0', fontSize: '18px', display: 'flex', alignItems: 'center', gap: '10px', color: '#102d43' }}>
-            <Lock size={20} color="#16a34a" /> Security & Aadhaar e-KYC
+            <Lock size={20} color="#16a34a" /> {t('settings.securityTitle', 'Security & Aadhaar e-KYC')}
           </h3>
-          <p style={{ color: '#64748b', fontSize: '14px', marginBottom: '16px' }}>Manage 2-Factor Authentication and linked DigiLocker accounts.</p>
+          <p style={{ color: '#64748b', fontSize: '14px', marginBottom: '16px' }}>{t('settings.securityDesc', 'Manage 2-Factor Authentication and linked DigiLocker accounts.')}</p>
           <button className="secondary-button" style={{ padding: '10px 18px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#f8fafc', fontWeight: 700, cursor: 'pointer' }}>
-            Configure Security Pin
+            {t('settings.configPin', 'Configure Security Pin')}
           </button>
         </div>
       </div>

@@ -1,42 +1,44 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FileText, Car, RefreshCw, CalendarDays, ArrowRight, ShieldCheck } from 'lucide-react';
+import { useLanguage } from '../../main';
 
 export function GovernmentServicesPage() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const services = [
     {
-      title: 'Learner Licence',
-      desc: 'Begin your journey. Apply for a new Learner Licence online with proctored computer test.',
-      btnText: 'Apply for LL',
+      title: t('services.card1Title', 'Learner Licence'),
+      desc: t('services.card1Desc', 'Begin your journey. Apply for a new Learner Licence online with proctored computer test.'),
+      btnText: t('services.card1Btn', 'Apply for LL'),
       path: '/ll/intro',
       icon: FileText,
-      tag: 'NEW APPLICANT'
+      tag: t('services.card1Tag', 'NEW APPLICANT')
     },
     {
-      title: 'Driving Licence',
-      desc: 'Convert your active Learner Licence to a permanent Driving Licence smartcard.',
-      btnText: 'Apply for DL',
+      title: t('services.card2Title', 'Driving Licence'),
+      desc: t('services.card2Desc', 'Convert your active Learner Licence to a permanent Driving Licence smartcard.'),
+      btnText: t('services.card2Btn', 'Apply for DL'),
       path: '/dl/intro',
       icon: Car,
-      tag: 'PERMANENT'
+      tag: t('services.card2Tag', 'PERMANENT')
     },
     {
-      title: 'Existing Licence',
-      desc: 'Renew, request a duplicate, or update your current licence details and address.',
-      btnText: 'Manage Services',
+      title: t('services.card3Title', 'Existing Licence'),
+      desc: t('services.card3Desc', 'Renew, request a duplicate, or update your current licence details and address.'),
+      btnText: t('services.card3Btn', 'Manage Services'),
       path: '/licence-services',
       icon: RefreshCw,
-      tag: 'SERVICES'
+      tag: t('services.card3Tag', 'SERVICES')
     },
     {
-      title: 'Tests & Appointments',
-      desc: 'Schedule or reschedule your driving tests and physical RTO slot appointments.',
-      btnText: 'Book Now',
+      title: t('services.card4Title', 'Tests & Appointments'),
+      desc: t('services.card4Desc', 'Schedule or reschedule your driving tests and physical RTO slot appointments.'),
+      btnText: t('services.card4Btn', 'Book Now'),
       path: '/appointments',
       icon: CalendarDays,
-      tag: 'SLOT BOOKING'
+      tag: t('services.card4Tag', 'SLOT BOOKING')
     }
   ];
 
@@ -44,13 +46,13 @@ export function GovernmentServicesPage() {
     <div className="page page-services-figma" style={{ width: 'min(1184px, calc(100% - 48px))', margin: '40px auto', display: 'flex', flexDirection: 'column', gap: '32px' }}>
       <div style={{ background: '#ffffff', padding: '36px', borderRadius: '20px', border: '1px solid #e2e8f0', boxShadow: '0 4px 16px rgba(0, 37, 66, 0.04)' }}>
         <div style={{ color: '#e88a2d', fontSize: '12px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>
-          PORTAL ACCESS
+          {t('services.portalAccess', 'PORTAL ACCESS')}
         </div>
         <h1 style={{ fontSize: '36px', fontWeight: 700, color: '#173b57', margin: '0 0 8px 0', letterSpacing: '-0.5px' }}>
-          Government Services
+          {t('services.title', 'Government Services')}
         </h1>
         <p style={{ color: '#476179', fontSize: '16px', margin: 0, lineHeight: 1.5, maxWidth: '680px' }}>
-          Access driving licence and transport services in one place. Streamlined for efficiency and ease of use.
+          {t('services.subtitle', 'Access driving licence and transport services in one place. Streamlined for efficiency and ease of use.')}
         </p>
       </div>
 

@@ -21,24 +21,23 @@
 }
 
 /* ─────────────────────────────────────────────────────────────
-   1. CLEAN NAVBAR (WHITE / PREMIUM)
+   1. CLEAN NAVBAR (WHITE / CITIZEN PORTAL HEADER)
    ───────────────────────────────────────────────────────────── */
 .premium-navbar {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(16, 45, 67, 0.08);
-  height: 70px;
+  background: #ffffff;
+  border-bottom: 1px solid rgba(16, 45, 67, 0.09);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  height: 64px;
   display: flex;
   align-items: center;
   width: 100%;
 }
 
 .navbar-inner {
-  max-width: 1140px;
+  max-width: 1160px;
   width: 100%;
   margin: 0 auto;
   padding: 0 24px;
@@ -46,13 +45,16 @@
   justify-content: space-between;
   align-items: center;
   box-sizing: border-box;
+  height: 100%;
 }
 
 .brand-link {
   display: flex;
   align-items: center;
+  gap: 10px;
   cursor: pointer;
   user-select: none;
+  text-decoration: none;
 }
 
 .official-brand-logo {
@@ -61,16 +63,50 @@
   object-fit: contain;
 }
 
+.brand-text {
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  font-family: 'Hanken Grotesk', 'Inter', system-ui, sans-serif;
+  text-transform: uppercase;
+}
+
+.brand-navy {
+  color: #102d43;
+}
+
+.brand-orange {
+  color: #ea580c;
+}
+
+.hero-eyebrow-tag {
+  display: inline-block;
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #ea580c;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  font-family: 'Hanken Grotesk', 'Inter', system-ui, sans-serif;
+}
+
+.footer-brand-title {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
 .navbar-links {
   display: flex;
   align-items: center;
-  gap: 28px;
+  gap: 24px;
 }
 
 .nav-link {
   color: #334155;
   text-decoration: none;
-  font-size: 14.5px;
+  font-size: 14px;
   font-weight: 600;
   transition: color 0.15s ease;
 }
@@ -83,7 +119,7 @@
   background: none;
   border: none;
   color: #ea580c;
-  font-size: 14.5px;
+  font-size: 14px;
   font-weight: 700;
   cursor: pointer;
   display: inline-flex;
@@ -105,21 +141,24 @@
 .navbar-right {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
 }
 
 .navbar-signin-btn {
-  background: none;
-  border: none;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
   color: #102d43;
-  font-size: 14px;
-  font-weight: 700;
+  font-size: 13.5px;
+  font-weight: 600;
   cursor: pointer;
-  padding: 8px 12px;
-  transition: color 0.15s ease;
+  padding: 7px 15px;
+  border-radius: 6px;
+  transition: all 0.15s ease;
 }
 
 .navbar-signin-btn:hover {
+  border-color: #94a3b8;
+  background: #f8fafc;
   color: #ea580c;
 }
 
@@ -127,22 +166,20 @@
   background: #102d43;
   color: #ffffff;
   border: none;
-  padding: 10px 20px;
-  border-radius: 999px;
+  padding: 8px 18px;
+  border-radius: 6px;
   font-size: 13.5px;
   font-weight: 700;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  box-shadow: 0 2px 8px rgba(16, 45, 67, 0.12);
   transition: all 0.2s ease;
 }
 
 .navbar-primary-btn:hover {
   background: #173b57;
   transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(16, 45, 67, 0.2);
 }
 
 .navbar-mobile-toggle {

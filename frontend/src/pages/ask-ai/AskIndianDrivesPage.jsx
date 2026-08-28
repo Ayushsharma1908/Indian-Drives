@@ -46,7 +46,7 @@ const FILTER_PILLS = [
 
 export function AskIndianDrivesPage() {
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { language, t } = useLanguage();
   const [searchParams] = useSearchParams();
   const { context } = useJourneyContext();
   const [input, setInput] = useState('');
@@ -54,6 +54,22 @@ export function AskIndianDrivesPage() {
   const [modalConfig, setModalConfig] = useState({ isOpen: false });
   const [streamingMessageId, setStreamingMessageId] = useState(null);
   const [selectedTag, setSelectedTag] = useState(null);
+
+  const localizedQuestions = [
+    { id: 1, icon: FileText, text: t('ask.q1', 'How do I apply for a Learner Licence?') },
+    { id: 2, icon: Folder, text: t('ask.q2', 'What documents do I need for an LL?') },
+    { id: 3, icon: Calendar, text: t('ask.q3', 'How can I book my driving test?') },
+    { id: 4, icon: CreditCard, text: t('ask.q4', 'How do I check my application status?') },
+    { id: 5, icon: Banknote, text: t('ask.q5', 'How much does a Driving Licence cost?') },
+    { id: 6, icon: ClipboardList, text: t('ask.q6', 'What should I bring to my driving test?') }
+  ];
+
+  const localizedFilterPills = [
+    t('ask.pillLL', 'LL'),
+    t('ask.pillDL', 'DL'),
+    t('ask.pillDocs', 'Documents'),
+    t('ask.pillTest', 'Driving Test')
+  ];
 
   const abortControllerRef = useRef(null);
   const messagesEndRef = useRef(null);
@@ -327,7 +343,7 @@ export function AskIndianDrivesPage() {
               e.currentTarget.style.color = '#476179';
             }}
           >
-            <RefreshCw size={13} /> New Chat
+            <RefreshCw size={13} /> {t('ask.newChat', 'New Chat')}
           </button>
         </div>
 
@@ -374,10 +390,10 @@ export function AskIndianDrivesPage() {
               </div>
               <div>
                 <h3 className="card-header" style={{ fontSize: '24px', fontWeight: 600, color: '#173b57', margin: '0 0 3px 0' }}>
-                  DriveSEVA Assistant
+                  {t('ask.assistantTitle', 'DriveSEVA Assistant')}
                 </h3>
                 <p className="status-pill" style={{ fontSize: '13px', color: '#476179', margin: 0, fontWeight: 500, borderRadius: '9999px' }}>
-                  Online • Ready to help
+                  {t('ask.onlineStatus', 'Online • Ready to help')}
                 </p>
               </div>
             </div>
@@ -385,10 +401,10 @@ export function AskIndianDrivesPage() {
             {/* SUGGESTED QUESTIONS */}
             <div>
               <div className="section-heading" style={{ fontSize: '24px', fontWeight: 600, letterSpacing: '0.5px', color: '#173b57', marginBottom: '12px', paddingLeft: '4px' }}>
-                SUGGESTED QUESTIONS
+                {t('ask.suggestedHeading', 'SUGGESTED QUESTIONS')}
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                {SUGGESTED_QUESTIONS.map((q) => {
+                {localizedQuestions.map((q) => {
                   const IconComp = q.icon;
                   return (
                     <button
@@ -557,7 +573,7 @@ export function AskIndianDrivesPage() {
 
             {/* FILTER TAGS BAR */}
             <div style={{ padding: '10px 24px', borderTop: '1px solid #f1f5f9', display: 'flex', gap: '8px', flexWrap: 'wrap', background: '#ffffff' }}>
-              {FILTER_PILLS.map((tag) => {
+              {localizedFilterPills.map((tag) => {
                 const isActive = selectedTag === tag;
                 return (
                   <button
@@ -621,7 +637,7 @@ export function AskIndianDrivesPage() {
                       handleSendMessage();
                     }
                   }}
-                  placeholder="Ask anything about driving licences..."
+                  placeholder={t('ask.inputPlaceholder', 'Ask anything about driving licences...')}
                   style={{
                     flex: 1,
                     padding: '10px 0',
@@ -651,7 +667,7 @@ export function AskIndianDrivesPage() {
                     justifyContent: 'center',
                     cursor: 'pointer'
                   }}
-                  title="Stop generating"
+                  title={t('ask.stopGenerating', 'Stop generating')}
                 >
                   <Square size={14} fill="#476179" />
                 </button>
@@ -683,7 +699,7 @@ export function AskIndianDrivesPage() {
 
             {/* DISCLAIMER SUBTEXT */}
             <div style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.6px', color: '#94a3b8', textAlign: 'center', padding: '6px 24px 14px 24px', textTransform: 'uppercase' }}>
-              AI ASSISTANT CAN MAKE MISTAKES. VERIFY IMPORTANT INFORMATION.
+              {t('ask.disclaimer', 'AI ASSISTANT CAN MAKE MISTAKES. VERIFY IMPORTANT INFORMATION.')}
             </div>
 
           </div>

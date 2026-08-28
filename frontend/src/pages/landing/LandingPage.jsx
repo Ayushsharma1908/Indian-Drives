@@ -176,13 +176,16 @@ export function LandingPage() {
           ───────────────────────────────────────────────────────────── */}
       <header className="premium-navbar">
         <div className="navbar-inner">
-          {/* Logo (Official Brand Asset) */}
+          {/* Logo & Brand Name (Official Brand Asset) */}
           <div className="brand-link" onClick={() => navigate('/')}>
             <img
               src="/indian-drives-logo.png"
               alt="Indian Drives"
               className="official-brand-logo"
             />
+            <span className="brand-text">
+              <span className="brand-navy">Indian</span> <span className="brand-orange">Drives</span>
+            </span>
           </div>
 
           {/* Navigation Links */}
@@ -212,7 +215,7 @@ export function LandingPage() {
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label="Toggle Navigation"
             >
-              {mobileMenuOpen ? <X size={22} /> : <span style={{ fontSize: '20px' }}>☰</span>}
+              {mobileMenuOpen ? <X size={20} /> : <span style={{ fontSize: '18px' }}>☰</span>}
             </button>
           </div>
         </div>
@@ -250,6 +253,10 @@ export function LandingPage() {
           
           {/* Main Headline & Supporting Copy */}
           <div className="hero-text-block">
+            <div className="hero-eyebrow-tag">
+              {t('landing.servicesEyebrow', 'DRIVING LICENCE SERVICES')}
+            </div>
+
             <h1 className="hero-headline">
               {t('landing.heroTitle', 'Your driving licence journey,')}<br />
               <span className="hero-highlight-orange">{t('landing.heroHighlight', 'simplified.')}</span>
@@ -541,7 +548,12 @@ export function LandingPage() {
       <footer className="premium-footer">
         <div className="premium-container footer-content-row">
           <div className="footer-left">
-            <img src="/indian-drives-logo.png" alt="Indian Drives" className="footer-logo-img" />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <img src="/indian-drives-logo.png" alt="Indian Drives" className="footer-logo-img" />
+              <span className="footer-brand-title">
+                <span className="brand-navy">INDIAN</span> <span className="brand-orange">DRIVES</span>
+              </span>
+            </div>
             <span className="footer-copyright">
               © {new Date().getFullYear()} {t('landing.footerRights', 'Indian Drives. All rights reserved.')}
             </span>

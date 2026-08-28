@@ -44,13 +44,13 @@ export function AppointmentsPage() {
         <div>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: 'var(--color-indigo)', fontSize: '11px', fontWeight: 800, letterSpacing: '1.2px', textTransform: 'uppercase', marginBottom: '6px' }}>
             <CalendarDays size={13} />
-            SLOT MANAGEMENT & TEST CENTRES
+            {t('appointments.eyebrow', 'SLOT MANAGEMENT & TEST CENTRES')}
           </div>
           <h1 style={{ color: 'var(--color-deep-navy)', fontSize: '36px', fontWeight: 700, margin: 0, letterSpacing: '-0.8px' }}>
-            {t('userFlow.appointmentsTitle')}
+            {t('appointments.title', 'Appointments & Test Bookings')}
           </h1>
           <p style={{ color: 'var(--color-text-secondary)', fontSize: '15px', margin: '6px 0 0 0' }}>
-            Manage your scheduled automated driving tests and view past RTO bookings.
+            {t('appointments.subtitle', 'Manage your scheduled automated driving tests and view past RTO bookings.')}
           </p>
         </div>
 
@@ -59,7 +59,7 @@ export function AppointmentsPage() {
           className="primary-button"
           style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', fontSize: '14px' }}
         >
-          <Plus size={16} /> Book Driving Test Slot
+          <Plus size={16} /> {t('appointments.bookSlotBtn', 'Book Driving Test Slot')}
         </button>
       </div>
 
@@ -69,14 +69,14 @@ export function AppointmentsPage() {
           style={{ padding: '7px 18px', fontSize: '13px' }}
           onClick={() => setTab('upcoming')}
         >
-          Upcoming ({upcomingList.length})
+          {t('appointments.upcomingTab', 'Upcoming')} ({upcomingList.length})
         </button>
         <button
           className={tab === 'past' ? 'primary-button' : 'secondary-button'}
           style={{ padding: '7px 18px', fontSize: '13px' }}
           onClick={() => setTab('past')}
         >
-          Past & History ({pastList.length})
+          {t('appointments.pastTab', 'Past & History')} ({pastList.length})
         </button>
         <button
           className={tab === 'all' ? 'primary-button' : 'secondary-button'}
