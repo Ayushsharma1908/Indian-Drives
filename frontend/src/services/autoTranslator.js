@@ -1244,6 +1244,29 @@ dictionary.gu = dictionary.gu || dictionary.hi;
 dictionary.ml = dictionary.ml || dictionary.hi;
 dictionary.pa = dictionary.pa || dictionary.hi;
 
+// Build reverse dictionary mapping all translated texts in all languages back to English
+const reverseDictionary = {};
+Object.entries(dictionary).forEach(([lang, dict]) => {
+  if (lang === 'en' || !dict) return;
+  Object.entries(dict).forEach(([enKey, transVal]) => {
+    if (typeof transVal === 'string' && typeof enKey === 'string') {
+      const cleanTrans = transVal.trim();
+      const cleanEn = enKey.trim();
+      if (cleanTrans && cleanEn && cleanTrans !== cleanEn) {
+        reverseDictionary[cleanTrans] = cleanEn;
+      }
+    }
+  });
+});
+
+let sortedReverseKeys = null;
+function getSortedReverseKeys() {
+  if (!sortedReverseKeys) {
+    sortedReverseKeys = Object.entries(reverseDictionary).sort((a, b) => b[0].length - a[0].length);
+  }
+  return sortedReverseKeys;
+}
+
 // Sorted key cache by descending length to guarantee multi-word phrases match before single words
 const sortedKeyCache = {};
 
@@ -1260,27 +1283,57 @@ export function translateText(text, targetLang) {
   if (!text || typeof text !== 'string') return text;
   const trimmed = text.trim();
   if (!trimmed) return text;
-  if (targetLang === 'en') return text;
 
+  // 1. Translating back to ENGLISH (Restore original English for all translated terms)
+  if (targetLang === 'en') {
+    if (reverseDictionary[trimmed]) {
+      return text.replace(trimmed, reverseDictionary[trimmed]);
+    }
+    const revEntries = getSortedReverseKeys();
+    let res = text;
+    for (const [transVal, enKey] of revEntries) {
+      if (transVal.length >= 2 && res.includes(transVal)) {
+        res = res.split(transVal).join(enKey);
+      }
+    }
+    return res;
+  }
+
+  // 2. Translating English -> Target Language
   const langDict = dictionary[targetLang] || dictionary.hi;
   if (!langDict) return text;
 
-  // 1. Direct exact match
-  if (langDict[trimmed]) {
-    return text.replace(trimmed, langDict[trimmed]);
-  }
-
-  // 2. Case-insensitive exact match
-  const lower = trimmed.toLowerCase();
-  for (const [enKey, transVal] of Object.entries(langDict)) {
-    if (enKey.toLowerCase() === lower) {
-      return text.replace(trimmed, transVal);
+  // First convert to English baseline if text was already in another Indian script
+  let enBaseline = text;
+  if (reverseDictionary[trimmed]) {
+    enBaseline = text.replace(trimmed, reverseDictionary[trimmed]);
+  } else {
+    const revEntries = getSortedReverseKeys();
+    for (const [transVal, enKey] of revEntries) {
+      if (transVal.length >= 2 && enBaseline.includes(transVal)) {
+        enBaseline = enBaseline.split(transVal).join(enKey);
+      }
     }
   }
 
-  // 3. Substring / phrase substitution sorted by longest key first
+  const enTrimmed = enBaseline.trim();
+
+  // Direct exact match
+  if (langDict[enTrimmed]) {
+    return enBaseline.replace(enTrimmed, langDict[enTrimmed]);
+  }
+
+  // Case-insensitive exact match
+  const lower = enTrimmed.toLowerCase();
+  for (const [enKey, transVal] of Object.entries(langDict)) {
+    if (enKey.toLowerCase() === lower) {
+      return enBaseline.replace(enTrimmed, transVal);
+    }
+  }
+
+  // Substring / phrase substitution sorted by longest key first
   const sortedEntries = getSortedKeys(targetLang);
-  let result = text;
+  let result = enBaseline;
   for (const [enKey, transVal] of sortedEntries) {
     if (enKey.length >= 2 && result.includes(enKey)) {
       result = result.split(enKey).join(transVal);
@@ -1323,19 +1376,15 @@ export function applyDOMTranslation(rootElement, targetLang) {
 
   let currentNode = walker.nextNode();
   while (currentNode) {
-    let original = originalTextMap.get(currentNode);
-    if (!original) {
-      original = currentNode.nodeValue;
-      originalTextMap.set(currentNode, original);
-    }
-
+    const currentVal = currentNode.nodeValue;
     if (isEnglish) {
-      if (currentNode.nodeValue !== original) {
-        currentNode.nodeValue = original;
+      const enVal = translateText(currentVal, 'en');
+      if (enVal !== currentVal) {
+        currentNode.nodeValue = enVal;
       }
     } else if (langDict) {
-      const translated = translateText(original, targetLang);
-      if (translated !== original && currentNode.nodeValue !== translated) {
+      const translated = translateText(currentVal, targetLang);
+      if (translated !== currentVal) {
         currentNode.nodeValue = translated;
       }
     }
@@ -1346,34 +1395,34 @@ export function applyDOMTranslation(rootElement, targetLang) {
   // Also translate input placeholders
   const inputs = rootElement.querySelectorAll('input[placeholder], textarea[placeholder]');
   inputs.forEach((input) => {
-    let originalPlaceholder = input.getAttribute('data-orig-placeholder');
-    if (!originalPlaceholder) {
-      originalPlaceholder = input.getAttribute('placeholder') || '';
-      input.setAttribute('data-orig-placeholder', originalPlaceholder);
-    }
-
+    const currentPlaceholder = input.getAttribute('placeholder') || '';
     if (isEnglish) {
-      input.setAttribute('placeholder', originalPlaceholder);
+      const enPlaceholder = translateText(currentPlaceholder, 'en');
+      if (enPlaceholder !== currentPlaceholder) {
+        input.setAttribute('placeholder', enPlaceholder);
+      }
     } else if (langDict) {
-      const translated = translateText(originalPlaceholder, targetLang);
-      input.setAttribute('placeholder', translated);
+      const translated = translateText(currentPlaceholder, targetLang);
+      if (translated !== currentPlaceholder) {
+        input.setAttribute('placeholder', translated);
+      }
     }
   });
 
   // Also translate button title attributes
   const titledButtons = rootElement.querySelectorAll('button[title]');
   titledButtons.forEach((btn) => {
-    let originalTitle = btn.getAttribute('data-orig-title');
-    if (!originalTitle) {
-      originalTitle = btn.getAttribute('title') || '';
-      btn.setAttribute('data-orig-title', originalTitle);
-    }
-
+    const currentTitle = btn.getAttribute('title') || '';
     if (isEnglish) {
-      btn.setAttribute('title', originalTitle);
+      const enTitle = translateText(currentTitle, 'en');
+      if (enTitle !== currentTitle) {
+        btn.setAttribute('title', enTitle);
+      }
     } else if (langDict) {
-      const translated = translateText(originalTitle, targetLang);
-      btn.setAttribute('title', translated);
+      const translated = translateText(currentTitle, targetLang);
+      if (translated !== currentTitle) {
+        btn.setAttribute('title', translated);
+      }
     }
   });
 }
