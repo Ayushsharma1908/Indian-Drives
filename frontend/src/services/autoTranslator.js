@@ -1,7 +1,7 @@
 // autoTranslator.js - Universal Real-Time DOM Translation Engine for Indian Drives
 // Seamlessly localizes 100% of text nodes, buttons, inputs, badges, placeholders, and labels across all pages.
 
-const originalTextMap = new WeakMap();
+import { translations } from '../data/translations.js';
 
 export const dictionary = {
   // ─────────────────────────────────────────────────────────────
@@ -1246,6 +1246,44 @@ dictionary.pa = dictionary.pa || dictionary.hi;
 
 // Build reverse dictionary mapping all translated texts in all languages back to English
 const reverseDictionary = {};
+
+// Helper to recursively ingest structured translation locale objects
+function ingestLocaleTree(enNode, targetNode, langCode) {
+  if (!enNode || !targetNode || typeof enNode !== 'object' || typeof targetNode !== 'object') return;
+  if (!dictionary[langCode]) dictionary[langCode] = {};
+
+  for (const key of Object.keys(enNode)) {
+    const enVal = enNode[key];
+    const targetVal = targetNode[key];
+    if (typeof enVal === 'string' && typeof targetVal === 'string') {
+      const cleanEn = enVal.trim();
+      const cleanTarget = targetVal.trim();
+      if (cleanEn && cleanTarget && cleanEn !== cleanTarget) {
+        if (!dictionary[langCode][cleanEn]) {
+          dictionary[langCode][cleanEn] = cleanTarget;
+        }
+        reverseDictionary[cleanTarget] = cleanEn;
+      }
+    } else if (typeof enVal === 'object' && typeof targetVal === 'object' && enVal !== null && targetVal !== null) {
+      ingestLocaleTree(enVal, targetVal, langCode);
+    }
+  }
+}
+
+// Ingest structured locale objects from translations
+try {
+  if (translations && translations.en) {
+    Object.keys(translations).forEach((langCode) => {
+      if (langCode !== 'en' && translations[langCode]) {
+        ingestLocaleTree(translations.en, translations[langCode], langCode);
+      }
+    });
+  }
+} catch (e) {
+  console.warn('Could not ingest structured translations:', e);
+}
+
+// Ingest flat dictionary entries
 Object.entries(dictionary).forEach(([lang, dict]) => {
   if (lang === 'en' || !dict) return;
   Object.entries(dict).forEach(([enKey, transVal]) => {
