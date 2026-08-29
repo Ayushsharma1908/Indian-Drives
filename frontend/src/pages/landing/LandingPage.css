@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .premium-landing-root {
-  background: #ffffff;
+  background: #ffffff !important;
   color: #102d43;
   font-family: 'Hanken Grotesk', 'Inter', system-ui, -apple-system, sans-serif;
   min-height: 100vh;
